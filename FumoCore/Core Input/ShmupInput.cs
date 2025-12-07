@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FumoCore.Input
+namespace RinCore
 {
     [DefaultExecutionOrder(-100)]
     public class ShmupInput : MonoBehaviour

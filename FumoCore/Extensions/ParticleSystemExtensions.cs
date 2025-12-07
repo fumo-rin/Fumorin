@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Loot Particle
 

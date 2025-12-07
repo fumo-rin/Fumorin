@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     public class CreditsLoader : MonoBehaviour
     {

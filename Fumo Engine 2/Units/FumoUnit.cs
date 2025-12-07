@@ -1,10 +1,10 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Fumorin.Units
+namespace RinCore.Units
 {
     #region Unit Movers
     public enum MoveResult

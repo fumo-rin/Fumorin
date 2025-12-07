@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     // --- Attribute for static fields ---
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]

@@ -1,8 +1,8 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     [CreateAssetMenu(menuName = "Bremsengine/Music Room Tracklist")]
     public class MusicRoomTracklist : ScriptableObject

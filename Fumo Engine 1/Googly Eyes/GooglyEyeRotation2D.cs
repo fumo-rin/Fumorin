@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class GooglyEyeRotation2D : MonoBehaviour
     {

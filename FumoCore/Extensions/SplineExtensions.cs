@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Mathematics;
 using UnityEngine.Splines;
-namespace FumoCore.Tools
+namespace RinCore
 {
     [System.Serializable]
     public class SplinePathSettings

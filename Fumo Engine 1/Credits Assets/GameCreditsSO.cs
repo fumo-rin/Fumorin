@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using FumoCore.Tools;
+using RinCore;
 using UnityEditor;
-namespace Fumorin
+namespace RinCore
 {
 #if UNITY_EDITOR
     public partial class GameCreditsSO

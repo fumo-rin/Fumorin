@@ -1,10 +1,10 @@
-using FumoCore.Tools;
+using RinCore;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.Composites;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     [RequireComponent(typeof(Button))]
     public class RenderTextureDetailButton : MonoBehaviour

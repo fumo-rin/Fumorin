@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class Helper
     {

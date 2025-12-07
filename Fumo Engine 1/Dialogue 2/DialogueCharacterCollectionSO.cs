@@ -1,8 +1,8 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     [CreateAssetMenu(fileName = "New Dialogue Characters", menuName = "Eientei/Dialogue 2/Character Lookup")]
     public class DialogueCharacterCollectionSO : ScriptableObject

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [CreateAssetMenu(fileName = "Scene String", menuName = "Core/Scriptable Helpers/Scene String")]
     public class SceneStringSO : ScriptableObject

@@ -5,7 +5,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [AttributeUsage(AttributeTargets.All, Inherited = true)]
     public class NYIAttribute : Attribute

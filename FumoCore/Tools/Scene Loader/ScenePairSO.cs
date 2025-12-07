@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [CreateAssetMenu(menuName = "Fumorin/Scene Pair")]
     public class ScenePairSO : ScriptableObject

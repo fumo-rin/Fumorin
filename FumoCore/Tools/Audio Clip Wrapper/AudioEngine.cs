@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Single Channel
     public static partial class AudioEngine
@@ -17,7 +17,7 @@ namespace FumoCore.Tools
             {
                 source = singleChannels[a] = RequestChannel(a.ToString());
                 source.outputAudioMixerGroup = SingleChannelsMixer;
-               }
+            }
             else
             {
                 source = singleChannels[a];
@@ -156,9 +156,9 @@ namespace FumoCore.Tools
                     }
                 }
             }
-            AddressablesTools.LoadKeys<AudioMixerGroup>(DynamicChannelsKey, DynamicsSetup);
-            AddressablesTools.LoadKeys<AudioMixerGroup>(SingleChannelsKey, SingleChannelsSetup);
-            AddressablesTools.LoadKeys<GameObject>(AudioEngineAddressableKey, SetupSources);
+            RinCore.AddressablesTools.LoadKeys<AudioMixerGroup>(DynamicChannelsKey, DynamicsSetup);
+            RinCore.AddressablesTools.LoadKeys<AudioMixerGroup>(SingleChannelsKey, SingleChannelsSetup);
+            RinCore.AddressablesTools.LoadKeys<GameObject>(AudioEngineAddressableKey, SetupSources);
         }
     }
 }

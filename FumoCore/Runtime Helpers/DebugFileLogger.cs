@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class DebugFileLogger
     {

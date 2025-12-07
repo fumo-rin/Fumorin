@@ -1,8 +1,8 @@
-using FumoCore.Tools;
+using RinCore;
 using QFSW.QC;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class RenderTextureDetail : MonoBehaviour
     {

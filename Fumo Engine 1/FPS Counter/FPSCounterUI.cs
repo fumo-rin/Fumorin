@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
-using FumoCore.Tools;
+using RinCore;
 
-namespace Fumorin
+namespace RinCore
 {
     public class FPSCounterUI : MonoBehaviour
     {

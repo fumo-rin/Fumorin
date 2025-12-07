@@ -6,11 +6,11 @@ using Unity.Services.Leaderboards;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Services.Authentication;
-using FumoCore.Tools;
+using RinCore;
 using Unity.Services.Core;
-using FumoCore.UGS;
+using RinCore.UGS;
 
-namespace Fumorin
+namespace RinCore
 {
     #region UI Controls
     public partial class FumoLeaderboard

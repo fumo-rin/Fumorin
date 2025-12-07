@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
 #if UNITY_EDITOR
     public static partial class FCEHelper

@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Fumorin
+namespace RinCore
 {
     public class MusicRoom : MonoBehaviour
     {

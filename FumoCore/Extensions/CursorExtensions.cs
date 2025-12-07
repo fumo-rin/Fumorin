@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using FumoCore.Input;
+using RinCore;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class CursorHelper
     {

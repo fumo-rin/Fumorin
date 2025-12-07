@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     [CreateAssetMenu(fileName ="New Character", menuName = "Eientei/Dialogue 2/Character")]
     public class DialogueCharacterSO : ScriptableObject

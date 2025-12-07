@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 #endif
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [System.Serializable]
     public class SceneReference
@@ -46,7 +46,7 @@ namespace FumoCore.Tools
 
 #if UNITY_EDITOR
 
-    [CustomPropertyDrawer(typeof(FumoCore.Tools.SceneReference))]
+    [CustomPropertyDrawer(typeof(RinCore.SceneReference))]
     public class SceneReferenceDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

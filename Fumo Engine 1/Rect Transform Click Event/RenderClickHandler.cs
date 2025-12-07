@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Render Texture Click
     public partial class RenderClickHandler : IPointerDownHandler

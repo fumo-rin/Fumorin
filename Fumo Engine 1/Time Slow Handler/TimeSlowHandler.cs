@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Singleton & Setup
     public partial class TimeSlowHandler : MonoBehaviour

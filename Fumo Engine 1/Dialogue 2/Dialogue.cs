@@ -1,6 +1,6 @@
-using Fumorin;
-using FumoCore.Tools;
-using FumoCore.Input;
+using RinCore;
+using RinCore;
+using RinCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Dialogue Part & Collection
     public partial class Dialogue

@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
 #if UNITY_EDITOR
     public class CreditsEditor : EditorWindow

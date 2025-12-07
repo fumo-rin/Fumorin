@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [RequireComponent(typeof(UnityEngine.UI.Selectable))]
     public class PreventEventSystemUnselect : MonoBehaviour

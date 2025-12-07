@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Drawline
     public static partial class Helper // Draw Line

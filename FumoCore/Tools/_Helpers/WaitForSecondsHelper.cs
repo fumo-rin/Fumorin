@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     static partial class Helper
     {

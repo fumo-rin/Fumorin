@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FumoCore.Input
+namespace RinCore
 {
     public static class GenericInputExtensions
     {

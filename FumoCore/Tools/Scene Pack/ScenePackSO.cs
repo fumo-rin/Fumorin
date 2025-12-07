@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 

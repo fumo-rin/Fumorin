@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Fumorin.Units
+namespace RinCore.Units
 {
     [System.Serializable]
     public abstract class UnitAction

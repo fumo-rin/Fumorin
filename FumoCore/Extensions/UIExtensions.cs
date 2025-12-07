@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class SliderExtensions
     {

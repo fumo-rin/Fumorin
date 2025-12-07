@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Fumorin
+namespace RinCore
 {
     public class VolumeSettingsFetcher : MonoBehaviour
     {

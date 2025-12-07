@@ -8,7 +8,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class VersionManager
     {

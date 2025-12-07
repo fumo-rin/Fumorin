@@ -1,9 +1,9 @@
-﻿using FumoCore.Tools;
+﻿using RinCore;
 using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Editor Script
 #if UNITY_EDITOR

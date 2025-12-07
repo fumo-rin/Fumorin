@@ -1,4 +1,4 @@
-namespace FumoCore.Tools
+namespace RinCore
 {
     using System;
     using UnityEngine;

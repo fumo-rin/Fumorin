@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-namespace Fumorin
+namespace RinCore
 {
     public class GlobalCoroutineRunner : MonoBehaviour
     {

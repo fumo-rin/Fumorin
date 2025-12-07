@@ -1,7 +1,7 @@
-using FumoCore.Tools;
+using RinCore;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class UnitDamageScaler : MonoBehaviour
     {

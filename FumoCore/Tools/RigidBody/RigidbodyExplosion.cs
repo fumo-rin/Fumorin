@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region 2D
     public static partial class RigidbodyExplosion

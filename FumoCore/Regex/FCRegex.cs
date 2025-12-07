@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class FCRegex
     {

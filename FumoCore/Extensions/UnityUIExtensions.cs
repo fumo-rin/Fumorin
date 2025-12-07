@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class UnityUIExtensions
     {

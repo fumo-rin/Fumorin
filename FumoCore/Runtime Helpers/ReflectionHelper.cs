@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class FCHelper
     {

@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 
-namespace Fumorin
+namespace RinCore
 {
     public class RagdollArm2D : MonoBehaviour
     {

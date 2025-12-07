@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class IntExtensions
     {

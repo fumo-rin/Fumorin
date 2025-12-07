@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     public class VolumeSliders : MonoBehaviour
     {

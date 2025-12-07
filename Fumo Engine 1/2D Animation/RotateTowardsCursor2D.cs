@@ -1,10 +1,10 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FumoCore.Input;
+using RinCore;
 
-namespace Fumorin
+namespace RinCore
 {
     public class RotateTowardsCursor2D : MonoBehaviour
     {

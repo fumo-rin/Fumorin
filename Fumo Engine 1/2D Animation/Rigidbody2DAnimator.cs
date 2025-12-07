@@ -1,10 +1,10 @@
-using FumoCore.Tools;
-using FumoCore.Input;
+using RinCore;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class Rigidbody2DAnimator : MonoBehaviour
     {

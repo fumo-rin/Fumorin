@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FumoCore
+namespace RinCore
 {
     public static class RaycastHelper
     {

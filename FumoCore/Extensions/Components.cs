@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class Components
     {

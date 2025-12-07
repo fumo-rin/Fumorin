@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     [RequireComponent(typeof(Toggle))]
     public class FumoSettingsButtonBool : MonoBehaviour

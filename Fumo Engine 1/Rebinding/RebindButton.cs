@@ -1,11 +1,11 @@
-using FumoCore.Input;
+using RinCore;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     public class RebindButton : MonoBehaviour
     {

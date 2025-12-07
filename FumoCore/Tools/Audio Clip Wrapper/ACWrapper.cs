@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Static Extension
     public static partial class ACWrapperExtensions
@@ -20,7 +20,7 @@ namespace FumoCore.Tools
     #region Audio clip Button
 
 #if UNITY_EDITOR
-    public class AudioClipTools
+    public partial class AudioClipMenuEntry
     {
         [MenuItem("Assets/Create AC Wrapper from AudioClip", true)]
         private static bool ValidateCreateACWrapper()

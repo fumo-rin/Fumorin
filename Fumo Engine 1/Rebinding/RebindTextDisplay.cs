@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Fumorin
+namespace RinCore
 {
     [RequireComponent(typeof(TMP_Text))]
     public class RebindTextDisplay : MonoBehaviour

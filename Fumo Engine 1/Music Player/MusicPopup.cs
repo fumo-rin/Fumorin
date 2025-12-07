@@ -1,10 +1,10 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class MusicPopup : MonoBehaviour
     {

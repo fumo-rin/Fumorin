@@ -1,17 +1,17 @@
-using FumoCore.Tools;
+using RinCore;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
 
 
-namespace Fumorin
+namespace RinCore
 {
     #region Music Clip Create
     using UnityEditor;
     using System.IO;
 
 #if UNITY_EDITOR
-    public class AudioClipTools
+    public class MusicClipMenuEntry
     {
         [MenuItem("Assets/Create Music Wrapper From AudioClip", true)]
         private static bool ValidateAudioClip()

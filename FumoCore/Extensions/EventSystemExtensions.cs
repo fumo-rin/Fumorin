@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class Helper
     {

@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Create Array
     public static partial class FCHelper

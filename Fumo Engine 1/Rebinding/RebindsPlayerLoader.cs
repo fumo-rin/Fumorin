@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-namespace Fumorin
+namespace RinCore
 {
     public class RebindsLoader : MonoBehaviour
     {

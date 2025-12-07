@@ -1,8 +1,8 @@
 using TMPro;
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 
-namespace Fumorin
+namespace RinCore
 {
     public class FumoLeaderboardEntry : MonoBehaviour
     {

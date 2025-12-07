@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Attack Tick
     public partial class TickManager

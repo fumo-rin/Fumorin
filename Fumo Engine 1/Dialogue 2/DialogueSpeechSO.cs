@@ -1,9 +1,9 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Fumorin
+namespace RinCore
 {
 #if UNITY_EDITOR
     [CustomEditor(typeof(DialogueSpeechSO))]

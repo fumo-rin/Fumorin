@@ -1,5 +1,5 @@
-using FumoCore.Tools;
-using FumoCore.Input;
+using RinCore;
+using RinCore;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 using System;
 using UnityEditor;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Funny Explosion
     public partial class GeneralManager

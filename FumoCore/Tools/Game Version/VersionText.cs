@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [RequireComponent(typeof(TMP_Text))]
     public class VersionText : MonoBehaviour

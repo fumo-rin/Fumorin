@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class SpriteMaterialQueue : MonoBehaviour
     {

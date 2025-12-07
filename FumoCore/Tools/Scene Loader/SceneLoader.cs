@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public class SceneLoader : MonoBehaviour
     {

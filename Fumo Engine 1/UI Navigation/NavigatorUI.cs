@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using FumoCore.Tools;
+using RinCore;
 using UnityEngine.EventSystems;
 
-namespace Fumorin
+namespace RinCore
 {
     public class NavigatorUI : MonoBehaviour
     {

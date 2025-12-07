@@ -2,11 +2,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
-using FumoCore.Input;
+using RinCore;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Fumorin
+namespace RinCore
 {
     [DefaultExecutionOrder(1)]
     public class RebindHandler : MonoBehaviour

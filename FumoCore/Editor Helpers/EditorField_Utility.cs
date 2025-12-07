@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     #region Class Drawer
 #if UNITY_EDITOR

@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [CreateAssetMenu(menuName = "Splines/Bremse Spline SO", fileName = "Spline SO")]
     public class SplineSO : ScriptableObject

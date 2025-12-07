@@ -3,7 +3,7 @@ using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditorInternal;
 #endif
-namespace FumoCore.Tools
+namespace RinCore
 {
     public class SortingLayerAttribute : PropertyAttribute
     {

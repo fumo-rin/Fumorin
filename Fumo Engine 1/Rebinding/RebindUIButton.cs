@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Fumorin
+namespace RinCore
 {
     [RequireComponent(typeof(Button))]
     public class RebindUIButton : MonoBehaviour

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public class StageMusic : MonoBehaviour
     {

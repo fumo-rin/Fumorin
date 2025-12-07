@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     [RequireComponent(typeof(Camera))]
     public class RenderTextureDetailCamera : MonoBehaviour

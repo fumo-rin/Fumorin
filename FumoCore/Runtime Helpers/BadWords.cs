@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static partial class BadWords
     {

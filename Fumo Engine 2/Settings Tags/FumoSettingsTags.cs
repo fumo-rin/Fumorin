@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
     public static class FumoSettingsTags
     {
@@ -27,7 +27,7 @@ namespace Fumorin
         static List<SettingTagBool> boolSettings = new();
         static Dictionary<string, bool> boolSettingsCache = new();
         static bool initialized = false;
-        [FumoCore.Tools.Initialize(-99999)]
+        [RinCore.Initialize(-99999)]
         private static void ResetFetch()
         {
             initialized = false;

@@ -1,10 +1,10 @@
-using FumoCore.Input;
+using RinCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [DefaultExecutionOrder(-5555)]
     public class FumoUISoundManager : MonoBehaviour

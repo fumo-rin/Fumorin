@@ -60,7 +60,7 @@ public static class AudioUtils
     }
 }
 #endif
-namespace FumoCore.Tools
+namespace RinCore
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]

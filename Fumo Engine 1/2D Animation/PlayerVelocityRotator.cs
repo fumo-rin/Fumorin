@@ -1,9 +1,7 @@
-using FumoCore.Tools;
-using FumoCore.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Fumorin
+namespace RinCore
 {
     public class PlayerVelocityRotator : MonoBehaviour
     {

@@ -8,7 +8,7 @@ using System;
 using UnityEngine.AddressableAssets;
 using System.Security.Cryptography;
 
-namespace FumoCore
+namespace RinCore
 {
     public static class AddressablesTools
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
 #if UNITY_EDITOR
     using UnityEditor;

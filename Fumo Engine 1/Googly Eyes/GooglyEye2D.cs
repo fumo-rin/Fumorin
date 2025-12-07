@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 using UnityEditor;
 
-namespace Fumorin
+namespace RinCore
 {
     public class GooglyEye2D : MonoBehaviour
     {

@@ -1,10 +1,10 @@
-using FumoCore.Tools;
+using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Fumorin
+namespace RinCore
 {
 #if UNITY_EDITOR
     public partial class CreditsSO

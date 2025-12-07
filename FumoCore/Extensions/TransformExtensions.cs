@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class GameObjectExtensions
     {

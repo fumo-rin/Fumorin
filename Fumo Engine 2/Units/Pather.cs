@@ -1,11 +1,11 @@
 using UnityEngine;
-using FumoCore.Tools;
+using RinCore;
 using Pathfinding;
 using Pathfinding.RVO;
 using System;
 using System.Collections;
 
-namespace Fumorin.Units
+namespace RinCore.Units
 {
     public class PathBuilder
     {

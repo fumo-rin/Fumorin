@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class CinemachineExtensions
     {

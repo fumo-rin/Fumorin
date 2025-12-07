@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fumorin.Assets.Bremsengine.Sprite
+namespace RinCore.Assets.Bremsengine.Sprite
 {
     public class SpriteColorSetter : MonoBehaviour
     {

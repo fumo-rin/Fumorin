@@ -4,9 +4,9 @@ using System.Linq;
 using UnityEngine;
 using System.Reflection;
 
-namespace Fumorin
+namespace RinCore
 {
-    using FumoCore.Tools;
+    using RinCore;
     #region Validator
     using System.IO;
     using UnityEditor;
@@ -31,7 +31,7 @@ namespace Fumorin
                 {
                     foreach (var item in commands)
                     {
-                        if (!Fumorin.ShmupCommands.HasCommand(item))
+                        if (!RinCore.ShmupCommands.HasCommand(item))
                         {
                             Debug.LogError($"Invalid command '{item}' in asset: {path}", asset);
                             if (asset != null && asset.dialogueTextFile) asset.dialogueTextFile.EditorPing();

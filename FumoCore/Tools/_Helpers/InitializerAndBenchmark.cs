@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class Initialize : Attribute

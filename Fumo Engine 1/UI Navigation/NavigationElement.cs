@@ -1,8 +1,8 @@
-using FumoCore.Tools;
+using RinCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Fumorin
+namespace RinCore
 {
     [DefaultExecutionOrder(100)]
     public class NavigationElement : MonoBehaviour, IDeselectHandler

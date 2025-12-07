@@ -1,11 +1,11 @@
-﻿using FumoCore.Tools;
+﻿using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Fumorin
+namespace RinCore
 {
     #region Play Mode
     public partial class MusicPlayer

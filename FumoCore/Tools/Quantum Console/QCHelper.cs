@@ -4,7 +4,7 @@ using UnityEngine;
 using QFSW.QC;
 using System;
 
-namespace FumoCore.Tools
+namespace RinCore
 {
     public static class QCHelper
     {

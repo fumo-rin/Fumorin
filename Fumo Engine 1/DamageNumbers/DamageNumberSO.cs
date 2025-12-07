@@ -5,8 +5,8 @@ using Unity.Mathematics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine.UIElements;
 using System.Globalization;
-using FumoCore.Tools;
-namespace Fumorin
+using RinCore;
+namespace RinCore
 {
     public class DamageNumberWrapper
     {
