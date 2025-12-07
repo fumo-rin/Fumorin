@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Audio Handler
+  m_EditorClassIdentifier: 
+  m_GroupName: Audio Handler
+  m_GUID: 5f5029334c878af48af7b1f941f26a79
+  m_SerializeEntries:
+  - m_GUID: 0d38c0719d3b9824f8b6fa4fed5f161e
+    m_Address: Packages/com.fumorin.tools/FumoCore/Tools/Audio Clip Wrapper/Addressable/2D
+      Audio Channel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Audio Engine
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d90163c4095a0a4283cc9766c8294e4
+    m_Address: Packages/com.fumorin.tools/FumoCore/Tools/Audio Clip Wrapper/Single
+      Channels.mixer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Single Channels
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2dceb49b28515464b8f65118788082ba
+    m_Address: Packages/com.fumorin.tools/FumoCore/Tools/Audio Clip Wrapper/Dynamic
+      Channels.mixer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Dynamic Channels
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f897197c2246dcd48bb3804024512c6b
+    m_Address: Packages/com.fumorin.tools/FumoCore/Tools/Audio Clip Wrapper/Addressable/3D
+      Audio Channel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Audio Engine
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 0259b81d29ccf6b4abd1d86ed40cbae0, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 667c578be4eaff7488bd4853fb460c7e, type: 2}
+    - {fileID: 11400000, guid: 403948191309f7f4b948be60e76baa00, type: 2}

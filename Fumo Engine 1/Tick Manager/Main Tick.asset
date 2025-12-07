@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90252a6eb170c2e43adb15b74b359f61, type: 3}
+  m_Script: {fileID: 11500000, guid: 43733206795362f44b917b2dd160a38d, type: 3}
   m_Name: Main Tick
   m_EditorClassIdentifier: 
-  value: 0.01666667
+  value: 0.05

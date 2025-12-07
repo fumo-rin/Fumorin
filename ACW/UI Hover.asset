@@ -9,18 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfdfd9a38256f704aaef3b6b2de7b90a, type: 3}
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
   m_Name: UI Hover
   m_EditorClassIdentifier: 
-  SoundName: UI HOVER
-  soundVolume: 0.394
-  audioMixerOverride: {fileID: -1549346045928506887, guid: f763467f695c0874491fef7ea22af191, type: 2}
+  SoundName: UI Hover
+  soundVolume: 0.7
+  audioMixerOverride: {fileID: -1549346045928506887, guid: 2d90163c4095a0a4283cc9766c8294e4, type: 2}
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: 7d753394eac8af6489c998fdd0039c44, type: 3}
-    PitchVariancePercent: 11.3
-    PitchOrigin: 3.86
-    Volume: 0.531
+  - clip: {fileID: 8300000, guid: 6ffe2c44517135f42b2a2267f7a60fa2, type: 3}
+    PitchVariancePercent: 3.1
+    PitchOrigin: 1
+    Volume: 0.529
     Muted: 0
   <singleChannel>k__BackingField: 1
-  <singleRepeatLockoutTime>k__BackingField: 0.02
+  <singleRepeatLockoutTime>k__BackingField: 0.008333334
   <Is3D>k__BackingField: 0

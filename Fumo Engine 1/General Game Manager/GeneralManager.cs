@@ -157,7 +157,7 @@ namespace RinCore
             }
             return sum;
         }
-        private static Dictionary<string, double> ScoreBreakdownAnalysis;
+        private static Dictionary<string, double> ScoreBreakdownAnalysis = new();
         [SerializeField] bool breakDownScore = false;
         public static double actualScore;
         public static double addedExtraScore;
@@ -330,6 +330,11 @@ namespace RinCore
         {
             StartInstance();
         }
+        [Initialize(-99959595)]
+        private static void ClearInstance()
+        {
+            Instance = null;
+        }
         [QFSW.QC.Command("FPS")]
         private static void SetFPS(int fps)
         {
@@ -369,6 +374,7 @@ namespace RinCore
         }
         private void StartInstance()
         {
+            Debug.Log(Instance);
             if (Instance != null)
             {
                 Destroy(gameObject);
