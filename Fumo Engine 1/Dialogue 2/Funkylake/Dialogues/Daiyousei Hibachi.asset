@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Daiyousei Hibachi
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: 41655bfbdc7e0b44faec2e7f0865ab10, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: It's over. You are too late.
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: Dai-chan! We are on an important mission!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Yes! A mission to drop uranium rods in the lake!
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: But you see... I've already dropped uranium rods in this
+        here lake!
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: '!'
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: '!'
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Since you are here, i will take the rods from you!
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: And also drop them in the lake!
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: It is OUR mission! It's very important!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Perhaps we will throw you in the lake as well!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: The lake is not big enough for the both of us.
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: Begone, but leave your uranium rods.
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: We can't do that. Our grand plan is very important.
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: The grand plan!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Then you leave me no choice.
+      CharacterName: Daiyousei
+      Command: 
+    - ContainedMessage: Raise your fists, and get ready for a beating!
+      CharacterName: Daiyousei
+      Command: 

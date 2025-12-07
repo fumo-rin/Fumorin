@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Tewi Generate
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: 46ef22fd43c542644bc26be6c6ddde20, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: Lmao
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Bruh
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Bee movie script
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: According to all known laws of aviation, there is no way
+        a bee should be able to fly.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Its wings are too small to get its fat little body off the
+        ground.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: The bee, of course, flies anyway because bees don't care
+        what humans think is impossible.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Yellow, black. Yellow, black. Yellow, black. Yellow, black.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Ooh, black and yellow!
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Let's shake it up a little.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Barry! Breakfast is ready!
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Coming!
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Hang on a second.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Hello?
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Barry?
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Adam?
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Can you believe this is happening?
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: I can't.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: I'll pick you up.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Looking sharp.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Use the stairs, Your father paid good money for those.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Sorry. I'm excited.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Here's the graduate.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: We're very proud of you, son.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: A perfect report card, all B's.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Very proud.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Ma! I got a thing going here.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: You got lint on your fuzz.
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Ow! That's me!
+      CharacterName: Tewi
+      Command: 
+    - ContainedMessage: Wave to us! We'll be in row 118,000.
+      CharacterName: Tewi
+      Command: 

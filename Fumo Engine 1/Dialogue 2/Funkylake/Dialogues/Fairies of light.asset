@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Fairies of light
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: 68f152a416d717340a04f08d1e6bfa3d, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: Finally! A nice place to drop the uranium rods!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: What are you doing!
+      CharacterName: Sunny Milk
+      Command: 
+    - ContainedMessage: We're dropping uranium rods in the lake! It is very important!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: STOP TALKING ABOUT THE PLAN!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: ... We are dropping uranium rods in the lake... It is very
+        important! It is our grand plan!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: The grand plan!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: That plan is grand!
+      CharacterName: Luna Child
+      Command: 
+    - ContainedMessage: Grand indeed!
+      CharacterName: Star Sapphire
+      Command: 
+    - ContainedMessage: Why can't we do fun things like that!
+      CharacterName: Star Sapphire
+      Command: 
+    - ContainedMessage: It's not for fun!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: It's important!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: I can't let this pass.
+      CharacterName: Sunny Milk
+      Command: 
+    - ContainedMessage: You've disgraced me in front of my crew.
+      CharacterName: Sunny Milk
+      Command: 
+    - ContainedMessage: If i beat you, we can drop the uranium rods instead!
+      CharacterName: Sunny Milk
+      Command: 
+    - ContainedMessage: It's time. We must get those rods!
+      CharacterName: Star Sapphire
+      Command: 
+    - ContainedMessage: I Wonder what they taste like!
+      CharacterName: Luna Child
+      Command: 
+    - ContainedMessage: They are not to be eaten!.. Stupid!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: They are to be dropped in the lake!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: ENOUGH!
+      CharacterName: Sunny Milk
+      Command: 

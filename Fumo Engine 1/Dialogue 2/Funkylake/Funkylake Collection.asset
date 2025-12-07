@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ebd159deb969e4194c700dd581df22, type: 3}
+  m_Name: Funkylake Collection
+  m_EditorClassIdentifier: 
+  secondaryCharacterLists: []
+  characters:
+  - characterLookupName: Okuu
+    characterReference: {fileID: 11400000, guid: 937e6a0617458b748b589291be6a509d, type: 2}
+  - characterLookupName: Sunny Milk
+    characterReference: {fileID: 11400000, guid: 55a298b977e0d624d82c9ff708aeacb7, type: 2}
+  - characterLookupName: Cirno
+    characterReference: {fileID: 11400000, guid: 7e71c9fdd8e39a04e9a3e541edac9ac7, type: 2}
+  - characterLookupName: Rin
+    characterReference: {fileID: 11400000, guid: 6651dde06f43f3a4ba81d8665bc2b6d9, type: 2}
+  - characterLookupName: Luna Child
+    characterReference: {fileID: 11400000, guid: d986fb808de601c4eaab36483f1065f3, type: 2}
+  - characterLookupName: Star Sapphire
+    characterReference: {fileID: 11400000, guid: 19c91e3d01d59fe48ab475bbfb12aa80, type: 2}
+  - characterLookupName: Yukari
+    characterReference: {fileID: 11400000, guid: 273f241aa23e50e43b8764fa4831fae8, type: 2}
+  - characterLookupName: Daiyousei
+    characterReference: {fileID: 11400000, guid: 416b5ef1029fb864b9179e14a2e1f4da, type: 2}
+  - characterLookupName: Koakuma
+    characterReference: {fileID: 11400000, guid: 950ef526fc5f22442979b302e34b2c9c, type: 2}
+  - characterLookupName: Wakasagihime
+    characterReference: {fileID: 11400000, guid: 5f9dddd150928a444adab4c485c7ad8c, type: 2}
+  - characterLookupName: Wriggle Nightbug
+    characterReference: {fileID: 11400000, guid: fba095ba37a290e4eb5605ef93482a6c, type: 2}
+  - characterLookupName: Tewi
+    characterReference: {fileID: 11400000, guid: c4a73dd83f1618241bd9613d65f4e168, type: 2}
+  - characterLookupName: Nazrin
+    characterReference: {fileID: 11400000, guid: 40e173d70f2e3314d8496f74ef7b38a1, type: 2}
+  - characterLookupName: Murasa
+    characterReference: {fileID: 11400000, guid: 2b30746c97eb99f44bdf88334b413b98, type: 2}
+  - characterLookupName: Ran
+    characterReference: {fileID: 11400000, guid: 22c2c7aa3609cad4d84e28fe1fb4d111, type: 2}
+  - characterLookupName: Reisen
+    characterReference: {fileID: 11400000, guid: 5ff814492da0db54283a49e70757652f, type: 2}

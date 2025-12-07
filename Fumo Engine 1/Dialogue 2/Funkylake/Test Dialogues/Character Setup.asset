@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Character Setup
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: 73c4bd7502e98d842a0ac19c4925f870, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: Uhhh
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: According to all known laws of aviation, there is no way
+        a bee should be able to fly.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Its wings are too small to get its fat little body off the
+        ground.
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: The bee, of course, flies anyway because bees don't care
+        what humans think is impossible.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Yellow, black. Yellow, black. Yellow, black. Yellow, black.
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Ooh, black and yellow!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Let's shake it up a little.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Barry! Breakfast is ready!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Coming!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Hang on a second.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Hello?
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Barry?
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Adam?
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Can you believe this is happening?
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: I can't.
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Your mom
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Yukari
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Sunny Milk
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Luna Child
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Star Sapphire
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: Present
+      CharacterName: Daiyousei
+      Command: 

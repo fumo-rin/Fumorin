@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Wriggle
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: b82ea05ac038a0945b1126a67ab45fbe, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: I've Heard about your.. grand... plans.
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: Grand indeed! We are dropping uranium rods in the lake!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: AND YOU DIDN'T INVITE ME!
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: Next time you can come as well!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: There is no next time, It's over for you!
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: For all the fun we had! this is unacceptable.
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: You leave me out for THIS MUCH FUN!
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: No... This ends here.
+      CharacterName: Wriggle Nightbug
+      Command: 
+    - ContainedMessage: The rods will be mine!
+      CharacterName: Wriggle Nightbug
+      Command: 

@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Wakasagihime
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: d8ccf4113293141439b883349ef68b86, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: Halt!
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: So it is true. You've come to poison our waters!
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Yes, We need to drop uranium rods in the lake. It is very
+        important!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: What's more important is the lake. I cannot let this pass!
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Step aside! We have grand plans for the lake!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: The grand plan!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: The only grand part about your plan is how stupid it is.
+        It is... GRANDLY.. grandly? GRANDLY stupid!
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Stupid of immense GRANDness!
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: A revolutionary new age is upon this place. No place for
+        a fish, your time is over!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: Is that so?
+      CharacterName: Wakasagihime
+      Command: 
+    - ContainedMessage: Then face me in battle! You will pay for this!
+      CharacterName: Wakasagihime
+      Command: 

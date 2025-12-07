@@ -1,0 +1,57 @@
+fileFormatVersion: 2
+guid: d39d1ffab8565db4eaeaedebdc125c54
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: -1922359599, guid: 043f56a1911ade618a683298c33b36ce, type: 3}
+  generateFile: 0
+  generateAt: <root>/<dir>/<subpath>/<name>.<format>
+  generateFramesAt: <root>/<dir>/<subpath>/<name>/<name> +<frame00>.<format>
+  generationMode: 0
+  textureShape: 0
+  textureImportation:
+    textureName: <name>
+    sRGB: 1
+    alphaIsTransparency: 1
+    readWrite: 0
+    generateMipmaps: 0
+    mipmapLimit:
+      useMipmapLimit: 1
+      groupName: 
+    wrapMode:
+      u: 0
+      v: 0
+      w: 0
+    filterMode: 1
+    anisoLevel: 1
+    maxSize: 0
+    resamplingFilter: 6
+    format: -1
+    compression: 1
+  spriteMode: 0
+  slicing:
+    margin: {x: 0, y: 0, z: 0, w: 0}
+    by: 0
+    size: {x: 0, y: 0}
+    interspace: {x: 0, y: 0}
+    vertically: 0
+    skipEmpty:
+      enabled: 0
+      color: {r: 0, g: 0, b: 0, a: 0}
+  spriteImportation:
+    worldUnit:
+      amount: 100
+      unit: 2
+    meshType: 1
+    extrudeEdges: 1
+    generatePhysicsShape: 1
+    spriteName: <name>
+    spriteNames: '<name>: <cellA00><region?( #<region01>.<subidx00>)>'
+    gridSprites: 1
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+  spritesheetRegions: []

@@ -1,0 +1,499 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6605495973625967450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'SquareFont : Bou Fonts'
+  m_EditorClassIdentifier: 
+  Priority: -100
+  Title: SquareFont
+  Credit: Bou Fonts-Dafont
+  Website: 
+--- !u!114 &-5599348401862779502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'TMM1st Archive : Osabisi'
+  m_EditorClassIdentifier: 
+  Priority: -32
+  Title: TMM1st Archive
+  Credit: Osabisi
+  Website: 
+--- !u!114 &-3957174019893985923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Books : ChairGTables'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Books
+  Credit: ChairGTables
+  Website: 
+--- !u!114 &-3904118705050937555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Arco Font : Dafont.com'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Arco Font
+  Credit: Dafont.com
+  Website: 
+--- !u!114 &-1611393824505189799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Arco : Rafael Olivo'
+  m_EditorClassIdentifier: 
+  Priority: -103
+  Title: Arco
+  Credit: Rafael Olivo-Dafont
+  Website: 
+--- !u!114 &-1437099455925838304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'CI GameDev Font : Chequered Ink'
+  m_EditorClassIdentifier: 
+  Priority: -112
+  Title: CI GameDev Font
+  Credit: Chequered Ink
+  Website: https://www.dafont.com/ci-gamedev.font?l[]=10&l[]=1
+--- !u!114 &-978606191320386190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Programming : Fumorin'
+  m_EditorClassIdentifier: 
+  Priority: 100
+  Title: Programming
+  Credit: Fumorin
+  Website: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68a5004c2e082dc46ab1e7cd05f819df, type: 3}
+  m_Name: Myourenscape
+  m_EditorClassIdentifier: 
+  gameName: MyourenScape
+  gameCreator: Fumorin, Rook, Seete, Naro
+  credits:
+  - {fileID: -978606191320386190}
+  - {fileID: 6572914005549538764}
+  - {fileID: 3888014111987981065}
+  - {fileID: 4225553417847788166}
+  - {fileID: 249763062001253139}
+  - {fileID: 3906904674851498832}
+  - {fileID: 4239436405774627390}
+  - {fileID: -3957174019893985923}
+  - {fileID: 2072036314459526444}
+  - {fileID: 3772821992112894986}
+  - {fileID: -6605495973625967450}
+  - {fileID: -1611393824505189799}
+  - {fileID: 5150104223899810029}
+  - {fileID: 2505791225382400504}
+  - {fileID: -5599348401862779502}
+  showTitle: 0
+  doubleSpacing: 1
+  spacingOverride: '#'
+--- !u!114 &249763062001253139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Sprites : Rook'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Sprites
+  Credit: Rook
+  Website: 
+--- !u!114 &462068575496133893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Edo SZ : Vic Fieger'
+  m_EditorClassIdentifier: 
+  Priority: -102
+  Title: Edo SZ
+  Credit: Vic Fieger
+  Website: http://www.vicfieger.com/
+--- !u!114 &1916002666600475221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Evil Empire : Tup Wanders'
+  m_EditorClassIdentifier: 
+  Priority: -108
+  Title: Evil Empire
+  Credit: Tup Wanders
+  Website: http://www.wanders.work/
+--- !u!114 &2072036314459526444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Books : Vicelover101pepbot'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Books
+  Credit: Vicelover101pepbot
+  Website: 
+--- !u!114 &2148076854873086542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Long Shot : MattyDeCesare'
+  m_EditorClassIdentifier: 
+  Priority: -106
+  Title: Long Shot
+  Credit: MattyDeCesare
+  Website: https://www.dafont.com/long-shot.font?l[]=10&l[]=1
+--- !u!114 &2505791225382400504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Shotgun sound : pixabay'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Shotgun sound
+  Credit: pixabay
+  Website: 
+--- !u!114 &3772821992112894986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Books : MirbyKirby'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Books
+  Credit: MirbyKirby
+  Website: 
+--- !u!114 &3828116855300831432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Fonts : By'
+  m_EditorClassIdentifier: 
+  Priority: -99
+  Title: Fonts
+  Credit: By
+  Website: 
+--- !u!114 &3888014111987981065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Music : Naro'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Music
+  Credit: Naro
+  Website: 
+--- !u!114 &3906904674851498832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Sprites : Fumorin'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Sprites
+  Credit: Fumorin
+  Website: 
+--- !u!114 &4225553417847788166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Sprites : Seete'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Sprites
+  Credit: Seete
+  Website: 
+--- !u!114 &4239436405774627390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Cave & Water tiles : ElvGames Unity Asset'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Cave & Water tiles
+  Credit: ElvGames Unity Asset
+  Website: 
+--- !u!114 &5150104223899810029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Metal Pipe Sound Effect : pixabay'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Metal Pipe Sound Effect
+  Credit: pixabay
+  Website: 
+--- !u!114 &5424932897494240880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'AmazDooM : Amazingmax'
+  m_EditorClassIdentifier: 
+  Priority: -105
+  Title: AmazDooM
+  Credit: Amazingmax
+  Website: https://www.dafont.com/amazingmax.d2472?l[]=10&l[]=1
+--- !u!114 &5477451185507623565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Sauna Background : nkaminetskyy'
+  m_EditorClassIdentifier: 
+  Priority: -10
+  Title: Sauna Background
+  Credit: nkaminetskyy
+  Website: https://pixabay.com/photos/pool-sauna-bath-vacation-3001209/
+--- !u!114 &5789429261779479007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Gumball Thick Wires :  Epoch Mini'
+  m_EditorClassIdentifier: 
+  Priority: -107
+  Title: Gumball Thick Wires
+  Credit: ' Epoch Mini'
+  Website: https://www.dafont.com/epoch-mini.d11229?l[]=10&l[]=1
+--- !u!114 &5964859013942610698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Fumorin
+  Credit: Fumorin
+  Website: Fumorin
+--- !u!114 &6572914005549538764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Music : Fumorin'
+  m_EditorClassIdentifier: 
+  Priority: 0
+  Title: Music
+  Credit: Fumorin
+  Website: 
+--- !u!114 &7940902906424499459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'VHS Gothic Font : Spottie Leonard'
+  m_EditorClassIdentifier: 
+  Priority: -113
+  Title: VHS Gothic Font
+  Credit: Spottie Leonard
+  Website: https://www.dafont.com/vhs-gothic.font?l[]=10&l[]=1
+--- !u!114 &7976282753810417361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Fonts : By'
+  m_EditorClassIdentifier: 
+  Priority: -99
+  Title: Fonts
+  Credit: By
+  Website: 
+--- !u!114 &8692701790121503829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Boss Sprites : Vitallery'
+  m_EditorClassIdentifier: 
+  Priority: 23
+  Title: Boss Sprites
+  Credit: Vitallery
+  Website: 
+--- !u!114 &9020438735517004926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080e8c93a1f7824b82466ae5395310e, type: 3}
+  m_Name: 'Good Brush : Sarah Robbaniyyah'
+  m_EditorClassIdentifier: 
+  Priority: -104
+  Title: Good Brush
+  Credit: Sarah Robbaniyyah
+  Website: http://www.goodjavastudio.com

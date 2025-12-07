@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0e993e35839664994bdcee925ef25c, type: 3}
+  m_Name: okuu
+  m_EditorClassIdentifier: 
+  speechClips:
+  - {fileID: 8300000, guid: 53e5ded4dfdd42b46864fbcd020feb9d, type: 3}
+  - {fileID: 8300000, guid: 58a22abdd3850114f8e779cc95caed9d, type: 3}
+  - {fileID: 8300000, guid: 7803ffb118ac3a44f972806c8982d964, type: 3}
+  - {fileID: 8300000, guid: 0798261ed0bc20b44a31c04dd00e0192, type: 3}
+  - {fileID: 8300000, guid: d006a8fcfab15804f8e84adae508369c, type: 3}
+  - {fileID: 8300000, guid: be87b2135f138ba459b7147e62aea6c2, type: 3}
+  pitchRange: {x: 1.35, y: 1.4}
+  pitchSteps: 218

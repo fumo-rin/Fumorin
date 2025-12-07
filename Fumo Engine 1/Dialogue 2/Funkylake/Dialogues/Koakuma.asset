@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Koakuma
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: 8e095fb8b6c5667439b7399c3b22de27, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: You there! Have you seen my books? it must have been around
+        500 of them.
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: 500 Books?! Finally a nice meal!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: It is not food! The books are to be opened.. AND READ!
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: What kinda stupid errand are you on anyway.
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: It's not stupid!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: We need to drop uranium rods in the lake! It's very important.
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: ...
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: That is the stupidest thing i've ever heard.
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: OUR GRAND PLAN IS NOT STUPID!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: The Grand plan!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Also stop telling people about our plan. Stupid!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: You're stupid!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: You're both stupid!
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: With you here my books are no longer safe.
+      CharacterName: Koakuma
+      Command: 
+    - ContainedMessage: Prepare to die!
+      CharacterName: Koakuma
+      Command: 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0e993e35839664994bdcee925ef25c, type: 3}
+  m_Name: Sunny Milk
+  m_EditorClassIdentifier: 
+  speechClips:
+  - {fileID: 8300000, guid: 0379cbc3d1c464f4aa0a70ffd2aa57b1, type: 3}
+  - {fileID: 8300000, guid: 51ccb97342976a64ba240be0ceadb9db, type: 3}
+  - {fileID: 8300000, guid: 10e8a9ca20a290b41adf4cd72e78d260, type: 3}
+  - {fileID: 8300000, guid: 67193ecdecd0b8c479196a917b41df53, type: 3}
+  - {fileID: 8300000, guid: f298bccefb3dd6744ba4b0440bb9f10d, type: 3}
+  - {fileID: 8300000, guid: c7a9e1840e407d945b46d5a3b551cd7c, type: 3}
+  - {fileID: 8300000, guid: 74265f93fcdf32c4c934d2a487786b6c, type: 3}
+  pitchRange: {x: 2.3, y: 2.45}
+  pitchSteps: 110

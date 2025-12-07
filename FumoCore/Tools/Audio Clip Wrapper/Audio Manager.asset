@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Audio Manager
+  m_EditorClassIdentifier: 
+  m_GroupName: Audio Manager
+  m_GUID: 81e40c6c79239d445925ff8d5892f795
+  m_SerializeEntries:
+  - m_GUID: 34215ea08f295ea4f9e78bbe991ca3df
+    m_Address: Audio Engine Sound Effects
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Dynamic Channels
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c3d0c3b1bbcee314fa91d6246890b7bf
+    m_Address: Addressable
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Audio Engine
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f763467f695c0874491fef7ea22af191
+    m_Address: Single Channels
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Single Channels
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 0259b81d29ccf6b4abd1d86ed40cbae0, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 592b6de56abb9bc40b6fe3a071bca7ce, type: 2}

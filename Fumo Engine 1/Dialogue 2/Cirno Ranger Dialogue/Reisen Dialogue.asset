@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Reisen Dialogue
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: f543b58f29e59ce4abed98a681c25e4f, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: So you've finally made it... I see why they call you the
+        Strongest.
+      CharacterName: Reisen
+      Command: 
+    - ContainedMessage: Yes, i was chosen to defeat you!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: What!
+      CharacterName: Reisen
+      Command: 
+    - ContainedMessage: No no, this is some kind of mistake... I just wanted this
+        sweet hat!
+      CharacterName: Reisen
+      Command: 
+    - ContainedMessage: It is a sweet hat.
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: We could just pretend to fight and you could let me go yes-yes?
+      CharacterName: Reisen
+      Command: 
+    - ContainedMessage: I don't want to get beat up by the strongest.
+      CharacterName: Reisen
+      Command: 
+    - ContainedMessage: I suppose.
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Ok, ill strike first and then you strike me, and i will let
+        you win.
+      CharacterName: Reisen
+      Command: 

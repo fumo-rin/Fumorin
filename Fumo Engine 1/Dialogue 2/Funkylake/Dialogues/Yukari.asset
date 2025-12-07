@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc1f49a4b937d4cb45f1bf7bcb16b9, type: 3}
+  m_Name: Yukari
+  m_EditorClassIdentifier: 
+  <dialogueTextFile>k__BackingField: {fileID: 4900000, guid: c9dd91f66f624f64299258a40974c042, type: 3}
+  characterLookup: {fileID: 11400000, guid: 34778517daf01eb4fbedf02ecfb5c537, type: 2}
+  containedDialogue:
+    parts:
+    - ContainedMessage: Nice day to drop some uranium rods in the local lake!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: A great plan indeed! let's get on with it!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Where do you think you are going?
+      CharacterName: Yukari
+      Command: 
+    - ContainedMessage: To the lake! We have an important mission.
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: A mission. Important indeed yes-yes!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: ... What is your mission?
+      CharacterName: Yukari
+      Command: 
+    - ContainedMessage: To drop uranium rods in the local lake!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: SHHH... Don't just tell our grand plan like that!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: WHAT? do you have any idea how stupid that is!
+      CharacterName: Yukari
+      Command: 
+    - ContainedMessage: Our grand plan is not stupid! You're stupid!
+      CharacterName: Okuu
+      Command: 
+    - ContainedMessage: The grand plan!
+      CharacterName: Cirno
+      Command: 
+    - ContainedMessage: Mewo mewo.
+      CharacterName: Rin
+      Command: 
+    - ContainedMessage: Either way you will go no further.
+      CharacterName: Yukari
+      Command: 

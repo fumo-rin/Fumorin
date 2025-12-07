@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cf020f52044f864fb18319a25fbc103, type: 3}
+  m_Name: Rin
+  m_EditorClassIdentifier: 
+  character:
+    characterName: Rin
+    sprite: {fileID: 21300000, guid: 851f691a68e9bf748a7da89de4357332, type: 3}
+    talkSprite: {fileID: 21300000, guid: 03e4728ae1b9b574daed595554949bf4, type: 3}
+    words: {fileID: 11400000, guid: ba18003f9a65b6c44900dd01e4579e72, type: 2}

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59dc42bc46c9a8a4da839d1165b5ff55, type: 3}
+  m_Name: Tracklist
+  m_EditorClassIdentifier: 
+  TrackList:
+  - {fileID: 11400000, guid: 223576ba039db5d45aaa259464042328, type: 2}
+  - {fileID: 11400000, guid: 5f48fd80e75d52e4783d37257d2f3f24, type: 2}
+  - {fileID: 11400000, guid: ba476b1bc9b776447b5e440024145298, type: 2}
+  - {fileID: 11400000, guid: 27219d73a7717924c97ae6e42f21852a, type: 2}
+  - {fileID: 11400000, guid: 86b6320f9ab2908488248596e5322c6f, type: 2}
+  - {fileID: 11400000, guid: 5c4059cd4665adc438434fa8a37e5193, type: 2}
+  - {fileID: 11400000, guid: 2bbd470f623a9b841b9e50fd56055e98, type: 2}
+  - {fileID: 11400000, guid: cf0ade8744b11b943b201f1e9e5d924f, type: 2}
+  - {fileID: 11400000, guid: dd09c3a279672ee4c9e532f348e73aab, type: 2}

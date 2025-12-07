@@ -1,0 +1,30 @@
+{
+    "name": "Fumorin",
+    "rootNamespace": "Fumorin",
+    "references": [
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:d6e01623879e41143a5078f9c1333ddd",
+        "GUID:abf3abfe52e694d45accf0d47935b829",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:f06555f75b070af458a003d92f9efb00",
+        "GUID:02f771204943f4a40949438e873e3eff",
+        "GUID:fb24642277b1db2449da7ac148ce939d",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:21d1eb854b91ade49bc69a263d12bee2",
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:8d9e84799a3968d4ba38c55892d14093",
+        "GUID:5540e30183c82e84b954c033c388e06c",
+        "GUID:fe25561d224ed4743af4c60938a59d0b",
+        "GUID:2073209246492244c9ad62c89d8d37bb",
+        "GUID:d6c595da0d01bc04b8d253e134c642fc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
