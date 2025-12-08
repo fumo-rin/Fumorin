@@ -1,5 +1,4 @@
 using RinCore;
-using RinCore;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;

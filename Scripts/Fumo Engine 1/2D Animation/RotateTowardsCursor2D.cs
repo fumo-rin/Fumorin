@@ -2,7 +2,6 @@ using RinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using RinCore;
 
 namespace RinCore
 {

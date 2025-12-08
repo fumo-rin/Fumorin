@@ -1,6 +1,4 @@
 using RinCore;
-using RinCore;
-using RinCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;

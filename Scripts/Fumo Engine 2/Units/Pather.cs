@@ -5,7 +5,7 @@ using Pathfinding.RVO;
 using System;
 using System.Collections;
 
-namespace RinCore.Units
+namespace RinCore
 {
     public class PathBuilder
     {
