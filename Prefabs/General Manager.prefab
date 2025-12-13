@@ -274,9 +274,7 @@ GameObject:
   - component: {fileID: 4483719465121273444}
   - component: {fileID: 8294303810776787283}
   - component: {fileID: 1779381781154097865}
-  - component: {fileID: 4613109892612405283}
   - component: {fileID: 2177139420486650473}
-  - component: {fileID: 1674462889925634618}
   - component: {fileID: 1088297479297689608}
   m_Layer: 0
   m_Name: General Manager
@@ -335,25 +333,6 @@ MonoBehaviour:
   mainTickDuration: 0.05
   mainTickSO: {fileID: 11400000, guid: e1644eb0f8be03c488bf5f0e9317deca, type: 2}
   AITickTime: {fileID: 11400000, guid: 7d16b4bfd7ed0e84a81cb39a309c007e, type: 2}
---- !u!114 &4613109892612405283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6220692254297865808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2806c5eed72efbf4d86fd34171263a73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputMap:
-    shootAction: {fileID: 1864257387097275648, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-    focusAction: {fileID: -1145331697551703494, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-    bombAction: {fileID: -673042676041731608, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-    skipDialogueAction: {fileID: 1864257387097275648, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-    reloadPracticeWarp: {fileID: 6565373169737290267, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-    chargeAction: {fileID: -6160558799152939430, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
 --- !u!114 &2177139420486650473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,20 +348,6 @@ MonoBehaviour:
   startingScene: {fileID: 11400000, guid: 6ac1b0f402c48174c8e50007f1c6ce3d, type: 2}
   loadingScreen: {fileID: 1779604231228070957}
   loadingScreenText: {fileID: 879523235413287891}
---- !u!114 &1674462889925634618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6220692254297865808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39447d207b6650f41a282a84281831a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveInput: {fileID: -4205259379574991189, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
-  lookInput: {fileID: 731452339764593362, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
 --- !u!114 &1088297479297689608
 MonoBehaviour:
   m_ObjectHideFlags: 0

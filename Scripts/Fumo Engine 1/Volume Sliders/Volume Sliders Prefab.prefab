@@ -402,8 +402,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Sound Effects
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
-  m_sharedMaterial: {fileID: -7632606495824812463, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
+  m_sharedMaterial: {fileID: 3379962116252370679, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -763,8 +763,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Dialogue
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
-  m_sharedMaterial: {fileID: -7632606495824812463, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
+  m_sharedMaterial: {fileID: 3379962116252370679, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -877,8 +877,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1506833824878837386}
-  - component: {fileID: 8131415786729967986}
   - component: {fileID: 1294509203275878742}
+  - component: {fileID: 7827060644216085314}
   m_Layer: 5
   m_Name: Volume Sliders Prefab
   m_TagString: Untagged
@@ -908,28 +908,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -207}
   m_SizeDelta: {x: 280, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &8131415786729967986
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5115564101120214862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a880ecb82a9131f4a8862a94dd00c09e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  effectsSlider: {fileID: 500490812388803999}
-  musicSlider: {fileID: 1703055976412437193}
-  dialogueSlider: {fileID: 7245452601266064198}
-  effectsMixers:
-  - {fileID: 24100000, guid: 34215ea08f295ea4f9e78bbe991ca3df, type: 2}
-  - {fileID: 24100000, guid: f763467f695c0874491fef7ea22af191, type: 2}
-  musicMixers:
-  - {fileID: 24100000, guid: ec81624eb858e504aadf6f717709524e, type: 2}
-  dialogueMixers:
-  - {fileID: 24100000, guid: f93b117703df37f4a9a546c43558caa0, type: 2}
 --- !u!114 &1294509203275878742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -956,6 +934,28 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &7827060644216085314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5115564101120214862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72546d1d2bf668343b829b2f8205dfa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectsSlider: {fileID: 500490812388803999}
+  musicSlider: {fileID: 1703055976412437193}
+  dialogueSlider: {fileID: 7245452601266064198}
+  effectsMixers:
+  - {fileID: 24100000, guid: 2dceb49b28515464b8f65118788082ba, type: 2}
+  - {fileID: 24100000, guid: 2d90163c4095a0a4283cc9766c8294e4, type: 2}
+  musicMixers:
+  - {fileID: 24100000, guid: 5f8d0f335fbb734499fb150c4540d641, type: 2}
+  dialogueMixers:
+  - {fileID: 24100000, guid: e930f3c98e575b74ba8fef009ffbc228, type: 2}
 --- !u!1 &5119530697470872046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1188,8 +1188,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Music
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
-  m_sharedMaterial: {fileID: -7632606495824812463, guid: 423940a322bd08f4e9cb4f271b5410e9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
+  m_sharedMaterial: {fileID: 3379962116252370679, guid: 13b4d6f02d087434b9190bd088af4722, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

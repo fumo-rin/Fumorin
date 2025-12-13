@@ -13,6 +13,7 @@ namespace RinCore
                 yield return origin + Helper.SeededRandomInsideUnitCircle() * size;
             }
         }
+        public static int Random256 => Helper.SeededRandomInt256;
         public static Vector2 Vec2(float size) => Helper.SeededRandomVector2() * size;
         public static float Range(float min, float max) => Helper.SeededRandomFloat(min, max);
         public static int Sign() => Helper.RandomSign();

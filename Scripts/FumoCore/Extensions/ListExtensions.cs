@@ -133,5 +133,9 @@ namespace RinCore
             if (result < 0)
                 result += count;
         }
+        public static IEnumerable<T> OrderByRandom<T>(this IEnumerable<T> source)
+        {
+            return source.OrderBy(_ => RandomHelper.Random256);
+        }
     }
 }

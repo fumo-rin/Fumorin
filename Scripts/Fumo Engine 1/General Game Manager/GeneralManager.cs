@@ -373,7 +373,6 @@ namespace RinCore
         }
         private void StartInstance()
         {
-            Debug.Log(Instance);
             if (Instance != null)
             {
                 Destroy(gameObject);
