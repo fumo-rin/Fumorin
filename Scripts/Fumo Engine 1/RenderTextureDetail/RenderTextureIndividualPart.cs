@@ -23,8 +23,8 @@ namespace RinCore
         [QFSW.QC.Command("render-size")]
         public static void SetNewSize(int x, int y)
         {
-            screenSize = new(x, y);
-            WhenChangeSize?.Invoke(x, y);
+            screenSize = new(x.Clamp(120, 2560), y.Clamp(120, 1440));
+            WhenChangeSize?.Invoke(screenSize.Item1, screenSize.Item2);
         }
         private void SetLocalSize(int x, int y)
         {
