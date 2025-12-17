@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "name": "Game Actions",
+    "name": "Rin Input",
     "maps": [
         {
             "name": "Fumo",
@@ -11,7 +11,7 @@
                     "type": "Value",
                     "id": "17e20bd4-10b6-45c8-ae66-181290169736",
                     "expectedControlType": "Vector2",
-                    "processors": "StickDeadzone(min=0.4);NormalizeVector2",
+                    "processors": "StickDeadzone",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -20,7 +20,7 @@
                     "type": "Value",
                     "id": "b3a84277-c3d4-40f8-90d9-108359f0bb30",
                     "expectedControlType": "Vector2",
-                    "processors": "",
+                    "processors": "StickDeadzone",
                     "interactions": "",
                     "initialStateCheck": true
                 }
@@ -1007,10 +1007,10 @@
                 {
                     "name": "",
                     "id": "bb8cf412-5e98-4165-a0b5-010aa75dda2a",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse;Gamepad;Touch;Joystick;XR",
+                    "groups": ";Gamepad;Touch;Joystick;XR",
                     "action": "Focus",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1029,7 +1029,7 @@
                 {
                     "name": "",
                     "id": "924c76bc-fdbc-4c51-b29a-b9db37b2bc5d",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad;Touch;Joystick;XR;Keyboard&Mouse",

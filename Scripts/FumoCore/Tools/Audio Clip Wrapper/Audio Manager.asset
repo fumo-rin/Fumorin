@@ -14,25 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Audio Manager
   m_GUID: 81e40c6c79239d445925ff8d5892f795
-  m_SerializeEntries:
-  - m_GUID: 34215ea08f295ea4f9e78bbe991ca3df
-    m_Address: Audio Engine Sound Effects
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Dynamic Channels
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c3d0c3b1bbcee314fa91d6246890b7bf
-    m_Address: Addressable
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Audio Engine
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f763467f695c0874491fef7ea22af191
-    m_Address: Single Channels
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Single Channels
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0259b81d29ccf6b4abd1d86ed40cbae0, type: 2}
   m_SchemaSet:

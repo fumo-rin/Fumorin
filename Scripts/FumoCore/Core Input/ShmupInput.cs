@@ -22,7 +22,13 @@ namespace RinCore
         }
         [SerializeField] private Map inputMap;
         private static ShmupInput instance;
-        public static Vector2 Move => GenericInput.Move;
+        public static Vector2 Move
+        {
+            get
+            {
+                return GenericInput.Move.normalized;
+            }
+        }
         public static bool Shoot => instance == null ? false : instance.inputMap.shootAction.IsPressed();
         public static bool ShootJustPressed => instance?.inputMap.shootAction.JustPressed() ?? false;
         public static bool ShootPressedLongerThan(float seconds) => instance?.inputMap.shootAction.PressedLongerThan(seconds) ?? false;

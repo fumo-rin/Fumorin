@@ -48,9 +48,9 @@ public static partial class PersistentJSON
 public static partial class PersistentJSON
 {
     private const string EncryptionKey = "Fumo Fumo Fumo Fumo";
-    private static long DoubleToLong(double value) =>
+    public static long ToLong(this double value) =>
         BitConverter.DoubleToInt64Bits(value);
-    private static double LongToDouble(long bits) =>
+    public static double ToDouble(this long bits) =>
         BitConverter.Int64BitsToDouble(bits);
     private static string EncryptString(string plainText)
     {
@@ -92,9 +92,10 @@ public static partial class PersistentJSON
             return Convert.ToBase64String(bytes);
         }
     }
+    [QFSW.QC.Command("-test-score-store")]
     public static bool SaveScore(double score, string key)
     {
-        long encoded = DoubleToLong(score);
+        long encoded = score.ToLong();
         string data = encoded.ToString();
         string hash = ComputeHash(data);
         string combined = $"{data}:{hash}";
@@ -102,9 +103,19 @@ public static partial class PersistentJSON
 
         return PersistentJSON.TrySave(encrypted, key);
     }
+    [QFSW.QC.Command("-test-score-fetch")]
+    private static double TestFetchScore(string key)
+    {
+        double score = 0d;
+        if (!LoadScore(key, out score))
+        {
+
+        }
+        return score;
+    }
     public static bool LoadScore(string key, out double score)
     {
-        score = 0f;
+        score = 0d;
         if (!PersistentJSON.TryLoad(out string encrypted, key))
             return false;
         try
@@ -120,7 +131,7 @@ public static partial class PersistentJSON
                 throw new Exception("Score tampering detected!");
 
             long encoded = long.Parse(data);
-            score = LongToDouble(encoded);
+            score = encoded.ToDouble();
             return true;
         }
         catch (Exception ex)

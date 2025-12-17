@@ -110,8 +110,10 @@ namespace RinCore
             bool InternalCheck()
             {
                 double scoreAccuracy = HiddenScoreValidationSum / ScoreValidationMultiplier;
-                Debug.Log($"Score Accuracy : {scoreAccuracy} - {actualScore} = " + (scoreAccuracy - actualScore));
-                if (scoreAccuracy - actualScore < (actualScore * 0.05d))
+                scoreAccuracy = double.IsNaN(scoreAccuracy) ? 0d : scoreAccuracy;
+                double totalExpected = actualScore + addedExtraScore;
+
+                if (Math.Abs(scoreAccuracy - totalExpected) < Math.Max(1.0, totalExpected * 0.05))
                 {
                     Debug.Log("Score Seems Good");
                     return true;
@@ -182,7 +184,6 @@ namespace RinCore
         }
         public static void RequestScoreRefresh()
         {
-            Debug.Log("T");
             IsHighscorePotentiallyOutOfSync = true;
             LoadHighScore();
             AddScore(0d, false);
@@ -260,10 +261,7 @@ namespace RinCore
         }
         private void OnApplicationQuit()
         {
-            if (!GeneralManager.IsEditor)
-            {
-                StoreScore(VisibleScore.ToLong());
-            }
+            StoreScore(VisibleScore.ToLong());
         }
         public static void StoreScore(long score)
         {
@@ -280,7 +278,7 @@ namespace RinCore
                     scoreMessage += $"Score Partition({item.Key}) : {item.Value.ToString("F0")}##".ReplaceLineBreaks("##");
                 }
             }
-            if (IsScoreLegit())
+            if (IsScoreLegit() && !IsEditor)
             {
                 long LeaderboardScore = score;
                 _ = FumoLeaderboard.SubmitScoreAsync(LeaderboardScore);

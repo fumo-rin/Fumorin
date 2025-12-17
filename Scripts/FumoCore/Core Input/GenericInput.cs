@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace RinCore
 {
@@ -23,11 +24,43 @@ namespace RinCore
             return GenericInput.GetTracker(reference)?.ReleasedLongerThan(seconds) ?? false;
         }
     }
+    #region Sticks & Deadzone
+    public partial class GenericInput
+    {
+        static float stickDeadZone = 0.4f;
+        [SerializeField] InputActionReference moveInput, lookInput;
+        static Vector2 cachedMove, cachedLook;
+        public static Vector2 Look => instance == null ? Vector2.zero : cachedLook.magnitude >= stickDeadZone ? cachedLook : Vector2.zero;
+        public static Vector2 Move => instance == null ? Vector2.zero : cachedMove.magnitude >= stickDeadZone ? cachedMove : Vector2.zero;
+        public static void BindDeadzoneReference(Slider targetSlider)
+        {
+            targetSlider.onValueChanged.AddListener(UpdateDeadzone);
+        }
+        [Initialize(999)]
+        private static void FetchDeadzone()
+        {
+            if (PersistentJSON.TryLoad(out float value, "Stick Deadzone"))
+            {
+                UpdateDeadzone(value);
+            }
+        }
+        [QFSW.QC.Command("-input-deadzone")]
+        private static void UpdateDeadzone(float value)
+        {
+            stickDeadZone = value.Clamp(0.05f, 0.95f);
+            PersistentJSON.TrySave(stickDeadZone, "Stick Deadzone");
+            Debug.Log("Updated stick deadzone :" + value.ToString("F2"));
+        }
+        public static void ReleaseDeadzoneReference(Slider targetSlider)
+        {
+            targetSlider.onValueChanged.RemoveListener(UpdateDeadzone);
+        }
+    }
+    #endregion
     [DefaultExecutionOrder(-100)]
-    internal class GenericInput : MonoBehaviour
+    public partial class GenericInput : MonoBehaviour
     {
         private static GenericInput instance;
-
         internal class ButtonStateTracker
         {
             public bool IsPressed { get; private set; }
@@ -74,10 +107,6 @@ namespace RinCore
             lookInput.action.Disable();
             instance = this;
         }
-        [SerializeField] InputActionReference moveInput, lookInput;
-        static Vector2 cachedMove, cachedLook;
-        public static Vector2 Look => instance == null ? Vector2.zero : cachedLook;
-        public static Vector2 Move => instance == null ? Vector2.zero : cachedMove;
         private void Update()
         {
             foreach (var kvp in trackers)
