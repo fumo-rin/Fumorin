@@ -48,6 +48,17 @@ namespace RinCore
     }
 #endif
     #endregion
+    #region nullable Play Extension
+    public static class MusicWrapperNullablePlay
+    {
+        public static void Play(this MusicWrapper p)
+        {
+            if (p == null)
+                return;
+            MusicWrapper.PlayMusic(p);
+        }
+    }
+    #endregion
     [CreateAssetMenu(menuName = "Bremsengine/MusicWrapper")]
     [System.Serializable]
     public class MusicWrapper : ScriptableObject
@@ -73,13 +84,9 @@ namespace RinCore
             clipVolume = 0.7f;
             dontReplaceSelf = true;
         }
-        public void Play()
+        internal static void PlayMusic(MusicWrapper p)
         {
-            PlayMusic(this);
-        }
-        private static void PlayMusic(MusicWrapper p)
-        {
-            if (p != null) MusicPlayer.PlayMusicWrapper(p);
+            MusicPlayer.PlayMusicWrapper(p);
         }
     }
 }
