@@ -17,6 +17,10 @@ namespace RinCore
             Category = category;
         }
     }
+    public class NYIUntested : NYIAttribute
+    {
+        public override string Category { get { return "Untested"; } }
+    }
     public class NYITestingAttribute : NYIAttribute
     {
         public override string Category { get { return "Testing"; } }
