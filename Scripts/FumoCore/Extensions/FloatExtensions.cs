@@ -1,4 +1,5 @@
-﻿using System;
+﻿using rinCore;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -296,6 +297,10 @@ namespace RinCore
                 return long.MinValue;
 
             return (long)result;
+        }
+        public static float Random(this (float, float) target)
+        {
+            return RNG.RandomFloatRange(target.Item1, target.Item2);
         }
     }
 }

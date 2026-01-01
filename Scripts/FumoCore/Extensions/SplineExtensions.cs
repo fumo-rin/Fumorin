@@ -29,7 +29,7 @@ namespace RinCore
                 UseOwnerTransformAsWorldCenter = true;
                 this.WorldCenterOverride = v;
                 PreventOverride = false;
-                Helper.Repaint();
+                RinHelper.Repaint();
             }
         }
         public void ClearWorldCenterOverride()
@@ -37,7 +37,7 @@ namespace RinCore
             WorldCenterOverride = Vector2.zero;
             UseOwnerTransformAsWorldCenter = false;
             PreventOverride = true;
-            Helper.Repaint();
+            RinHelper.Repaint();
         }
     }
     public static class SplineExtensions

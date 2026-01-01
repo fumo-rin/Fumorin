@@ -67,7 +67,7 @@ namespace RinCore
         public float BeatLength => 60f / bpm.Max(1f);
         public static implicit operator AudioClip(MusicWrapper mw) => mw == null ? null : mw.musicClip;
         public static implicit operator float(MusicWrapper mw) => mw == null ? 0f : mw.musicVolume;
-        public string TrackName = Helper.DefaultName;
+        public string TrackName = RinHelper.DefaultName;
         public AudioClip musicClip;
         public float musicVolume => clipVolume * MusicPlayer.GlobalVolume;
         public float musicLength => musicClip != null ? musicClip.length : 0f;

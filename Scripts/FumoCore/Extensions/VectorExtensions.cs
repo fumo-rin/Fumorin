@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RinCore
 {
     #region Helper
-    public static partial class Helper
+    public static partial class RinHelper
     {
 
     }

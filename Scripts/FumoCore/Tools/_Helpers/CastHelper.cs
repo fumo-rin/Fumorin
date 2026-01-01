@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         static RaycastHit2D[] cache = new RaycastHit2D[30];
         public static bool TryFindInCircleCast<T>(Vector2 origin, float radius, LayerMask layerMask, out HashSet<T> result) where T : MonoBehaviour
@@ -38,13 +38,13 @@ namespace RinCore
                 {
                     if (hit.transform != null)
                     {
-                        Helper.DrawLine2D(origin, origin + (target - origin), ColorHelper.FullGreen, 0.15f);
+                        RinHelper.DrawLine2D(origin, origin + (target - origin), ColorHelper.FullGreen, 0.15f);
                         result = hit.transform.GetComponent<T>();
                         break;
                     }
                     else
                     {
-                        Helper.DrawLine2D(origin, origin + (target - origin), ColorHelper.DeepRed, 0.15f);
+                        RinHelper.DrawLine2D(origin, origin + (target - origin), ColorHelper.DeepRed, 0.15f);
                     }
                 }
             }

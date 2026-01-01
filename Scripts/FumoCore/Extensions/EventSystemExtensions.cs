@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         public static void EventSystem_Deselect()
         {
@@ -19,12 +19,12 @@ namespace RinCore
             EventSystem.current.SetSelectedGameObject(null);
             if (g == null)
             {
-                Helper.EventSystem_LastSelected = null;
+                RinHelper.EventSystem_LastSelected = null;
                 return false;
             }
             if (g.activeInHierarchy)
             {
-                Helper.EventSystem_LastSelected = g;
+                RinHelper.EventSystem_LastSelected = g;
                 EventSystem.current.SetSelectedGameObject(g);
                 return true;
             }
@@ -53,7 +53,7 @@ namespace RinCore
     {
         public static bool Select_WithEventSystem(this GameObject g)
         {
-            return Helper.EventSystem_Select(g);
+            return RinHelper.EventSystem_Select(g);
         }
     }
 }

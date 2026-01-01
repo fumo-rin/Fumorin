@@ -1007,7 +1007,7 @@
                 {
                     "name": "",
                     "id": "bb8cf412-5e98-4165-a0b5-010aa75dda2a",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad;Touch;Joystick;XR",
@@ -1029,7 +1029,7 @@
                 {
                     "name": "",
                     "id": "924c76bc-fdbc-4c51-b29a-b9db37b2bc5d",
-                    "path": "<Gamepad>/rightTrigger",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad;Touch;Joystick;XR;Keyboard&Mouse",

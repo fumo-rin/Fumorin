@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RinCore
 {
     #region Drawline
-    public static partial class Helper // Draw Line
+    public static partial class RinHelper // Draw Line
     {
         public static void DrawLine2D(Vector2 from, Vector2 to, Color32? c, float time = 0.5f)
         {
@@ -17,7 +17,7 @@ namespace RinCore
     }
     #endregion
     #region Old Benchmark
-    public static partial class Helper // Benchmark
+    public static partial class RinHelper // Benchmark
     {
         public struct BenchmarkOld
         {

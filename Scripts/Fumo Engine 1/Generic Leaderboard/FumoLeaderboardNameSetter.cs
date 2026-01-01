@@ -54,7 +54,7 @@ namespace RinCore
             wasChanged = storedName != s;
             storedName = s;
             PersistentJSON.TrySave(s, saveKey);
-            Helper.EventSystem_Deselect();
+            RinHelper.EventSystem_Deselect();
         }
     }
 }

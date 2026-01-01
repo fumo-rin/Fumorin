@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         public static Vector2 MousePosition => GetMousePosition();
         private static Vector2 GetMousePosition()

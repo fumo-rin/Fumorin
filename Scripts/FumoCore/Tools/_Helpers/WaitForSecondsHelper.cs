@@ -3,17 +3,32 @@ using System.Collections.Generic;
 
 namespace RinCore
 {
-    static partial class Helper
+    public class WaitForSecondsCached : CustomYieldInstruction
     {
-        static Dictionary<int, WaitForSeconds> wfsCache;
+        readonly float duration;
+        float startTime;
+        public WaitForSecondsCached(float seconds)
+        {
+            duration = seconds;
+            Reset();
+        }
+        public override void Reset()
+        {
+            startTime = Time.time;
+        }
+        public override bool keepWaiting =>
+            Time.time - startTime < duration;
+    }
+    static partial class RinHelper
+    {
+        static Dictionary<int, WaitForSecondsCached> wfsCache;
 
         [Initialize(-99999)]
         private static void ResetWaitforsecondsCache()
         {
-            wfsCache = new Dictionary<int, WaitForSeconds>();
+            wfsCache = new Dictionary<int, WaitForSecondsCached>();
         }
-
-        public static WaitForSeconds WaitForSeconds(this float seconds, bool cached = true)
+        public static WaitForSecondsCached WaitForSeconds(this float seconds, bool cached = true)
         {
             if (seconds <= 0f)
             {
@@ -22,21 +37,24 @@ namespace RinCore
 
             if (!cached)
             {
-                return new WaitForSeconds(seconds);
+                return new WaitForSecondsCached(seconds);
+            }
+            if (wfsCache.Count > 10000)
+            {
+                wfsCache.Clear();
             }
             int msKey = Mathf.RoundToInt(seconds * 1000f);
 
-            if (wfsCache.TryGetValue(msKey, out WaitForSeconds value))
+            if (wfsCache.TryGetValue(msKey, out WaitForSecondsCached value))
             {
                 return value;
             }
 
-            WaitForSeconds spawned = new WaitForSeconds(seconds);
+            WaitForSecondsCached spawned = new WaitForSecondsCached(seconds);
             wfsCache[msKey] = spawned;
             return spawned;
         }
-
-        public static WaitForSeconds WaitForSeconds(this float seconds, ref float totalElapsed)
+        public static WaitForSecondsCached WaitForSeconds(this float seconds, ref float totalElapsed)
         {
             totalElapsed += seconds;
             return seconds.WaitForSeconds();

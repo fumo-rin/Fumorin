@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         public static void EditorPing(this UnityEngine.Object o)
         {

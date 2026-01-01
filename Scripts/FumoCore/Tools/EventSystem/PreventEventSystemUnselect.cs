@@ -9,7 +9,7 @@ namespace RinCore
     {
         private void LateUpdate()
         {
-            if (!Helper.HasSelectWithEventSystem)
+            if (!RinHelper.HasSelectWithEventSystem)
             {
                 gameObject.Select_WithEventSystem();
             }

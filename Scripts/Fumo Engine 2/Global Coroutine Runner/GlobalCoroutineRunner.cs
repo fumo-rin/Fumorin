@@ -6,6 +6,13 @@ using UnityEngine.SceneManagement;
 
 namespace RinCore
 {
+    public static class GlobalCoroutineRunnerExtensions
+    {
+        public static Coroutine RunRoutine(this IEnumerator co, string? keyOverride = null, bool persistAcrossScenes = false)
+        {
+            return GlobalCoroutineRunner.StartRoutine(keyOverride ?? nameof(co), co, persistAcrossScenes);
+        }
+    }
     public class GlobalCoroutineRunner : MonoBehaviour
     {
         private static GlobalCoroutineRunner _instance;

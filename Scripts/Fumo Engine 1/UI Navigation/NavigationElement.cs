@@ -25,7 +25,7 @@ namespace RinCore
         }
         public void OnDeselect(BaseEventData eventData)
         {
-            if (Helper.EventSystem_LastSelected == gameObject && EventSystem.current.currentSelectedGameObject == null && gameObject != null)
+            if (RinHelper.EventSystem_LastSelected == gameObject && EventSystem.current.currentSelectedGameObject == null && gameObject != null)
             {
                 gameObject.Select_WithEventSystem();
             }

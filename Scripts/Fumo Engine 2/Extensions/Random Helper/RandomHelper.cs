@@ -1,3 +1,4 @@
+using rinCore;
 using RinCore;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +11,12 @@ namespace RinCore
         {
             for (int i = 0; i < count; i++)
             {
-                yield return origin + Helper.SeededRandomInsideUnitCircle() * size;
+                yield return origin + RinHelper.SeededRandomInsideUnitCircle() * size;
             }
         }
-        public static int Random256 => Helper.SeededRandomInt256;
-        public static Vector2 Vec2(float size) => Helper.SeededRandomVector2() * size;
-        public static float Range(float min, float max) => Helper.SeededRandomFloat(min, max);
-        public static int Sign() => Helper.RandomSign();
+        public static int Random255 => RNG.Byte255;
+        public static Vector2 Vec2(float size) => RinHelper.SeededRandomVector2() * size;
+        public static float Range(float min, float max) => RNG.RandomFloatRange(min, max);
+        public static int Sign() => RinHelper.RandomSign();
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using rinCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -100,7 +101,7 @@ namespace RinCore
             {
                 if (normalizedInput.Contains(badWord, StringComparison.OrdinalIgnoreCase))
                 {
-                    clean = Helper.SeededRandomInt256 > 150 ? CleanNameGen(characterLimit, cute1, cute2, cute3) : CleanNameGen(characterLimit, cute1, cute2);
+                    clean = RNG.Byte255 > 150 ? CleanNameGen(characterLimit, cute1, cute2, cute3) : CleanNameGen(characterLimit, cute1, cute2);
                     return true;
                 }
             }

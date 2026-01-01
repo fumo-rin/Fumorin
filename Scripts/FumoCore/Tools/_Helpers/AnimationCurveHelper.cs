@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         public static AnimationCurve InitializedAnimationCurve => new AnimationCurve().Initialized();
         public static AnimationCurve Initialized(this AnimationCurve a)

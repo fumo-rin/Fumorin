@@ -1,3 +1,4 @@
+using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace RinCore
         }
         public static IEnumerable<T> OrderByRandom<T>(this IEnumerable<T> source)
         {
-            return source.OrderBy(_ => RandomHelper.Random256);
+            return source.OrderBy(_ => RNG.Byte255);
         }
     }
 }

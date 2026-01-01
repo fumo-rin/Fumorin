@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         /*
         static public int DirectionalCollectBox(RaycastHit2D[] result, Vector2 origin, Vector2 target, float linearOffset, float reach, float width, float addedAngle, int mask = -1, bool drawDebug = false)

@@ -40,7 +40,6 @@ namespace RinCore
                     Debug.Log("[StageRoutines] Instance destroyed and cleared.");
             }
         }
-
         public static void StopAll()
         {
             if (instance != null)

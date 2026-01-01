@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace RinCore
 {
-    public static partial class Helper
+    public static partial class RinHelper
     {
         public static void GizmosDrawCircle(Vector2 position, float radius, Color32 color, byte fillOpacity = 0)
         {
