@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 759e816689562954ca07584234576acd, type: 2}
-  m_sharedMaterial: {fileID: 1285635738293883577, guid: 759e816689562954ca07584234576acd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
+  m_sharedMaterial: {fileID: -8885995462406905172, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -92,17 +92,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 10
+  m_fontSize: 22
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
-  m_fontSizeMax: 10
-  m_fontStyle: 32
+  m_fontSizeMax: 22
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -146,11 +147,12 @@ GameObject:
   m_Component:
   - component: {fileID: 266775465905345240}
   - component: {fileID: 8648709299712498062}
-  - component: {fileID: 4414870069256534877}
   - component: {fileID: 2639193446651572102}
   - component: {fileID: 2134823898510153465}
+  - component: {fileID: 4628692236591776893}
+  - component: {fileID: 8769929039052511698}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Mid Res
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,7 +165,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263048154701550129}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -184,19 +186,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263048154701550129}
   m_CullTransparentMesh: 1
---- !u!114 &4414870069256534877
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263048154701550129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7f3c8e7c5f0d62429b4e2b80a02eaca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detail: 1
 --- !u!114 &2639193446651572102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,6 +260,33 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4628692236591776893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263048154701550129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afb0c195bcb80a4c841fa63e2adfb71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rinCore::rinCore.RenderTextureDetailButtonV2
+  itemText: {fileID: 1439338379716862261}
+  width: 360
+  height: 480
+--- !u!114 &8769929039052511698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263048154701550129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1cc836f070597849950fdbdbc93ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rinCore::RinCore.PreventEventSystemUnselect
 --- !u!1 &1380899580616962494
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,12 +297,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5273122494088886512}
   - component: {fileID: 124337874797991979}
-  - component: {fileID: 5609861817403381610}
   - component: {fileID: 994160026386366868}
   - component: {fileID: 5385722597105487952}
-  - component: {fileID: 7319764157256237687}
+  - component: {fileID: 4261800213802453371}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: Low Res
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -320,19 +335,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380899580616962494}
   m_CullTransparentMesh: 1
---- !u!114 &5609861817403381610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1380899580616962494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7f3c8e7c5f0d62429b4e2b80a02eaca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detail: 2
 --- !u!114 &994160026386366868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,7 +409,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7319764157256237687
+--- !u!114 &4261800213802453371
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -416,9 +418,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1380899580616962494}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24c83b580f7b8a04482d8cb3df43bb4c, type: 3}
+  m_Script: {fileID: 11500000, guid: 3afb0c195bcb80a4c841fa63e2adfb71, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: rinCore::rinCore.RenderTextureDetailButtonV2
+  itemText: {fileID: 7763296982037154505}
+  width: 240
+  height: 320
 --- !u!1 &3879378065340232034
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,11 +434,11 @@ GameObject:
   m_Component:
   - component: {fileID: 6266767651507202749}
   - component: {fileID: 6152559224161059719}
-  - component: {fileID: 7980006356489894212}
   - component: {fileID: 3447179039955777976}
   - component: {fileID: 952226989960851313}
+  - component: {fileID: 2644904472755661222}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: High Res
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -467,19 +472,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3879378065340232034}
   m_CullTransparentMesh: 1
---- !u!114 &7980006356489894212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3879378065340232034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7f3c8e7c5f0d62429b4e2b80a02eaca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detail: 0
 --- !u!114 &3447179039955777976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,6 +546,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2644904472755661222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3879378065340232034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afb0c195bcb80a4c841fa63e2adfb71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rinCore::rinCore.RenderTextureDetailButtonV2
+  itemText: {fileID: 1315408923420511373}
+  width: 480
+  height: 640
 --- !u!1 &4235957961517344028
 GameObject:
   m_ObjectHideFlags: 0
@@ -621,8 +628,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Render Scale
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 759e816689562954ca07584234576acd, type: 2}
-  m_sharedMaterial: {fileID: 1285635738293883577, guid: 759e816689562954ca07584234576acd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
+  m_sharedMaterial: {fileID: -8885995462406905172, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -646,17 +653,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
+  m_fontSize: 28
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
-  m_fontSizeMax: 14
-  m_fontStyle: 32
+  m_fontSizeMax: 28
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -757,8 +765,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 759e816689562954ca07584234576acd, type: 2}
-  m_sharedMaterial: {fileID: 1285635738293883577, guid: 759e816689562954ca07584234576acd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
+  m_sharedMaterial: {fileID: -8885995462406905172, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -782,17 +790,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 10
+  m_fontSize: 22
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
-  m_fontSizeMax: 10
-  m_fontStyle: 32
+  m_fontSizeMax: 22
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -856,9 +865,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7934233918934455462}
-  - {fileID: 5273122494088886512}
-  - {fileID: 266775465905345240}
   - {fileID: 6266767651507202749}
+  - {fileID: 266775465905345240}
+  - {fileID: 5273122494088886512}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -884,7 +893,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 10
+  m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
@@ -959,8 +968,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 759e816689562954ca07584234576acd, type: 2}
-  m_sharedMaterial: {fileID: 1285635738293883577, guid: 759e816689562954ca07584234576acd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
+  m_sharedMaterial: {fileID: -8885995462406905172, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -984,17 +993,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 10
+  m_fontSize: 22
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
-  m_fontSizeMax: 10
-  m_fontStyle: 32
+  m_fontSizeMax: 22
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

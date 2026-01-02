@@ -89,218 +89,6 @@ namespace RinCore
         }
     }
     #endregion
-    #region Beat
-    public partial class MusicPlayer
-    {
-        public static event System.Action WhenBeat;
-
-        private static double nextBeatDspTime = 0;
-        private static bool beatActive => IsPlaying;
-
-        private static float dynamicBpm = 0f;
-        private static float dynamicBeatLength = 0.5f;
-
-        private const float bpmRefreshRate = 0.12f;       // seconds between analyses
-        private const float bpmSmoothAlpha = 0.25f;       // smoothing for BPM (0..1)
-        private const float phaseCorrectionGain = 0.65f;  // how strongly to correct beat phase (0..1)
-        private const float onsetThreshold = 1e-6f;      // threshold for onset flux acceptance
-        private const bool debug = false;
-
-        private float bpmUpdateTimer = 0f;
-
-        private void RunBeat()
-        {
-            if (!beatActive || instance == null) return;
-
-            var playingSource = instance.selectedTrack == 1 ? instance.track1 : instance.track2;
-            var wrapper = currentlyPlaying.music;
-            if (!playingSource.isPlaying || wrapper == null)
-                return;
-
-            bpmUpdateTimer += Time.unscaledDeltaTime;
-            if (bpmUpdateTimer >= bpmRefreshRate)
-            {
-                bpmUpdateTimer = 0f;
-                UpdateDynamicBpmAndPhase(playingSource, wrapper);
-            }
-
-            double dsp = AudioSettings.dspTime;
-            if (dsp >= nextBeatDspTime && !isFading)
-            {
-                WhenBeat?.Invoke();
-                nextBeatDspTime += dynamicBeatLength;
-            }
-        }
-
-        private static void UpdateDynamicBpmAndPhase(AudioSource source, MusicWrapper wrapper)
-        {
-            AudioClip clip = source.clip;
-            if (clip == null) return;
-
-            int freq = clip.frequency;
-
-            int analysisWindowSamples = 4096;
-            int hopSizeSamples = analysisWindowSamples / 4;
-
-            int currentSample = source.timeSamples;
-            if (currentSample < 0 || currentSample >= clip.samples) return;
-
-            int startSample = Mathf.Clamp(currentSample - analysisWindowSamples / 2, 0, Mathf.Max(0, clip.samples - analysisWindowSamples));
-            float[] raw = new float[analysisWindowSamples];
-            clip.GetData(raw, startSample);
-
-            if (clip.channels == 2)
-            {
-                float[] rawStereo = new float[analysisWindowSamples * 2];
-                clip.GetData(rawStereo, startSample);
-                for (int i = 0; i < analysisWindowSamples; i++)
-                    raw[i] = 0.5f * (rawStereo[i * 2] + rawStereo[i * 2 + 1]);
-            }
-
-            int frameSize = 512;
-            int frameHop = 256;
-            int frames = Mathf.Max(1, (analysisWindowSamples - frameSize) / frameHop);
-
-            float[] energy = new float[frames];
-            for (int f = 0; f < frames; f++)
-            {
-                int baseIdx = f * frameHop;
-                float e = 0f;
-                for (int i = 0; i < frameSize; i++)
-                {
-                    float s = raw[baseIdx + i];
-                    e += s * s;
-                }
-                energy[f] = e;
-            }
-
-            float[] flux = new float[frames];
-            for (int i = 1; i < frames; i++)
-            {
-                float d = energy[i] - energy[i - 1];
-                flux[i] = Mathf.Max(0f, d);
-            }
-
-            float maxFlux = 0f;
-            for (int i = 0; i < frames; i++) if (flux[i] > maxFlux) maxFlux = flux[i];
-            if (maxFlux > 0f)
-            {
-                for (int i = 0; i < frames; i++) flux[i] /= maxFlux;
-            }
-
-            float secondsPerFrame = (float)frameHop / freq;
-            int minBpm = 40;
-            int maxBpm = 240;
-
-            int minLag = Mathf.Max(2, Mathf.FloorToInt((60f / maxBpm) / secondsPerFrame));
-            int maxLag = Mathf.Max(minLag + 1, Mathf.CeilToInt((60f / minBpm) / secondsPerFrame));
-
-            if (frames < maxLag + 2)
-            {
-                ApplyBpmFallback(wrapper);
-                return;
-            }
-
-            float bestCorr = 0f;
-            int bestLag = minLag;
-
-            for (int lag = minLag; lag <= maxLag; lag++)
-            {
-                float corr = 0f;
-                float denomA = 0f;
-                float denomB = 0f;
-                for (int i = 0; i < frames - lag; i++)
-                {
-                    corr += flux[i] * flux[i + lag];
-                    denomA += flux[i] * flux[i];
-                    denomB += flux[i + lag] * flux[i + lag];
-                }
-                float norm = (denomA > 0f && denomB > 0f) ? corr / Mathf.Sqrt(denomA * denomB) : 0f;
-
-                if (norm > bestCorr)
-                {
-                    bestCorr = norm;
-                    bestLag = lag;
-                }
-            }
-
-            float secondsPerBeat = bestLag * secondsPerFrame;
-            if (secondsPerBeat <= 0f)
-            {
-                ApplyBpmFallback(wrapper);
-                return;
-            }
-
-            float bpmCandidate = 60f / secondsPerBeat;
-
-            while (bpmCandidate < 60f) bpmCandidate *= 2f;
-            while (bpmCandidate > 180f) bpmCandidate *= 0.5f;
-
-            if (bestCorr < 0.08f)
-            {
-                if (wrapper.bpm > 0f)
-                {
-                    bpmCandidate = wrapper.bpm;
-                }
-                dynamicBpm = dynamicBpm <= 0f ? bpmCandidate : Mathf.Lerp(dynamicBpm, bpmCandidate, bpmSmoothAlpha * 0.4f);
-            }
-            else
-            {
-                dynamicBpm = dynamicBpm <= 0f ? bpmCandidate : Mathf.Lerp(dynamicBpm, bpmCandidate, bpmSmoothAlpha);
-            }
-
-            dynamicBpm = Mathf.Clamp(dynamicBpm, 40f, 220f);
-            dynamicBeatLength = 60f / dynamicBpm;
-
-            int bestOnsetFrame = 0;
-            float bestOnsetVal = 0f;
-            for (int i = 0; i < frames; i++)
-            {
-                if (flux[i] > bestOnsetVal)
-                {
-                    bestOnsetVal = flux[i];
-                    bestOnsetFrame = i;
-                }
-            }
-
-            if (bestOnsetVal > onsetThreshold)
-            {
-                int onsetSampleIndex = startSample + bestOnsetFrame * frameHop;
-
-                double dspNow = AudioSettings.dspTime;
-                currentSample = source.timeSamples;
-                double onsetDsp = dspNow + ((double)onsetSampleIndex - (double)currentSample) / freq;
-                if (nextBeatDspTime <= 0)
-                {
-                    nextBeatDspTime = onsetDsp + dynamicBeatLength;
-                }
-                else
-                {
-                    double phaseError = onsetDsp - nextBeatDspTime;
-                    double halfBeat = dynamicBeatLength * 0.5;
-                    if (phaseError > halfBeat) phaseError -= dynamicBeatLength * System.Math.Floor((phaseError / dynamicBeatLength) + 0.5);
-                    if (phaseError < -halfBeat) phaseError += dynamicBeatLength * System.Math.Floor(((-phaseError) / dynamicBeatLength) + 0.5);
-
-                    nextBeatDspTime += phaseCorrectionGain * phaseError;
-                }
-            }
-        }
-
-        private static void ApplyBpmFallback(MusicWrapper wrapper)
-        {
-            if (wrapper != null && wrapper.bpm > 0f)
-            {
-                dynamicBpm = Mathf.Lerp(dynamicBpm <= 0f ? wrapper.bpm : dynamicBpm, wrapper.bpm, bpmSmoothAlpha);
-                dynamicBeatLength = 60f / dynamicBpm;
-            }
-            else
-            {
-                dynamicBpm = Mathf.Lerp(dynamicBpm <= 0f ? 120f : dynamicBpm, 120f, bpmSmoothAlpha);
-                dynamicBeatLength = 60f / dynamicBpm;
-            }
-        }
-    }
-    #endregion
     public partial class MusicPlayer : MonoBehaviour
     {
         static MusicWrapper loopedMusic;
@@ -354,17 +142,20 @@ namespace RinCore
                 Playlist.Enqueue(item);
             }
         }
+        bool started = false; // this is for external ready checks
         private void Update()
         {
-            RunBeat();
-            if (!Application.isFocused || IsPlaying || isFading)
-                return;
-
-            if (Playlist.Count <= 0)
-                return;
-
-            MusicWrapper wrapper = Playlist.Dequeue();
-            wrapper.Play();
+            if (started)
+            {
+                if (!Application.isFocused || IsPlaying || isFading)
+                    return;
+            }
+            if (Playlist.Count > 0)
+            {
+                MusicWrapper wrapper = Playlist.Dequeue();
+                wrapper.Play();
+            }
+            started = true;
         }
         private void Awake()
         {
@@ -382,6 +173,7 @@ namespace RinCore
             SetPlayMode(FetchPlaymode());
         }
         static MusicPlayer instance;
+        public static bool IsReady => instance != null && instance.started;
         [SerializeField] AudioSource track1;
         [SerializeField] AudioSource track2;
         MusicWrapper song1;
@@ -412,9 +204,6 @@ namespace RinCore
             {
                 loopedMusic = mw;
             }
-
-            double dsp = AudioSettings.dspTime;
-            nextBeatDspTime = dsp + mw.BeatLength;
         }
         private void PlayCrossfade(MusicWrapper clip, float crossfade = 0.5f)
         {

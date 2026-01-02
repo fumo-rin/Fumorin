@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using UnityEditor;
 using UnityEngine;
 
 namespace RinCore
@@ -262,6 +263,10 @@ namespace RinCore
 
             return shaped * amplitude;
         }
+        public static float SineAmp(this float angleDegrees, float amplitude)
+        {
+            return Mathf.Sin(angleDegrees * Mathf.Deg2Rad) * amplitude;
+        }
         public static float SineWave(this float frequency, float time, float amplitude = 1f)
         {
             float angularFrequency = 2 * (float)Math.PI * frequency;
@@ -301,6 +306,14 @@ namespace RinCore
         public static float Random(this (float, float) target)
         {
             return RNG.RandomFloatRange(target.Item1, target.Item2);
+        }
+        public static float Add(this float f, float other)
+        {
+            return f + other;
+        }
+        public static float Mod(this float f, float mod)
+        {
+            return f % mod;
         }
     }
 }

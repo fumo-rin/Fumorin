@@ -3,32 +3,16 @@ using System.Collections.Generic;
 
 namespace RinCore
 {
-    public class WaitForSecondsCached : CustomYieldInstruction
-    {
-        readonly float duration;
-        float startTime;
-        public WaitForSecondsCached(float seconds)
-        {
-            duration = seconds;
-            Reset();
-        }
-        public override void Reset()
-        {
-            startTime = Time.time;
-        }
-        public override bool keepWaiting =>
-            Time.time - startTime < duration;
-    }
     static partial class RinHelper
     {
-        static Dictionary<int, WaitForSecondsCached> wfsCache;
+        static Dictionary<int, WaitForSeconds> wfsCache;
 
         [Initialize(-99999)]
         private static void ResetWaitforsecondsCache()
         {
-            wfsCache = new Dictionary<int, WaitForSecondsCached>();
+            wfsCache = new Dictionary<int, WaitForSeconds>();
         }
-        public static WaitForSecondsCached WaitForSeconds(this float seconds, bool cached = true)
+        public static WaitForSeconds WaitForSeconds(this float seconds, bool cached = true)
         {
             if (seconds <= 0f)
             {
@@ -37,7 +21,7 @@ namespace RinCore
 
             if (!cached)
             {
-                return new WaitForSecondsCached(seconds);
+                return new UnityEngine.WaitForSeconds(seconds);
             }
             if (wfsCache.Count > 10000)
             {
@@ -45,19 +29,14 @@ namespace RinCore
             }
             int msKey = Mathf.RoundToInt(seconds * 1000f);
 
-            if (wfsCache.TryGetValue(msKey, out WaitForSecondsCached value))
+            if (wfsCache.TryGetValue(msKey, out WaitForSeconds value))
             {
                 return value;
             }
 
-            WaitForSecondsCached spawned = new WaitForSecondsCached(seconds);
+            WaitForSeconds spawned = new WaitForSeconds(seconds);
             wfsCache[msKey] = spawned;
             return spawned;
-        }
-        public static WaitForSecondsCached WaitForSeconds(this float seconds, ref float totalElapsed)
-        {
-            totalElapsed += seconds;
-            return seconds.WaitForSeconds();
         }
     }
 }

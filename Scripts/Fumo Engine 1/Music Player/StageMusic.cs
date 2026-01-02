@@ -7,10 +7,7 @@ namespace RinCore
         [SerializeField] MusicWrapper music;
         private void Start()
         {
-            if (MusicPlayer.FetchPlaymode() == MusicPlayer.PlayMode.Loop)
-            {
-                music.Play();
-            }
+            music.Play();
         }
     }
 }

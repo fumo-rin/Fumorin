@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: UI Hover
   m_EditorClassIdentifier: 
   SoundName: UI Hover
-  soundVolume: 0.7
+  soundVolume: 0.814
   audioMixerOverride: {fileID: -1549346045928506887, guid: 2d90163c4095a0a4283cc9766c8294e4, type: 2}
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: 6ffe2c44517135f42b2a2267f7a60fa2, type: 3}
-    PitchVariancePercent: 3.1
-    PitchOrigin: 1
-    Volume: 0.529
+  - clip: {fileID: 8300000, guid: d187050b7fc4f1d4dbf576dfde05bd5f, type: 3}
+    PitchVariancePercent: 9.6
+    PitchOrigin: 2.45
+    Volume: 0.786
     Muted: 0
   <singleChannel>k__BackingField: 1
   <singleRepeatLockoutTime>k__BackingField: 0.008333334

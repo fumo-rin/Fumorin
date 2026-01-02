@@ -30,30 +30,27 @@ namespace RinCore
         static float stickDeadZone = 0.4f;
         [SerializeField] InputActionReference moveInput, lookInput;
         static Vector2 cachedMove, cachedLook;
-        public static Vector2 Look => instance == null ? Vector2.zero : cachedLook.magnitude >= stickDeadZone ? cachedLook : Vector2.zero;
-        public static Vector2 Move => instance == null ? Vector2.zero : cachedMove.magnitude >= stickDeadZone ? cachedMove : Vector2.zero;
-        public static void BindDeadzoneReference(Slider targetSlider)
-        {
-            targetSlider.onValueChanged.AddListener(UpdateDeadzone);
-        }
+        public static Vector2 Look => instance == null ? Vector2.zero : cachedLook.magnitude >= stickDeadZone.Clamp(0.05f, 0.95f) ? cachedLook : Vector2.zero;
+        public static Vector2 Move => instance == null ? Vector2.zero : cachedMove.magnitude >= stickDeadZone.Clamp(0.05f, 0.95f) ? cachedMove : Vector2.zero;
         [Initialize(999)]
-        private static void FetchDeadzone()
+        public static float FetchDeadzone()
         {
             if (PersistentJSON.TryLoad(out float value, "Stick Deadzone"))
             {
-                UpdateDeadzone(value);
+                return UpdateDeadzone(value);
+            }
+            else
+            {
+                return UpdateDeadzone(0.4f);
             }
         }
         [QFSW.QC.Command("-input-deadzone")]
-        private static void UpdateDeadzone(float value)
+        public static float UpdateDeadzone(float value)
         {
-            stickDeadZone = value.Clamp(0.05f, 0.95f);
+            stickDeadZone = value.Clamp(0.05f, 1f);
             PersistentJSON.TrySave(stickDeadZone, "Stick Deadzone");
             Debug.Log("Updated stick deadzone :" + value.ToString("F2"));
-        }
-        public static void ReleaseDeadzoneReference(Slider targetSlider)
-        {
-            targetSlider.onValueChanged.RemoveListener(UpdateDeadzone);
+            return stickDeadZone;
         }
     }
     #endregion

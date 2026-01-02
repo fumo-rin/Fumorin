@@ -12,6 +12,10 @@ namespace RinCore
         private void Awake()
         {
             b = GetComponent<Button>();
+            if (GeneralManager.IsWebGL)
+            {
+                b.interactable = false;
+            }
         }
         private void Start()
         {

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: UI Click
   m_EditorClassIdentifier: 
   SoundName: UI Click
-  soundVolume: 0.7
+  soundVolume: 0.839
   audioMixerOverride: {fileID: -1549346045928506887, guid: 2d90163c4095a0a4283cc9766c8294e4, type: 2}
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: dca4ff073cdf6ab4088ffd195ad26739, type: 3}
-    PitchVariancePercent: 10.1
-    PitchOrigin: 1
-    Volume: 0.732
+  - clip: {fileID: 8300000, guid: f51e12b964f70b04fbab5bbd307f8f61, type: 3}
+    PitchVariancePercent: 11.6
+    PitchOrigin: 1.95
+    Volume: 1
     Muted: 0
   <singleChannel>k__BackingField: 1
   <singleRepeatLockoutTime>k__BackingField: 0.008333334

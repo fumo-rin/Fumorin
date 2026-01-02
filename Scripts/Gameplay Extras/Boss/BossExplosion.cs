@@ -24,7 +24,7 @@ namespace rinCore
                 List<Vector2> relativePositions = new();
                 for (int i = 0; i < count; i++)
                 {
-                    relativePositions.Add(RNG.SeededRandomVector2.ScaleToMagnitude(new RNG.floatRange(data.minRadius, data.maxRadius)));
+                    relativePositions.Add(RNG.SeededRandomVector2.ScaleToMagnitude(RNG.FloatRange(data.minRadius, data.maxRadius)));
                 }
                 if (relativePositions == null || relativePositions.Count <= 0)
                 {

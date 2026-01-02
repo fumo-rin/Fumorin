@@ -9,6 +9,7 @@ namespace RinCore
     #region Music Clip Create
     using UnityEditor;
     using System.IO;
+    using System.Collections;
 
 #if UNITY_EDITOR
     public class MusicClipMenuEntry
@@ -84,9 +85,31 @@ namespace RinCore
             clipVolume = 0.7f;
             dontReplaceSelf = true;
         }
+        [Initialize(-999)]
+        private static void ResetQueue()
+        {
+            musicPlayNextRoutine = null;
+        }
+        static Coroutine musicPlayNextRoutine;
         internal static void PlayMusic(MusicWrapper p)
         {
-            MusicPlayer.PlayMusicWrapper(p);
+            IEnumerator CO_PlayWhenReady()
+            {
+                Debug.Log("Playing : " + p.TrackName);
+                while (!MusicPlayer.IsReady)
+                {
+                    Debug.Log("Stalling...");
+                    yield return null;
+                }
+                MusicPlayer.PlayMusicWrapper(p);
+                Debug.Log("Now Playing");
+                musicPlayNextRoutine = null;
+            }
+            if (musicPlayNextRoutine != null)
+            {
+                GlobalCoroutineRunner.StopAllOfKey("Music Play Queue");
+            }
+            musicPlayNextRoutine = CO_PlayWhenReady().RunRoutine("Music Play Queue");
         }
     }
 }

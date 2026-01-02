@@ -70,7 +70,7 @@ namespace RinCore
                     hoverTarget = selected;
             }
 
-            if (hoverTarget != lastHovered && hoverTarget != null)
+            if (hoverTarget != lastHovered && hoverTarget != null && !SceneLoader.IsLoading)
             {
                 lastHovered = hoverTarget;
                 hoverSound?.Play(ALHandler.Position);
@@ -113,7 +113,7 @@ namespace RinCore
                     submitTarget = selected;
             }
 
-            if (submitPressed && !submitPressedLastFrame && submitTarget != null && submitTarget.activeInHierarchy)
+            if (submitPressed && !submitPressedLastFrame && submitTarget != null && submitTarget.activeInHierarchy && !SceneLoader.IsLoading)
             {
                 clickSound?.Play(ALHandler.Position);
             }

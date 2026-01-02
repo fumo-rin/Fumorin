@@ -53,6 +53,14 @@ namespace RinCore
             return i.AsFloat().Multiply(multiplier);
         }
         public static float AsFloat(this int i, float multiplier = 1f) => (float)i * multiplier;
+        public static int Add(this int i, int other)
+        {
+            return (i + other);
+        }
+        public static int Mod(this int i, int mod)
+        {
+            return i % mod;
+        }
         public static string ToThousandsString(this int value, int decimals = 0, CultureInfo culture = null)
         {
             culture ??= CultureInfo.CurrentCulture;

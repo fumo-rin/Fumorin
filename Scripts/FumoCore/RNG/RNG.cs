@@ -1,4 +1,6 @@
+using Pathfinding.Graphs.Grid;
 using RinCore;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 namespace rinCore
@@ -101,26 +103,9 @@ namespace rinCore
     #region Float Range
     public static partial class RNG
     {
-        public struct floatRange
+        public static float FloatRange(float min, float max)
         {
-            float min, max;
-            float selected;
-            public floatRange(float min, float max)
-            {
-                this.min = min;
-                this.max = max;
-                this.selected = 0f;
-                this.selected = Next();
-            }
-            public float Next()
-            {
-                selected = RandomFloatRange(min, max);
-                return selected;
-            }
-            public static implicit operator float(floatRange item)
-            {
-                return item.selected;
-            }
+            return RandomFloatRange(min, max);
         }
     }
     #endregion
