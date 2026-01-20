@@ -7,9 +7,17 @@ namespace RinCore
     [RequireComponent(typeof(UnityEngine.UI.Selectable))]
     public class PreventEventSystemUnselect : MonoBehaviour
     {
+        [SerializeField] bool SelectWhenEnabled = false;
         private void LateUpdate()
         {
             if (!RinHelper.HasSelectWithEventSystem)
+            {
+                gameObject.Select_WithEventSystem();
+            }
+        }
+        private void OnEnable()
+        {
+            if (SelectWhenEnabled)
             {
                 gameObject.Select_WithEventSystem();
             }

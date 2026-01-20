@@ -10,7 +10,8 @@ namespace RinCore
         public enum KeysShmup
         {
             PlayerShotVisibilityReduction,
-            PlayerAutoFireWhenFocused
+            PlayerAutoFireWhenFocused,
+            Invincible
         }
         #endregion
 
