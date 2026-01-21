@@ -359,33 +359,33 @@ namespace RinCore
         }
         public static Vector2 QuantizeToStepSize(this Vector2 vector, float stepSize = 45f, Rect? biasRect = null)
         {
-            if (vector == Vector2.zero)
-                return Vector2.zero;
-
-            if (biasRect != null)
-                return QuantizeToStepSizeWithBias(vector, biasRect.Value, stepSize);
-
-            float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
-            float snappedAngle = Mathf.Round(angle / stepSize) * stepSize;
-            float radians = snappedAngle * Mathf.Deg2Rad;
-            return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)).normalized;
+            if (biasRect.HasValue)
+            {
+                return vector.QuantizeToStepSizeWithBias(biasRect.Value, stepSize);
+            }
+            return Snap(vector, stepSize);
         }
         private static Vector2 QuantizeToStepSizeWithBias(this Vector2 vector, Rect biasRect, float stepSize = 45f)
         {
-            if (vector == Vector2.zero)
-                return Vector2.zero;
-            float aspectRatio = biasRect.width / biasRect.height;
+            if (vector.sqrMagnitude < 0.001f) return Vector2.zero;
+            float scaleX = biasRect.width > 0 ? 1f / biasRect.width : 1f;
+            float scaleY = biasRect.height > 0 ? 1f / biasRect.height : 1f;
+
+            Vector2 biasedVector = new Vector2(vector.x * scaleX, vector.y * scaleY);
+            Vector2 snappedNormalized = Snap(biasedVector, stepSize).normalized;
+            Vector2 result = new Vector2(snappedNormalized.x * biasRect.width, snappedNormalized.y * biasRect.height);
+
+            return result.normalized * vector.magnitude;
+        }
+        private static Vector2 Snap(Vector2 vector, float stepSize)
+        {
+            if (vector.sqrMagnitude < 0.001f) return Vector2.zero;
+
             float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
-            float adjustedAngle = angle;
+            float snappedAngle = Mathf.Round(angle / stepSize) * stepSize;
+            float rad = snappedAngle * Mathf.Deg2Rad;
 
-            if (aspectRatio > 1f)
-                adjustedAngle = Mathf.LerpAngle(angle, Mathf.Round(angle / 180f) * 180f, 0.5f);
-            else if (aspectRatio < 1f)
-                adjustedAngle = Mathf.LerpAngle(angle, Mathf.Round((angle - 90f) / 180f) * 180f + 90f, 0.5f);
-
-            float snappedAngle = Mathf.Round(adjustedAngle / stepSize) * stepSize;
-            float radians = snappedAngle * Mathf.Deg2Rad;
-            return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)).normalized;
+            return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
         }
         public static void LineChop(this Vector2 a, Vector2 b, int segments, out List<Vector2> result)
         {
