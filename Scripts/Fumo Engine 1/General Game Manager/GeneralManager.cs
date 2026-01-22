@@ -115,12 +115,12 @@ namespace RinCore
 
                 if (Math.Abs(scoreAccuracy - totalExpected) < Math.Max(1.0, totalExpected * 0.05))
                 {
-                    Debug.Log("Score Seems Good");
+                    Debug.Log("Score Accuracy is correctish");
                     return true;
                 }
                 if (actualScore > 0f)
                 {
-                    Debug.LogWarning("Score Seems Not Good");
+                    Debug.LogWarning("Score Inaccuracy.");
                 }
                 return false;
             }
@@ -132,14 +132,16 @@ namespace RinCore
                     {
                         if (!validator.Invoke())
                         {
-                            Debug.LogWarning("Score invalidated by external component : " + validator.GetType().Name);
+                            Debug.Log("Score invalidated by external component : " + validator.GetType().Name);
                             return false;
                         }
                     }
                 }
                 return true;
             }
-            return InternalCheck() && ExternalCheck();
+            bool scoreSubmitable = InternalCheck() && ExternalCheck();
+            Debug.Log("Submitable score: " + scoreSubmitable);
+            return scoreSubmitable;
         }
         public static double SumUpScoreAnalysis(bool debugPrint)
         {

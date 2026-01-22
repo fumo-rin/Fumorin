@@ -7,20 +7,160 @@ using UnityEngine;
 
 namespace RinCore
 {
+    #region Managed Reference List (Dropdown List)
+#if UNITY_EDITOR
+    public static partial class EF_Utility
+    {
+        public static void EF_TypeDropdownList<TBase>(Rect rect, string label, string listFieldName, UnityEngine.Object backingObject) where TBase : class
+        {
+            if (backingObject == null) return;
+
+            SerializedObject so = new SerializedObject(backingObject);
+            SerializedProperty listProp = so.FindProperty(listFieldName);
+
+            if (listProp == null || !listProp.isArray)
+            {
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, RowHeight), $"Error: {listFieldName} not found.");
+                return;
+            }
+
+            so.Update();
+
+            float currentY = rect.y;
+
+            EditorGUI.LabelField(new Rect(rect.x, currentY, rect.width, RowHeight), label, EditorStyles.boldLabel);
+            currentY += RowHeight + RowPadding;
+
+            var derivedTypes = TypeCache.GetTypesDerivedFrom<TBase>()
+                .Where(t => !t.IsAbstract && t.IsClass && t.IsSerializable)
+                .ToList();
+
+            for (int i = 0; i < listProp.arraySize; i++)
+            {
+                SerializedProperty element = listProp.GetArrayElementAtIndex(i);
+                object obj = element.managedReferenceValue;
+                string typeName = obj != null ? obj.GetType().Name : "(Empty)";
+
+                float contentHeight = EF_ClassDrawerHeight(obj);
+                Rect boxRect = new Rect(rect.x, currentY, rect.width, contentHeight + RowHeight + 15);
+                GUI.Box(boxRect, "", EditorStyles.helpBox);
+
+                float elementHeaderY = currentY + 5;
+
+                float btnWidth = 25f;
+                float spacing = 2f;
+                float totalButtonsWidth = (btnWidth * 3) + (spacing * 2) + 10;
+
+                Rect typeRect = new Rect(rect.x + 5, elementHeaderY, rect.width - totalButtonsWidth, RowHeight);
+                Rect upRect = new Rect(typeRect.xMax + 2, elementHeaderY, btnWidth, RowHeight);
+                Rect downRect = new Rect(upRect.xMax + spacing, elementHeaderY, btnWidth, RowHeight);
+                Rect removeRect = new Rect(downRect.xMax + spacing, elementHeaderY, btnWidth, RowHeight);
+
+                if (GUI.Button(typeRect, $"[{i}] {typeName}", EditorStyles.popup))
+                {
+                    GenericMenu menu = new GenericMenu();
+                    foreach (var type in derivedTypes)
+                    {
+                        Type t = type;
+                        menu.AddItem(new GUIContent(t.Name), typeName == t.Name, () => {
+                            element.managedReferenceValue = Activator.CreateInstance(t);
+                            so.ApplyModifiedProperties();
+                        });
+                    }
+                    menu.ShowAsContext();
+                }
+
+                GUI.enabled = i > 0;
+                if (GUI.Button(upRect, "↑"))
+                {
+                    listProp.MoveArrayElement(i, i - 1);
+                    so.ApplyModifiedProperties();
+                    GUIUtility.ExitGUI();
+                }
+
+                GUI.enabled = i < listProp.arraySize - 1;
+                if (GUI.Button(downRect, "↓"))
+                {
+                    listProp.MoveArrayElement(i, i + 1);
+                    so.ApplyModifiedProperties();
+                    GUIUtility.ExitGUI();
+                }
+                GUI.enabled = true;
+
+                if (GUI.Button(removeRect, "X"))
+                {
+                    listProp.DeleteArrayElementAtIndex(i);
+                    so.ApplyModifiedProperties();
+                    GUIUtility.ExitGUI();
+                }
+
+                float fieldStartY = elementHeaderY + RowHeight + RowPadding;
+
+                if (obj != null)
+                {
+                    EditorGUI.indentLevel++;
+                    EF_ClassDrawer(new Rect(rect.x + 10, fieldStartY, rect.width - 20, 0), obj, backingObject, ref fieldStartY);
+                    EditorGUI.indentLevel--;
+                }
+
+                currentY = fieldStartY + 10;
+            }
+            if (GUI.Button(new Rect(rect.x, currentY, rect.width, RowHeight), "+ Add " + typeof(TBase).Name))
+            {
+                GenericMenu menu = new GenericMenu();
+                foreach (var type in derivedTypes)
+                {
+                    Type t = type;
+                    menu.AddItem(new GUIContent(t.Name), false, () => {
+                        int idx = listProp.arraySize;
+                        listProp.InsertArrayElementAtIndex(idx);
+                        listProp.GetArrayElementAtIndex(idx).managedReferenceValue = Activator.CreateInstance(t);
+                        so.ApplyModifiedProperties();
+                    });
+                }
+                menu.ShowAsContext();
+            }
+
+            so.ApplyModifiedProperties();
+        }
+
+        public static float GetEF_TypeDropdownListHeight<TBase>(string listFieldName, UnityEngine.Object backingObject)
+        {
+            if (backingObject == null) return 0;
+            SerializedObject so = new SerializedObject(backingObject);
+            SerializedProperty listProp = so.FindProperty(listFieldName);
+            if (listProp == null) return 0;
+
+            float height = RowHeight + RowPadding; // Header
+            for (int i = 0; i < listProp.arraySize; i++)
+            {
+                object obj = listProp.GetArrayElementAtIndex(i).managedReferenceValue;
+                height += RowHeight + RowPadding + 10; // Element Header
+                height += EF_ClassDrawerHeight(obj);
+                height += 5; // Spacing
+            }
+            height += RowHeight + RowPadding; // Add Button
+            return height;
+        }
+    }
+#endif
+    #endregion
     #region Class Drawer
 #if UNITY_EDITOR
     public static partial class EF_Utility
     {
-        public static bool EF_ClassDrawer(Rect startRect, object target, ref float yOffset)
+        public static void EF_ClassDrawer(Rect startRect, object target, UnityEngine.Object backingObject, ref float yOffset)
         {
             if (target == null)
             {
-                EditorGUI.LabelField(new Rect(startRect.x, yOffset, startRect.width, EditorGUIUtility.singleLineHeight), "(null)");
-                yOffset += EditorGUIUtility.singleLineHeight + 2f;
-                return false;
+                EditorGUI.LabelField(new Rect(startRect.x, yOffset, startRect.width, RowHeight), "(null)");
+                yOffset += RowHeight + RowPadding;
+                return;
             }
+
             Type type = target.GetType();
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+
             foreach (var field in fields)
             {
                 if (field.IsNotSerialized) continue;
@@ -30,10 +170,11 @@ namespace RinCore
                 Type fieldType = field.FieldType;
                 object value = field.GetValue(target);
 
-                Rect fieldRect = new Rect(startRect.x, yOffset, startRect.width, EditorGUIUtility.singleLineHeight);
-                yOffset += EditorGUIUtility.singleLineHeight + 2f;
+                Rect fieldRect = new Rect(startRect.x, yOffset, startRect.width, RowHeight);
+                yOffset += RowHeight + RowPadding;
 
                 EditorGUI.BeginChangeCheck();
+
                 if (fieldType == typeof(float))
                     value = EditorGUI.FloatField(fieldRect, label, (float)(value ?? 0f));
                 else if (fieldType == typeof(int))
@@ -48,18 +189,11 @@ namespace RinCore
                     value = EditorGUI.ObjectField(fieldRect, label, (UnityEngine.Object)value, fieldType, true);
                 else if (!fieldType.IsPrimitive && !fieldType.IsEnum && !fieldType.IsArray && fieldType.IsClass)
                 {
-                    EditorGUI.LabelField(fieldRect, $"{label} ({fieldType.Name})");
-
-                    if (value == null && GUI.Button(new Rect(startRect.x + startRect.width - 60, fieldRect.y, 60, fieldRect.height), "Create"))
-                    {
-                        value = Activator.CreateInstance(fieldType);
-                    }
-
+                    EditorGUI.LabelField(fieldRect, $"{label} ({fieldType.Name})", EditorStyles.boldLabel);
                     if (value != null)
                     {
-                        float indent = 15f;
                         EditorGUI.indentLevel++;
-                        EF_ClassDrawer(new Rect(startRect.x + indent, yOffset, startRect.width - indent, 1000f), value, ref yOffset);
+                        EF_ClassDrawer(startRect, value, backingObject, ref yOffset);
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -67,47 +201,37 @@ namespace RinCore
                 {
                     EditorGUI.LabelField(fieldRect, label, $"({fieldType.Name}) Not Supported");
                 }
-                if (EditorGUI.EndChangeCheck() && target != null)
+
+                if (EditorGUI.EndChangeCheck())
                 {
-                    if (target is UnityEngine.Object o)
-                    {
-                        Undo.RecordObject(target as UnityEngine.Object, "Modify Field");
-                        field.SetValue(target, value);
-                        EditorUtility.SetDirty(target as UnityEngine.Object);
-                    }
-                    else
-                    {
-                        field.SetValue(target, value);
-                    }
-                    return true;
+                    Undo.RecordObject(backingObject, "Modify Field");
+                    field.SetValue(target, value);
+                    EditorUtility.SetDirty(backingObject);
                 }
             }
-            return false;
         }
+
         public static float EF_ClassDrawerHeight(object target)
         {
-            if (target == null)
-                return EditorGUIUtility.singleLineHeight + 2f;
+            if (target == null) return RowHeight + RowPadding;
 
             Type type = target.GetType();
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-
             float height = 0f;
+
             foreach (var field in fields)
             {
                 if (field.IsNotSerialized) continue;
                 if (Attribute.IsDefined(field, typeof(HideInInspector))) continue;
 
-                height += EditorGUIUtility.singleLineHeight + 2f;
-
+                height += RowHeight + RowPadding;
                 Type fieldType = field.FieldType;
-                if (!fieldType.IsPrimitive && !fieldType.IsEnum && !fieldType.IsArray && fieldType.IsClass)
+                if (!fieldType.IsPrimitive && !fieldType.IsEnum && !fieldType.IsArray && fieldType.IsClass && !typeof(UnityEngine.Object).IsAssignableFrom(fieldType))
                 {
                     object value = field.GetValue(target);
                     height += EF_ClassDrawerHeight(value);
                 }
             }
-
             return height;
         }
     }
@@ -271,123 +395,6 @@ namespace RinCore
             return GUI.Button(rect, label);
         }
     }
-    #endregion
-    #region Class List Dropdown
-#if UNITY_EDITOR
-    public static partial class EF_Utility
-    {
-        private const float TypeRowHeight = 20f;
-        private const float TypeRowPadding = 2f;
-        private const float TypeButtonWidth = 25f;
-
-        public static List<TBase> EF_TypeDropdownList<TBase>(Rect rect, string label, List<TBase> list) where TBase : class
-        {
-            list ??= new List<TBase>();
-
-            Type baseType = typeof(TBase);
-
-            var types = TypeCache.GetTypesDerivedFrom(baseType)
-                .Where(t => t.IsClass && !t.IsAbstract && t.IsSerializable)
-                .OrderBy(t => t.FullName)
-                .ToList();
-
-            float y = rect.y;
-
-            EditorGUI.LabelField(new Rect(rect.x, y, rect.width, TypeRowHeight), label);
-            y += TypeRowHeight + TypeRowPadding;
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                Rect row = new Rect(rect.x, y, rect.width, TypeRowHeight);
-                Rect buttonRect = new Rect(row.x, row.y, row.width - TypeButtonWidth - 4f, row.height);
-                Rect removeRect = new Rect(buttonRect.xMax + 4f, row.y, TypeButtonWidth, row.height);
-
-                int localIndex = i;
-
-                string buttonLabel = list[localIndex]?.GetType().Name ?? "(None)";
-                if (GUI.Button(buttonRect, buttonLabel))
-                {
-                    GenericMenu menu = new GenericMenu();
-
-                    menu.AddItem(new GUIContent("(None)"), list[localIndex] == null, () =>
-                    {
-                        if (localIndex < list.Count)
-                        {
-                            Undo.RecordObject(Selection.activeObject, "Clear Attack");
-                            list[localIndex] = null;
-                            EditorUtility.SetDirty(Selection.activeObject);
-                        }
-                    });
-
-                    for (int t = 0; t < types.Count; t++)
-                    {
-                        int capturedTypeIndex = t;
-                        string path = types[t].FullName.Replace('+', '/');
-                        menu.AddItem(new GUIContent(path), list[localIndex]?.GetType() == types[t], () =>
-                        {
-                            if (localIndex < list.Count)
-                            {
-                                Undo.RecordObject(Selection.activeObject, "Change Attack Type");
-                                list[localIndex] = Activator.CreateInstance(types[capturedTypeIndex]) as TBase;
-                                EditorUtility.SetDirty(Selection.activeObject);
-                            }
-                        });
-                    }
-
-                    menu.ShowAsContext();
-                }
-
-                if (GUI.Button(removeRect, "−"))
-                {
-                    Undo.RecordObject(Selection.activeObject, "Remove Attack");
-                    list.RemoveAt(localIndex);
-                    EditorUtility.SetDirty(Selection.activeObject);
-                    break;
-                }
-
-                y += TypeRowHeight + TypeRowPadding;
-
-                if (list.Count > localIndex && list[localIndex] != null)
-                {
-                    float drawerYOffset = y;
-                    EF_ClassDrawer(
-                        new Rect(rect.x + 15f, y, rect.width - 15f, 1000f),
-                        list[localIndex],
-                        ref drawerYOffset
-                    );
-                    y = drawerYOffset + TypeRowPadding;
-                }
-            }
-            if (GUI.Button(new Rect(rect.x, y, rect.width, TypeRowHeight), "+ Add"))
-            {
-                Undo.RecordObject(Selection.activeObject, "Add Attack");
-                list.Add(null);
-                EditorUtility.SetDirty(Selection.activeObject);
-            }
-
-            return list;
-        }
-
-        public static float GetTypeDropdownListHeight<TBase>(List<TBase> list)
-        {
-            float height = TypeRowHeight + TypeRowPadding;
-
-            if (list == null)
-                return height + TypeRowHeight;
-
-            foreach (var element in list)
-            {
-                height += TypeRowHeight + TypeRowPadding;
-
-                if (element != null)
-                    height += EF_ClassDrawerHeight(element) + TypeRowPadding;
-            }
-
-            height += TypeRowHeight;
-            return height;
-        }
-    }
-#endif
     #endregion
     #region Class Dropdown
 #if UNITY_EDITOR
