@@ -38,5 +38,14 @@ namespace RinCore
             wfsCache[msKey] = spawned;
             return spawned;
         }
+        public static WaitUntil Or(this WaitUntil current, WaitUntil other)
+        {
+            return new WaitUntil(() =>
+            {
+                bool currentDone = current == null || !current.keepWaiting;
+                bool otherDone = other == null || !other.keepWaiting;
+                return currentDone || otherDone;
+            });
+        }
     }
 }
