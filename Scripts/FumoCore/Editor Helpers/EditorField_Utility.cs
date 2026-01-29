@@ -11,116 +11,110 @@ namespace RinCore
 #if UNITY_EDITOR
     public static partial class EF_Utility
     {
+        const float RemoveButtonWidth = 25f;
+
         public static void EF_TypeDropdownList<TBase>(Rect rect, string label, string listFieldName, UnityEngine.Object backingObject) where TBase : class
         {
-            if (backingObject == null) return;
+            if (backingObject == null)
+                return;
+
+            const float RemoveButtonWidth = 25f;
 
             SerializedObject so = new SerializedObject(backingObject);
             SerializedProperty listProp = so.FindProperty(listFieldName);
-
             if (listProp == null || !listProp.isArray)
             {
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, RowHeight), $"Error: {listFieldName} not found.");
+                EditorGUI.LabelField(
+                    new Rect(rect.x, rect.y, rect.width, RowHeight),
+                    $"Error: {listFieldName} not found or not an array"
+                );
                 return;
             }
 
             so.Update();
+            float y = rect.y;
 
-            float currentY = rect.y;
+            EditorGUI.LabelField(new Rect(rect.x, y, rect.width, RowHeight), label, EditorStyles.boldLabel);
+            y += RowHeight + RowPadding;
 
-            EditorGUI.LabelField(new Rect(rect.x, currentY, rect.width, RowHeight), label, EditorStyles.boldLabel);
-            currentY += RowHeight + RowPadding;
-
-            var derivedTypes = TypeCache.GetTypesDerivedFrom<TBase>()
-                .Where(t => !t.IsAbstract && t.IsClass && t.IsSerializable)
+            var groupedTypes = TypeCache.GetTypesDerivedFrom<TBase>()
+                .Where(t => t.IsClass && !t.IsAbstract && t.IsSerializable)
+                .GroupBy(t => t.DeclaringType)
+                .OrderBy(g => g.Key != null ? g.Key.Name : "")
                 .ToList();
 
             for (int i = 0; i < listProp.arraySize; i++)
             {
                 SerializedProperty element = listProp.GetArrayElementAtIndex(i);
-                object obj = element.managedReferenceValue;
-                string typeName = obj != null ? obj.GetType().Name : "(Empty)";
+                object value = element.managedReferenceValue;
 
-                float contentHeight = EF_ClassDrawerHeight(obj);
-                Rect boxRect = new Rect(rect.x, currentY, rect.width, contentHeight + RowHeight + 15);
-                GUI.Box(boxRect, "", EditorStyles.helpBox);
+                string typeName = value != null ? value.GetType().Name : "(None)";
 
-                float elementHeaderY = currentY + 5;
+                Rect popupRect = new Rect(rect.x, y, rect.width - RemoveButtonWidth - 4f, RowHeight);
+                Rect removeRect = new Rect(popupRect.xMax + 4f, y, RemoveButtonWidth, RowHeight);
 
-                float btnWidth = 25f;
-                float spacing = 2f;
-                float totalButtonsWidth = (btnWidth * 3) + (spacing * 2) + 10;
-
-                Rect typeRect = new Rect(rect.x + 5, elementHeaderY, rect.width - totalButtonsWidth, RowHeight);
-                Rect upRect = new Rect(typeRect.xMax + 2, elementHeaderY, btnWidth, RowHeight);
-                Rect downRect = new Rect(upRect.xMax + spacing, elementHeaderY, btnWidth, RowHeight);
-                Rect removeRect = new Rect(downRect.xMax + spacing, elementHeaderY, btnWidth, RowHeight);
-
-                if (GUI.Button(typeRect, $"[{i}] {typeName}", EditorStyles.popup))
+                if (GUI.Button(popupRect, $"[{i}] {typeName}", EditorStyles.popup))
                 {
                     GenericMenu menu = new GenericMenu();
-                    foreach (var type in derivedTypes)
-                    {
-                        Type t = type;
-                        menu.AddItem(new GUIContent(t.Name), typeName == t.Name, () => {
-                            element.managedReferenceValue = Activator.CreateInstance(t);
+
+                    menu.AddItem(new GUIContent("(None)"), value == null,
+                        () =>
+                        {
+                            element.managedReferenceValue = null;
                             so.ApplyModifiedProperties();
-                        });
+                            EditorUtility.SetDirty(backingObject);
+                        }
+                    );
+
+                    foreach (var group in groupedTypes)
+                    {
+                        string category = group.Key != null ? group.Key.Name : "Uncategorized";
+
+                        foreach (var type in group)
+                        {
+                            Type captured = type;
+                            string path = $"{category}/{captured.Name}";
+
+                            menu.AddItem(new GUIContent(path), value != null && value.GetType() == captured,
+                                () =>
+                                {
+                                    element.managedReferenceValue =
+                                        Activator.CreateInstance(captured);
+                                    so.ApplyModifiedProperties();
+                                    EditorUtility.SetDirty(backingObject);
+                                }
+                            );
+                        }
                     }
+
                     menu.ShowAsContext();
                 }
 
-                GUI.enabled = i > 0;
-                if (GUI.Button(upRect, "↑"))
-                {
-                    listProp.MoveArrayElement(i, i - 1);
-                    so.ApplyModifiedProperties();
-                    GUIUtility.ExitGUI();
-                }
-
-                GUI.enabled = i < listProp.arraySize - 1;
-                if (GUI.Button(downRect, "↓"))
-                {
-                    listProp.MoveArrayElement(i, i + 1);
-                    so.ApplyModifiedProperties();
-                    GUIUtility.ExitGUI();
-                }
-                GUI.enabled = true;
-
-                if (GUI.Button(removeRect, "X"))
+                if (GUI.Button(removeRect, "−"))
                 {
                     listProp.DeleteArrayElementAtIndex(i);
                     so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(backingObject);
                     GUIUtility.ExitGUI();
                 }
 
-                float fieldStartY = elementHeaderY + RowHeight + RowPadding;
+                y += RowHeight + RowPadding;
 
-                if (obj != null)
+                if (element.managedReferenceValue != null)
                 {
-                    EditorGUI.indentLevel++;
-                    EF_ClassDrawer(new Rect(rect.x + 10, fieldStartY, rect.width - 20, 0), obj, backingObject, ref fieldStartY);
-                    EditorGUI.indentLevel--;
+                    float drawerY = y;
+                    EF_ClassDrawer(new Rect(rect.x + 15f, y, rect.width - 15f, 0f), element.managedReferenceValue, backingObject, ref drawerY);
+                    y = drawerY + RowPadding;
                 }
-
-                currentY = fieldStartY + 10;
             }
-            if (GUI.Button(new Rect(rect.x, currentY, rect.width, RowHeight), "+ Add " + typeof(TBase).Name))
+            if (GUI.Button(new Rect(rect.x, y, rect.width, RowHeight), "+ Add"))
             {
-                GenericMenu menu = new GenericMenu();
-                foreach (var type in derivedTypes)
-                {
-                    Type t = type;
-                    menu.AddItem(new GUIContent(t.Name), false, () => {
-                        int idx = listProp.arraySize;
-                        listProp.InsertArrayElementAtIndex(idx);
-                        listProp.GetArrayElementAtIndex(idx).managedReferenceValue = Activator.CreateInstance(t);
-                        so.ApplyModifiedProperties();
-                    });
-                }
-                menu.ShowAsContext();
-            }
+                listProp.InsertArrayElementAtIndex(listProp.arraySize);
+                listProp.GetArrayElementAtIndex(listProp.arraySize - 1).managedReferenceValue = null;
 
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(backingObject);
+            }
             so.ApplyModifiedProperties();
         }
 

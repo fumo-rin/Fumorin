@@ -23,6 +23,17 @@ namespace RinCore
         public static Color32 PastelCyan => new Color32(140, 240, 255, 255);
         public static Color32 PastelOrange => new Color32(255, 216, 140, 255);
         public static Color32 White => new Color32(255, 255, 255, 255);
+        #region Gray
+        public static Color32 Gray1 => new Color32(25, 25, 25, 255);
+        public static Color32 Gray2 => new Color32(51, 51, 51, 255);
+        public static Color32 Gray3 => new Color32(76, 76, 76, 255);
+        public static Color32 Gray4 => new Color32(102, 102,102, 255);
+        public static Color32 Gray5 => new Color32(127, 127, 127, 255);
+        public static Color32 Gray6 => new Color32(152, 152, 152, 255);
+        public static Color32 Gray7 => new Color32(178, 178, 178, 255);
+        public static Color32 Gray8 => new Color32(203, 203, 203, 255);
+        public static Color32 Gray9 => new Color32(229, 229, 229, 255);
+        #endregion
     }
     public static class ColorExtensions
     {

@@ -129,7 +129,7 @@ namespace RinCore
         }
         public static float RandomPositiveNegativeRange(this float f)
         {
-            return UnityEngine.Random.Range(-f.Absolute(), f.Absolute());
+            return RNG.RandomFloatRange(-f.Absolute(), f.Absolute());
         }
         public static float Quantize(this float f, float steps, bool roundUp = false)
         {

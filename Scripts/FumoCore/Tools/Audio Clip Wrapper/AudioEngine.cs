@@ -34,7 +34,9 @@ namespace RinCore
         {
             if (a.singleRepeatLockoutTime > 0f)
             {
-                if (!a.ReplayTimeAllowed()) return;
+                if (!a.ReplayTimeAllowed())
+                    return;
+
                 a.SetNextPlayTime(Time.unscaledTime + a.singleRepeatLockoutTime);
             }
             for (int i = 0; i < a.soundClips.Count; i++)
