@@ -62,7 +62,7 @@ namespace rinCore
             {
                 float x = SeededRandomFloat01;
                 float y = SeededRandomFloat01;
-                return new Vector2(x, y);
+                return new Vector2(-0.5f + x, -0.5f + y).normalized;
             }
         }
         public static Vector3 SeededRandomVector3

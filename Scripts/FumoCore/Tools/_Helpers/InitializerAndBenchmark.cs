@@ -42,10 +42,6 @@ namespace RinCore
                 {
                     InvokeWithBenchmark(method, attr);
                 }
-                else
-                {
-                    UnityEngine.Debug.LogWarning($"Invalid DialogueCommand method '{method.Name}' — must be 'static void Method()'");
-                }
             }
         }
         public static void InvokeWithBenchmark(MethodInfo method, Initialize b, object target = null)

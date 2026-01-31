@@ -321,5 +321,57 @@ namespace RinCore
             if (!ps.isPlaying)
                 ps.Play();
         }
+        public static Color32 GetInitialColor32(this ParticleSystem ps)
+        {
+            var main = ps.main;
+            var startColor = main.startColor;
+
+            Color c = startColor.mode switch
+            {
+                ParticleSystemGradientMode.Color => startColor.color,
+
+                ParticleSystemGradientMode.TwoColors =>
+                    Color.Lerp(startColor.colorMin, startColor.colorMax, UnityEngine.Random.value),
+
+                ParticleSystemGradientMode.Gradient =>
+                    startColor.gradient.Evaluate(0f),
+
+                ParticleSystemGradientMode.TwoGradients =>
+                    Color.Lerp(
+                        startColor.gradientMin.Evaluate(0f),
+                        startColor.gradientMax.Evaluate(0f),
+                        UnityEngine.Random.value
+                    ),
+
+                _ => Color.white
+            };
+
+            return (Color32)c;
+        }
+        public static float GetInitialStartSize(this ParticleSystem ps)
+        {
+            var main = ps.main;
+            var startSize = main.startSize;
+
+            return startSize.mode switch
+            {
+                ParticleSystemCurveMode.Constant => startSize.constant,
+
+                ParticleSystemCurveMode.TwoConstants =>
+                    Mathf.Lerp(startSize.constantMin, startSize.constantMax, UnityEngine.Random.value),
+
+                ParticleSystemCurveMode.Curve =>
+                    startSize.curve.Evaluate(0f),
+
+                ParticleSystemCurveMode.TwoCurves =>
+                    Mathf.Lerp(
+                        startSize.curveMin.Evaluate(0f),
+                        startSize.curveMax.Evaluate(0f),
+                        UnityEngine.Random.value
+                    ),
+
+                _ => 1f
+            };
+        }
     }
 }

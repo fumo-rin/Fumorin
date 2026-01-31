@@ -80,19 +80,19 @@ namespace RinCore
             /// <summary>
             /// Generic polygon (N points), normalized to unit circle.
             /// </summary>
-            public static List<Vector2> PolygonN(int n, float size, out List<Vector2> points)
+            public static List<Vector2> PolygonN(int n, float size, float rotationDegrees, out List<Vector2> points)
             {
                 points = new List<Vector2>();
+                float rotationRad = rotationDegrees * MathF.PI / 180f;
                 for (int i = 0; i < n; i++)
                 {
-                    float angle = i * MathF.PI * 2f / n - MathF.PI / 2f;
+                    float angle = i * MathF.PI * 2f / n - MathF.PI / 2f + rotationRad;
+
                     points.Add(new Vector2(MathF.Cos(angle), MathF.Sin(angle)));
                 }
-
                 Scale(points, size);
                 return points;
             }
-
             /// <summary>
             /// Helper to apply size scaling.
             /// </summary>
