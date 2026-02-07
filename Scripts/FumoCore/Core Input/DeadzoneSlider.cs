@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace rinCore
+namespace RinCore
 {
     [RequireComponent(typeof(Slider))]
     public class DeadzoneSlider : MonoBehaviour

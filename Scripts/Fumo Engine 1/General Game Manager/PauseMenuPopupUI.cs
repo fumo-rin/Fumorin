@@ -1,7 +1,7 @@
 using RinCore;
 using UnityEngine;
 
-namespace rinCore
+namespace RinCore
 {
     public class PauseMenuPopupUI : MonoBehaviour
     {

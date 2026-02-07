@@ -1,4 +1,4 @@
-using rinCore;
+using RinCore;
 using RinCore;
 using System.Collections.Generic;
 using UnityEngine;

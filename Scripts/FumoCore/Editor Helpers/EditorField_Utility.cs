@@ -12,22 +12,20 @@ namespace RinCore
     public static partial class EF_Utility
     {
         const float RemoveButtonWidth = 25f;
-
         public static void EF_TypeDropdownList<TBase>(Rect rect, string label, string listFieldName, UnityEngine.Object backingObject) where TBase : class
         {
             if (backingObject == null)
                 return;
 
             const float RemoveButtonWidth = 25f;
+            const float MoveButtonWidth = 22f;
+            const float ButtonSpacing = 2f;
 
             SerializedObject so = new SerializedObject(backingObject);
             SerializedProperty listProp = so.FindProperty(listFieldName);
             if (listProp == null || !listProp.isArray)
             {
-                EditorGUI.LabelField(
-                    new Rect(rect.x, rect.y, rect.width, RowHeight),
-                    $"Error: {listFieldName} not found or not an array"
-                );
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, RowHeight), $"Error: {listFieldName} not found or not an array");
                 return;
             }
 
@@ -37,10 +35,23 @@ namespace RinCore
             EditorGUI.LabelField(new Rect(rect.x, y, rect.width, RowHeight), label, EditorStyles.boldLabel);
             y += RowHeight + RowPadding;
 
-            var groupedTypes = TypeCache.GetTypesDerivedFrom<TBase>()
+            string GetNestedCategoryPath(Type type)
+            {
+                Stack<string> stack = new Stack<string>();
+                Type current = type.DeclaringType;
+                while (current != null)
+                {
+                    stack.Push(current.Name);
+                    current = current.DeclaringType;
+                }
+                return stack.Count > 0 ? string.Join("/", stack) : "Uncategorized";
+            }
+
+            var derivedTypes = TypeCache.GetTypesDerivedFrom<TBase>()
                 .Where(t => t.IsClass && !t.IsAbstract && t.IsSerializable)
-                .GroupBy(t => t.DeclaringType)
-                .OrderBy(g => g.Key != null ? g.Key.Name : "")
+                .Select(t => new { Type = t, Category = GetNestedCategoryPath(t) })
+                .GroupBy(x => x.Category)
+                .OrderBy(g => g.Key)
                 .ToList();
 
             for (int i = 0; i < listProp.arraySize; i++)
@@ -50,45 +61,59 @@ namespace RinCore
 
                 string typeName = value != null ? value.GetType().Name : "(None)";
 
-                Rect popupRect = new Rect(rect.x, y, rect.width - RemoveButtonWidth - 4f, RowHeight);
-                Rect removeRect = new Rect(popupRect.xMax + 4f, y, RemoveButtonWidth, RowHeight);
+                float buttonsWidth = (MoveButtonWidth * 2) + RemoveButtonWidth + (ButtonSpacing * 3);
+
+                Rect popupRect = new Rect(rect.x, y, rect.width - buttonsWidth, RowHeight);
+                Rect upRect = new Rect(popupRect.xMax + ButtonSpacing, y, MoveButtonWidth, RowHeight);
+                Rect downRect = new Rect(upRect.xMax + ButtonSpacing, y, MoveButtonWidth, RowHeight);
+                Rect removeRect = new Rect(downRect.xMax + ButtonSpacing, y, RemoveButtonWidth, RowHeight);
 
                 if (GUI.Button(popupRect, $"[{i}] {typeName}", EditorStyles.popup))
                 {
                     GenericMenu menu = new GenericMenu();
-
-                    menu.AddItem(new GUIContent("(None)"), value == null,
-                        () =>
-                        {
-                            element.managedReferenceValue = null;
-                            so.ApplyModifiedProperties();
-                            EditorUtility.SetDirty(backingObject);
-                        }
-                    );
-
-                    foreach (var group in groupedTypes)
+                    menu.AddItem(new GUIContent("(None)"), value == null, () =>
                     {
-                        string category = group.Key != null ? group.Key.Name : "Uncategorized";
+                        element.managedReferenceValue = null;
+                        so.ApplyModifiedProperties();
+                        EditorUtility.SetDirty(backingObject);
+                    });
 
-                        foreach (var type in group)
+                    foreach (var group in derivedTypes)
+                    {
+                        foreach (var entry in group.OrderBy(x => x.Type.Name))
                         {
-                            Type captured = type;
-                            string path = $"{category}/{captured.Name}";
-
-                            menu.AddItem(new GUIContent(path), value != null && value.GetType() == captured,
-                                () =>
-                                {
-                                    element.managedReferenceValue =
-                                        Activator.CreateInstance(captured);
-                                    so.ApplyModifiedProperties();
-                                    EditorUtility.SetDirty(backingObject);
-                                }
-                            );
+                            Type captured = entry.Type;
+                            string path = $"{group.Key}/{captured.Name}";
+                            menu.AddItem(new GUIContent(path), value != null && value.GetType() == captured, () =>
+                            {
+                                element.managedReferenceValue = Activator.CreateInstance(captured);
+                                so.ApplyModifiedProperties();
+                                EditorUtility.SetDirty(backingObject);
+                            });
                         }
                     }
 
                     menu.ShowAsContext();
                 }
+
+                GUI.enabled = i > 0;
+                if (GUI.Button(upRect, "↑"))
+                {
+                    listProp.MoveArrayElement(i, i - 1);
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(backingObject);
+                    GUIUtility.ExitGUI();
+                }
+
+                GUI.enabled = i < listProp.arraySize - 1;
+                if (GUI.Button(downRect, "↓"))
+                {
+                    listProp.MoveArrayElement(i, i + 1);
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(backingObject);
+                    GUIUtility.ExitGUI();
+                }
+                GUI.enabled = true;
 
                 if (GUI.Button(removeRect, "−"))
                 {
@@ -107,17 +132,17 @@ namespace RinCore
                     y = drawerY + RowPadding;
                 }
             }
+
             if (GUI.Button(new Rect(rect.x, y, rect.width, RowHeight), "+ Add"))
             {
                 listProp.InsertArrayElementAtIndex(listProp.arraySize);
                 listProp.GetArrayElementAtIndex(listProp.arraySize - 1).managedReferenceValue = null;
-
                 so.ApplyModifiedProperties();
                 EditorUtility.SetDirty(backingObject);
             }
+
             so.ApplyModifiedProperties();
         }
-
         public static float GetEF_TypeDropdownListHeight<TBase>(string listFieldName, UnityEngine.Object backingObject)
         {
             if (backingObject == null) return 0;
@@ -125,15 +150,15 @@ namespace RinCore
             SerializedProperty listProp = so.FindProperty(listFieldName);
             if (listProp == null) return 0;
 
-            float height = RowHeight + RowPadding; // Header
+            float height = RowHeight + RowPadding;
             for (int i = 0; i < listProp.arraySize; i++)
             {
                 object obj = listProp.GetArrayElementAtIndex(i).managedReferenceValue;
-                height += RowHeight + RowPadding + 10; // Element Header
+                height += RowHeight + RowPadding + 10;
                 height += EF_ClassDrawerHeight(obj);
-                height += 5; // Spacing
+                height += 5;
             }
-            height += RowHeight + RowPadding; // Add Button
+            height += RowHeight + RowPadding;
             return height;
         }
     }

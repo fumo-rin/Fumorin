@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace rinCore
+namespace RinCore
 {
     public class BossExplosion
     {

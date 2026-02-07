@@ -1,4 +1,4 @@
-using rinCore;
+using RinCore;
 using UnityEngine;
 
 namespace RinCore

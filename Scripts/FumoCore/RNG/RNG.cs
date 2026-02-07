@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
-namespace rinCore
+namespace RinCore
 {
     #region Base RNG Builder
     public static partial class RNG

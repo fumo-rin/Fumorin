@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using RinCore;
 
-namespace rinCore
+namespace RinCore
 {
     [RequireComponent(typeof(TMP_Dropdown))]
     public class ResetWindow : MonoBehaviour
