@@ -98,7 +98,7 @@ namespace RinCore
                 Debug.Log("Playing : " + p.TrackName);
                 while (!MusicPlayer.IsReady)
                 {
-                    Debug.Log("Stalling...");
+                    Debug.Log("Stalling Music...");
                     yield return null;
                 }
                 MusicPlayer.PlayMusicWrapper(p);

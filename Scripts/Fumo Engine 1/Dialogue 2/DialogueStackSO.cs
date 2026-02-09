@@ -2,16 +2,49 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
+
+#if UNITY_EDITOR
+using UnityEditor;
+using System.IO;
+using UnityEditor.VersionControl;
+#endif
 namespace RinCore
 {
+    #region Speech
+    [System.Serializable]
+    public class DialogueSpeechData
+    {
+        [SerializeField] float volume = 1f;
+        [SerializeField] List<AudioClip> speechClips = new();
+        public bool GetWord(int hashValue, out AudioClip result)
+        {
+            result = null;
+            if (speechClips.Count <= 1)
+            {
+                result = speechClips[0];
+            }
+            else
+            {
+                result = speechClips[hashValue % speechClips.Count];
+            }
+            return result != null;
+        }
+        [SerializeField] Vector2 pitchRange;
+        [Range(100, 300)]
+        [SerializeField] int pitchSteps;
+        public void ApplySettings(int hashValue, ref AudioSource s)
+        {
+            float pitch = pitchRange.x.LerpUnclamped(pitchRange.y, (hashValue % pitchRange.y));
+            s.pitch = pitch;
+            s.volume = volume;
+        }
+    }
+    #endregion
+
     #region Editor Script
 #if UNITY_EDITOR
-    using UnityEngine;
-    using UnityEditor;
-    using System.IO;
-    using UnityEditor.VersionControl;
-    using System.Collections.Generic;
 
     public static class CreateShmupDialogueFromText
     {
@@ -41,7 +74,7 @@ namespace RinCore
             string dialoguePath = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(directory, dialogueName));
             var newSO = ScriptableObject.CreateInstance<DialogueStackSO>();
             newSO.name = Path.GetFileNameWithoutExtension(dialoguePath);
-            newSO.SetDialogueTextAsset(selected);
+            newSO.PopulateFromTextAsset(selected);
             AssetDatabase.CreateAsset(newSO, dialoguePath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -85,6 +118,17 @@ namespace RinCore
     [CreateAssetMenu(fileName = "New Dialogue Stack", menuName = "Bremsengine/Dialogue 2/Dialogue Stack")]
     public class DialogueStackSO : ScriptableObject
     {
+        #region Editor shiz
+        private void EditorValidate()
+        {
+#if UNITY_EDITOR
+            if (dialogueTextFile == null)
+            {
+                return;
+            }
+            PopulateFromTextAsset(dialogueTextFile);
+#endif
+        }
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -92,31 +136,102 @@ namespace RinCore
             {
                 return;
             }
-            SetDialogueTextAsset(dialogueTextFile);
-        }
-        private void Awake()
-        {
-            if (dialogueTextFile == null)
-            {
-                return;
-            }
-            SetDialogueTextAsset(dialogueTextFile);
-        }
-        public void SetDialogueTextAsset(TextAsset asset)
-        {
-            dialogueTextFile = asset;
-            LoadDialogueFromTextAsset();
-            this.Dirty();
+            PopulateFromTextAsset(dialogueTextFile);
         }
         public void Editor_RefreshAndSave()
         {
-            SetDialogueTextAsset(dialogueTextFile);
+            PopulateFromTextAsset(dialogueTextFile);
             this.SetDirtyAndSave();
         }
 #endif
+        #endregion
+        private void Awake()
+        {
+            EditorValidate();
+        }
+        [System.Serializable]
+        public class CharacterEntry
+        {
+            #region Prop Drawer
+#if UNITY_EDITOR
+            [CustomPropertyDrawer(typeof(DialogueStackSO.CharacterEntry))]
+            public class CharacterEntryDrawer : PropertyDrawer
+            {
+                private const float Padding = 2f;
+                public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+                {
+                    EditorGUI.BeginProperty(position, label, property);
+                    position = EditorGUI.IndentedRect(position);
+                    var nameProp = property.FindPropertyRelative("characterName");
+                    var characterProp = property.FindPropertyRelative("character");
+                    float half = position.width * 0.45f;
+                    float spacing = 6f;
+                    var nameRect = new Rect(position.x, position.y, half, EditorGUIUtility.singleLineHeight);
+                    var charRect = new Rect(position.x + half + spacing, position.y, position.width - half - spacing, EditorGUIUtility.singleLineHeight);
+
+                    EditorGUI.PropertyField(nameRect, nameProp, GUIContent.none);
+                    EditorGUI.PropertyField(charRect, characterProp, GUIContent.none);
+                    EditorGUI.EndProperty();
+                }
+                public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+                {
+                    return EditorGUIUtility.singleLineHeight + Padding;
+                }
+            }
+#endif
+            #endregion
+            public string characterName;
+            public DialogueCharacterSO character;
+        }
+        [SerializeField] List<CharacterEntry> characterList = new();
+        Dictionary<string, DialogueCharacterSO> characterLookup;
         [field: SerializeField] public TextAsset dialogueTextFile { get; private set; }
-        [SerializeField] private DialogueCharacterCollectionSO characterLookup;
         [SerializeField] Dialogue.DialogueCollection containedDialogue;
+        public IEnumerable<Dialogue.DialoguePart> DialogueParts
+        {
+            get
+            {
+                foreach (var item in containedDialogue.parts)
+                {
+                    yield return item;
+                }
+            }
+        }
+        private void FillFromList(List<CharacterEntry> entries, Dictionary<string, DialogueCharacterSO> lookup)
+        {
+            foreach (var item in entries)
+            {
+                if (item.character == null)
+                {
+                    Debug.LogWarning("Missing Character");
+                    continue;
+                }
+                if (lookup.ContainsKey(item.characterName))
+                {
+                    continue;
+                }
+                lookup[item.characterName] = item.character;
+            }
+        }
+        public bool TryGetCharacter(string characterName, out DialogueCharacterSO result)
+        {
+            result = null;
+            if (characterLookup == null || characterLookup.Count <= 0)
+            {
+                characterLookup = new();
+            }
+            FillFromList(characterList, characterLookup);
+
+            if (characterLookup == null || characterLookup.Count <= 0)
+            {
+                Debug.LogError("Bad Character Lookup for : " + name);
+                return false;
+            }
+
+            characterLookup.TryGetValue(characterName, out result);
+
+            return result != null;
+        }
         public bool GetAllCommands(out HashSet<string> commandNames)
         {
             commandNames = null;
@@ -132,11 +247,13 @@ namespace RinCore
         }
         public void StartDialogue(out WaitUntil wait, Action WhenEndDialogue)
         {
-            Dialogue.LoadDialogue(containedDialogue, WhenEndDialogue);
-            wait = Dialogue.WaitUntilNoDialogue;
+            Dialogue.LoadDialogue(this, WhenEndDialogue);
+            float minimumTimeWait = Time.time + 0.5f;
+            wait = new(() => !Dialogue.IsRunning && Time.time > minimumTimeWait);
         }
-        public void LoadDialogueFromTextAsset()
+        public void PopulateFromTextAsset(TextAsset asset)
         {
+            dialogueTextFile = asset;
             List<Dialogue.DialoguePart> newParts = new();
             if (dialogueTextFile == null)
             {
@@ -162,15 +279,28 @@ namespace RinCore
                 var split = line.Split(new[] { ':' }, 2);
                 var character = split[0].Trim();
                 var message = split[1].Trim().Capitalized();
-                if (characterLookup != null)
-                {
-                    characterLookup.AddCharacter(character);
-                }
                 if (!string.IsNullOrEmpty(character) && !string.IsNullOrEmpty(message))
                 {
                     newParts.Add(new Dialogue.DialoguePart(message)
                     {
                         CharacterName = character
+                    });
+                }
+                bool characterExists = false;
+                foreach (var item in characterList)
+                {
+                    if (item != null && item.characterName == character)
+                    {
+                        characterExists = true;
+                        break;
+                    }
+                }
+                if (!characterExists)
+                {
+                    characterList.Add(new()
+                    {
+                        characterName = character,
+                        character = null
                     });
                 }
             }

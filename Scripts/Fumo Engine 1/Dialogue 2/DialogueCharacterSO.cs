@@ -1,28 +1,59 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+using RinCore;
+#endif
 namespace RinCore
 {
-    [CreateAssetMenu(fileName ="New Character", menuName = "Eientei/Dialogue 2/Character")]
+    [CreateAssetMenu(fileName = "New Character", menuName = "RinCore/Dialogue 2/Character")]
     public class DialogueCharacterSO : ScriptableObject
     {
-        [System.Serializable]
-        public struct Character
+#if UNITY_EDITOR
+
+        [CustomEditor(typeof(DialogueCharacterSO))]
+        public class DialogueCharacterSOEditor : Editor
         {
-            public string characterName;
-            public Sprite sprite;
-            public Sprite talkSprite;
-            [SerializeField] DialogueSpeechSO words;
-            public bool GetSpeech(int hashValue, ref AudioSource s, out AudioClip result)
+            public override void OnInspectorGUI()
             {
-                result = null;
-                if (words != null)
+                DrawDefaultInspector();
+                EditorGUILayout.Space(10);
+                if (GUILayout.Button("Ping & Select Asset"))
                 {
-                    words.ApplySettings(hashValue, ref s);
-                    words.GetWord(hashValue, out result);
+                    DialogueCharacterSO so = (DialogueCharacterSO)target;
+                    Selection.activeObject = so;
+                    so.EditorPing();
                 }
-                return result != null;
             }
         }
-        public Character character;
+#endif
+        public string characterName;
+        public Sprite sprite;
+        public Sprite talkSprite;
+        [SerializeField] DialogueSpeechData words;
+        public bool Speak(AudioSource player, int hashValue)
+        {
+            if (player == null)
+                return false;
+
+            bool success = GetSpeech(hashValue, ref player, out AudioClip result);
+            if (success)
+            {
+                player.clip = result;
+                player.Play();
+            }
+            return success;
+        }
+        private bool GetSpeech(int hashValue, ref AudioSource s, out AudioClip result)
+        {
+            result = null;
+            if (words != null)
+            {
+                words.ApplySettings(hashValue, ref s);
+                words.GetWord(hashValue, out result);
+            }
+            return result != null;
+        }
     }
 }

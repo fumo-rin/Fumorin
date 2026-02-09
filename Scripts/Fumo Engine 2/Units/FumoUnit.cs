@@ -249,12 +249,12 @@ namespace RinCore
     public abstract partial class FumoUnit : MonoBehaviour
     {
         public static FumoUnit Player { get; protected set; }
-        public static bool PlayerAs<T>(out T player)
+        public static bool PlayerAs<T>(out T player) where T : FumoUnit
         {
             if (Player is T p)
             {
                 player = p;
-                return true;
+                return player != null && p.gameObject.activeInHierarchy;
             }
             else
             {

@@ -2,6 +2,7 @@ using RinCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEditor;
@@ -22,7 +23,7 @@ namespace RinCore
             {
                 get
                 {
-                    return ContainedMessage.OwoSpeak();
+                    return ContainedMessage;
                 }
             }
             public string CharacterName;
@@ -54,74 +55,21 @@ namespace RinCore
     {
         static int SpeakValue;
         static int wordCharCount;
-        [SerializeField] int charCountToSpeak = 5;
+        const int CHAR_COUNT_TO_SPEAK = 3;
         private static void ResetSpeech()
         {
             SpeakValue = 0;
             wordCharCount = 0;
-        }
-        private static void IncrementSpeak(char toAdd, DialoguePart d)
-        {
-            SpeakValue += toAdd.GetHashCode();
-            wordCharCount++;
-            if (wordCharCount >= instance.charCountToSpeak)
-            {
-                EndWord(d);
-            }
-        }
-        private static void EndWord(DialoguePart d)
-        {
-            if (instance == null)
-            {
-                return;
-            }
-            bool foundCharacter = false;
-            if (instance.loadedCharacters.TryGetCharacter(d.CharacterName, out DialogueCharacterSO.Character character))
-            {
-                foundCharacter = true;
-            }
-            else if (instance.loadedCharacters.TryGetSecondaryCharacter(d.CharacterName, out character))
-            {
-                foundCharacter = true;
-            }
-            if (!foundCharacter)
-            {
-                return;
-            }
-            if (SpeakValue > 0f)
-            {
-                if (character.GetSpeech(SpeakValue, ref instance.speechPlayer, out AudioClip result))
-                {
-                    SpeakFunny(instance.speechPlayer, result);
-                }
-                Jiggle(character);
-            }
-            SpeakValue = 0;
-            wordCharCount = 0;
-        }
-        private static void SpeakFunny(AudioSource s, AudioClip clip)
-        {
-            s.clip = clip;
-            s.Play();
         }
     }
     #endregion
     #region Load & Add Dialogue
     public partial class Dialogue
     {
-        public static void LoadDialogue(DialogueCollection newDialogueStack, Action whenDialogueEnd = null)
+        public static void LoadDialogue(DialogueStackSO stack, Action whenDialogueEnd = null)
         {
             Stop();
-            foreach (var item in newDialogueStack.parts)
-            {
-                AddDialogue(new(item));
-            }
-            Dialogue.SetContinuePressedStall(1f);
-            instance.activeDialogue = instance.StartCoroutine(RunDialogue(0f, whenDialogueEnd));
-        }
-        static void AddDialogue(DialogueStackEntry entry)
-        {
-            DialogueStack.Add(entry);
+            instance.activeDialogueRoutine = instance.StartCoroutine(RunDialogue(stack, 0f, whenDialogueEnd));
         }
     }
     #endregion
@@ -137,6 +85,7 @@ namespace RinCore
         private static void UpdateText(int letterCount, out bool IsMessageDone)
         {
             IsMessageDone = false;
+            Debug.Log("TT:" + letterCount.ToString() + " : ");
             instance.dialogueText.maxVisibleCharacters = letterCount;
             if (instance.dialogueText.text.Length <= letterCount)
             {
@@ -169,137 +118,13 @@ namespace RinCore
                         endTime += Time.unscaledDeltaTime;
                         yield return null;
                     }
-                    if (!GeneralManager.IsPaused && ContinuePressed)
+                    if (!GeneralManager.IsPaused && ContinuePressedOrHeldForALongTime)
                     {
                         yield break;
                     }
                     yield return null;
                 }
             }
-        }
-    }
-    #endregion
-    #region Dialogue Stack Entry
-    public partial class Dialogue
-    {
-        static readonly HashSet<char> ExcludedPunctuation = new()
-{
-    '\'', '"', '‘', '’', '“', '”', ','
-};
-        public class DialogueStackEntry : IEnumerator
-        {
-            public DialoguePart dialoguePart;
-            int currentLetter;
-            IEnumerator enumerator;
-            public DialogueStackEntry(DialoguePart d)
-            {
-                dialoguePart = d;
-                currentLetter = 0;
-                enumerator = WaitForDialogueAndContinue(d);
-            }
-            public IEnumerator RunDialogue(DialoguePart d)
-            {
-                enumerator = WaitForDialogueAndContinue(d);
-                return this;
-            }
-            IEnumerator WaitForDialogueAndContinue(DialoguePart d)
-            {
-                if (!string.IsNullOrWhiteSpace(d.Command))
-                {
-                    ShmupCommands.TryRun(d.Command);
-                    yield break;
-                }
-                string message = dialoguePart.ProcessedMessage;
-                if (message.Length == 0)
-                {
-                    yield break;
-                }
-                bool isPauseChar(char c) => (char.IsSymbol(c) || char.IsWhiteSpace(c));
-                float messageWait = 0f;
-                float continueSkipWait = 0f;
-                bool isDone = false;
-                string nameOverride = "";
-                bool loadedChar = instance.loadedCharacters.TryGetCharacter(d.CharacterName, out var jiggleChar);
-                if (!loadedChar)
-                {
-                    //Try Load From Secondary
-                    loadedChar = instance.loadedCharacters.TryGetSecondaryCharacter(d.CharacterName, out jiggleChar);
-                }
-                if (loadedChar)
-                {
-                    nameOverride = jiggleChar.characterName;
-                }
-                else
-                {
-                    Debug.LogWarning("Bad");
-                }
-                Dialogue.SetTextMessage(dialoguePart, message, nameOverride);
-                if (loadedChar)
-                {
-                    Jiggle(jiggleChar);
-                }
-                ResetSpeech();
-                while (!isDone && currentLetter < message.Length)
-                {
-                    while (GeneralManager.IsPaused)
-                    {
-                        yield return null;
-                    }
-                    while (Time.unscaledTime < messageWait)
-                    {
-                        if (!GeneralManager.IsPaused && ContinuePressed)
-                        {
-                            Dialogue.UpdateText(message.Length + 1, out isDone);
-                            currentLetter = message.Length - 1;
-                            messageWait = 0f;
-                            continueSkipWait = Time.unscaledTime + 0.033f;
-                            while (Time.unscaledTime < continueSkipWait)
-                            {
-                                yield return null;
-                            }
-                            yield return null;
-                        }
-                        yield return null;
-                    }
-                    Dialogue.UpdateText(currentLetter + 1, out isDone);
-                    bool isSpoken = true;
-                    char currentChar = message[currentLetter];
-
-                    if (char.IsPunctuation(currentChar) && !currentChar.RegexChar(ExcludedPunctuation))
-                    {
-                        messageWait = Time.unscaledTime + 0.25f;
-                        isSpoken = false;
-                        EndWord(d);
-                    }
-                    else if (isPauseChar(currentChar))
-                    {
-                        messageWait = Time.unscaledTime + 0.05f;
-                        isSpoken = false;
-                        EndWord(d);
-                    }
-                    else
-                    {
-                        messageWait = Time.unscaledTime + 0.015f;
-                    }
-                    if (isSpoken)
-                    {
-                        IncrementSpeak(currentChar, d);
-                    }
-                    currentLetter++;
-                }
-                EndWord(d);
-                messageWait = Time.unscaledTime + 999999f;
-                IEnumerator wait = new WaitForContinueOrTime(5f);
-                while (wait.MoveNext())
-                {
-                    yield return null;
-                }
-                yield return null;
-                yield return null;
-            }
-            public object Current => MoveNext();
-            public bool MoveNext() => enumerator.MoveNext();
-            public void Reset() => enumerator.Reset();
         }
     }
     #endregion
@@ -312,7 +137,7 @@ namespace RinCore
         {
             activeJiggle = null;
         }
-        private static void Jiggle(DialogueCharacterSO.Character character)
+        private static void Jiggle(DialogueCharacterSO character)
         {
             if (activeJiggle == null)
             {
@@ -324,7 +149,8 @@ namespace RinCore
             }
             Image image = null;
 
-            if (PlayerCharacter.character.characterName == character.characterName)
+            bool isPlayer = PlayerCharacter.characterName == character.characterName;
+            if (isPlayer)
             {
                 instance.playerChatAnimator.SetTrigger(instance.animationChatStringKey);
                 instance.playerSprite.enabled = true;
@@ -336,7 +162,7 @@ namespace RinCore
                 image = instance.otherSprite;
                 instance.otherSprite.enabled = true;
             }
-            IEnumerator CO_JiggleSprite(Image image, DialogueCharacterSO.Character c)
+            IEnumerator CO_JiggleSprite(Image image, DialogueCharacterSO c)
             {
                 instance.SetSprite(image, c.talkSprite);
                 yield return 0.015f.WaitForSeconds();
@@ -390,12 +216,131 @@ namespace RinCore
     #endregion
     public partial class Dialogue : MonoBehaviour
     {
-        [Initialize(100)]
-        private static void Reinitialize()
+        #region Run Dialogue
+        static readonly HashSet<char> ExcludedPunctuation = new()
+{
+    '\'', '"', '‘', '’', '“', '”', ','
+};
+        static IEnumerator RunStack(DialogueStackSO stack)
         {
-            ContinuePressedStallTimeEnd = 0f;
+            float continueStallTime = Time.unscaledTime + 1f;
+            bool StalledContinue()
+            {
+                return Time.unscaledTime < continueStallTime;
+            }
+            DialogueCharacterSO resultCharacter;
+            void IncrementSpeak(char toAdd)
+            {
+                SpeakValue += toAdd.GetHashCode();
+                wordCharCount++;
+                if (wordCharCount >= CHAR_COUNT_TO_SPEAK)
+                {
+                    EndWord();
+                }
+            }
+            void EndWord()
+            {
+                if (instance == null)
+                {
+                    return;
+                }
+                bool foundCharacter = false;
+                foundCharacter = resultCharacter != null;
+                if (!foundCharacter)
+                {
+#if UNITY_EDITOR
+                    Debug.LogWarning("Missing Character to jiggle");
+#endif
+                    return;
+                }
+                if (SpeakValue > 0f)
+                {
+                    resultCharacter.Speak(instance.speechPlayer, SpeakValue);
+                    Jiggle(resultCharacter);
+                }
+                SpeakValue = 0;
+                wordCharCount = 0;
+            }
+            bool isPauseChar(char c) => (char.IsSymbol(c) || char.IsWhiteSpace(c));
+            foreach (var d in stack.DialogueParts)
+            {
+                continueStallTime = Time.unscaledTime + 0.1f;
+                stack.TryGetCharacter(d.CharacterName, out resultCharacter);
+                Jiggle(resultCharacter);
+                if (!string.IsNullOrWhiteSpace(d.Command))
+                {
+                    if (ShmupCommands.TryRun(d.Command))
+                    {
+                        continue;
+                    }
+                }
+                int currentLetterIndex = 0;
+                string message = d.ProcessedMessage;
+                bool isDone = false;
+                string nameOverride = "";
+                float speakingWait = Time.unscaledTime + 0.05f;
+                Dialogue.SetTextMessage(d, message, nameOverride);
+                instance.dialogueText.ForceMeshUpdate();
+                ResetSpeech();
+
+
+
+
+                while (!isDone && currentLetterIndex < message.Length)
+                {
+                    while (GeneralManager.IsPaused)
+                    {
+                        yield return null;
+                    }
+                    while (Time.unscaledTime < speakingWait)
+                    {
+                        if (!GeneralManager.IsPaused && ContinuePressedOrHeldForALongTime && !StalledContinue())
+                        {
+                            Dialogue.UpdateText(message.Length + 1, out isDone);
+                            currentLetterIndex = message.Length - 1;
+                            speakingWait = 0f;
+                        }
+                        yield return null;
+                    }
+                    Dialogue.UpdateText(currentLetterIndex + 1, out isDone);
+                    bool isSpoken = true;
+                    char currentChar = message[currentLetterIndex];
+
+                    if (char.IsPunctuation(currentChar) && !currentChar.RegexChar(ExcludedPunctuation))
+                    {
+                        speakingWait = Time.unscaledTime + 0.25f;
+                        isSpoken = false;
+                        EndWord();
+                    }
+                    else if (isPauseChar(currentChar))
+                    {
+                        speakingWait = Time.unscaledTime + 0.05f;
+                        isSpoken = false;
+                        EndWord();
+                    }
+                    else
+                    {
+                        speakingWait = Time.unscaledTime + 0.015f;
+                    }
+                    if (isSpoken)
+                    {
+                        IncrementSpeak(currentChar);
+                    }
+                    currentLetterIndex++;
+                }
+                EndWord();
+                speakingWait = Time.unscaledTime + 999999f;
+                IEnumerator wait = new WaitForContinueOrTime(5f);
+                while (wait.MoveNext())
+                {
+                    yield return null;
+                }
+            }
+            yield return null;
+            yield return null;
+            if (instance != null) instance.activeDialogueRoutine = null;
         }
-        static float ContinuePressedStallTimeEnd;
+        #endregion
         static DialogueCharacterSO PlayerCharacter;
         [SerializeField] TMP_Text dialogueText, characterNameText;
         [SerializeField] string animationChatStringKey = "CHAT";
@@ -404,52 +349,43 @@ namespace RinCore
         [SerializeField] Image playerSprite;
         [SerializeField] Image otherSprite;
         static Dialogue instance;
-        static List<DialogueStackEntry> DialogueStack = new();
         [SerializeField] GameObject visibilityAnchor;
         [SerializeField] AudioSource speechPlayer;
-        [SerializeField] DialogueCharacterCollectionSO loadedCharacters;
-        Coroutine activeDialogue;
-        public static void SetContinuePressedStall(float delay) => ContinuePressedStallTimeEnd = Time.unscaledTime + delay;
-        static bool ContinuePressed
+        Coroutine activeDialogueRoutine;
+        static bool ContinuePressedOrHeldForALongTime
         {
             get
             {
-                return ShmupInput.SkipDialogueJustPressed || (ShmupInput.SkipDialoguePressedLongerThan(0.85f) && Time.unscaledTime >= ContinuePressedStallTimeEnd);
+                return ShmupInput.SkipDialogueJustPressed || (ShmupInput.SkipDialoguePressedLongerThan(0.85f));
             }
         }
-        public static bool IsRunning => DialogueStack != null && DialogueStack.Count > 0 && instance.visibilityAnchor.activeInHierarchy;
-        public static WaitUntil WaitUntilNoDialogue => new(() => DialogueStack == null || DialogueStack.Count <= 0);
+        public static bool IsRunning
+        {
+            get
+            {
+                bool running = instance.activeDialogueRoutine != null && instance.visibilityAnchor.activeInHierarchy;
+                return running;
+            }
+        }
         private void Awake()
         {
             instance = this;
-            if (DialogueStack == null)
-            {
-                DialogueStack = new List<DialogueStackEntry>();
-            }
             SetBoxVisibility(false);
-        }
-        public static void RunThisWhenPlayerRespawns()
-        {
-            Dialogue.SetContinuePressedStall(0f);
         }
         private static void SetBoxVisibility(bool state)
         {
             instance.visibilityAnchor.SetActive(state);
         }
-        private static IEnumerator RunDialogue(float delay, Action whenDialogueEnd)
+        private static IEnumerator RunDialogue(DialogueStackSO stack, float delay, Action whenDialogueEnd)
         {
             yield return delay.WaitForSeconds(false);
             SetBoxVisibility(true);
             instance.playerSprite.enabled = false;
             instance.otherSprite.enabled = false;
-            if (PlayerCharacter != null) Jiggle(PlayerCharacter.character);
-            foreach (DialogueStackEntry entry in DialogueStack)
-            {
-                yield return entry.RunDialogue(entry.dialoguePart);
-            }
+            if (PlayerCharacter != null) Jiggle(PlayerCharacter);
+            yield return RunStack(stack);
             whenDialogueEnd?.Invoke();
             SetBoxVisibility(false);
-            DialogueStack.Clear();
         }
         public static void Stop()
         {
@@ -457,12 +393,12 @@ namespace RinCore
             {
                 return;
             }
-            if (instance.activeDialogue != null)
+            if (instance.activeDialogueRoutine != null)
             {
-                instance.StopCoroutine(instance.activeDialogue);
+                instance.StopCoroutine(instance.activeDialogueRoutine);
+                instance.activeDialogueRoutine = null;
             }
             SetBoxVisibility(false);
-            DialogueStack.Clear();
         }
     }
 }
