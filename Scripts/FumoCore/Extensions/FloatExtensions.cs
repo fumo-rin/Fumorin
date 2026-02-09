@@ -18,9 +18,28 @@ namespace RinCore
         {
             return f + (target - f) * lerp;
         }
-        public static float MapToLerp(this float lerp, float a, float b)
+        #region Summary For Map From 01
+        /// <summary>
+        /// Maps a 0-1 value to a range of a to b. 0.4 for 5 to 10 for example would be 7.
+        /// Values below min return 0, values above max return >1.
+        /// </summary>
+        #endregion
+        public static float MapFrom01(this float lerp, float a, float b)
         {
             return a + (b - a) * lerp;
+        }
+        #region Summary For Map To 01
+        /// <summary>
+        /// Maps a float value to a 0-1 range based on specified min and max.
+        /// Values below min return 0, values above max return >1.
+        /// </summary>
+        #endregion
+        public static float MapTo01(this float f, float min, float max, bool clamp = false)
+        {
+            if (min == max)
+                return 1f;
+            float f2 = clamp ? f.Clamp(min, max) : f;
+            return (f2 - min) / (max - min);
         }
         public static float Clamp(this float f, float min, float max)
         {
@@ -91,7 +110,7 @@ namespace RinCore
         }
         public static float Multiply(this float f, float value)
         {
-            return f = f * value;
+            return f * value;
         }
         public static float Half(this float f)
         {

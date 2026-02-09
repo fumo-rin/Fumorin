@@ -1,14 +1,16 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace RinCore
 {
     public static class OwoSpeakExtensions
     {
-        private static readonly string[] OwoList = new[]
-        {
-        "OwO", "owo", "UwU", "uwu", "^w^", ">w<", "(´•ω•`)"
-        };
+        private static readonly string[] OwoList =
+        new[] { "OwO", "owo", "UwU", "uwu", ">w<" };
+
+        //new[] { "OwO", "owo", "UwU", "uwu", "^w^", ">w<", "(´•ω•`)" }; // this list has some weird symbols that are not so great for many fonts.
+
         [QFSW.QC.Command("-owo")]
         public static string OwoSpeak(this string msg, bool Extras = true)
         {
@@ -23,10 +25,12 @@ namespace RinCore
                 return $"owo{links.Count}";
             }
 
+            // Preserve links
             string s = Regex.Replace(msg, @"\|c.*?\|r", ReplaceLink);
             s = Regex.Replace(s, @"\{.*?\}", ReplaceLink);
 
-            s = Regex.Replace(s, @"([lr])(\S*s?)", m =>
+            // Skip Numbers
+            s = Regex.Replace(s, @"([lr])([^\d\s]*)", m =>
             {
                 string l = m.Groups[1].Value;
                 string following = m.Groups[2].Value;
@@ -37,7 +41,7 @@ namespace RinCore
                 return "w" + following;
             });
 
-            s = Regex.Replace(s, @"([LR])(\S*S?)", m =>
+            s = Regex.Replace(s, @"([LR])([^\d\s]*)", m =>
             {
                 string L = m.Groups[1].Value;
                 string following = m.Groups[2].Value;
@@ -47,8 +51,10 @@ namespace RinCore
 
                 return "W" + following;
             });
-            s = Regex.Replace(s, @"U([^VW])", "UW$1");
-            s = Regex.Replace(s, @"u([^vw])", "uw$1");
+
+            // Preserve numbers and other characters
+            s = Regex.Replace(s, @"U([^VW\d])", "UW$1");
+            s = Regex.Replace(s, @"u([^vw\d])", "uw$1");
 
             s = s.Replace("ith ", "if ");
 
@@ -59,11 +65,10 @@ namespace RinCore
             if (Extras)
             {
                 s = AddStutterRandom(s);
-            }
-            if (Extras)
-            {
                 s = AddOwoEndingRandom(s);
             }
+
+            // Restore links
             s = Regex.Replace(s, @"owo(\d+)", m =>
             {
                 int index = int.Parse(m.Groups[1].Value) - 1;
@@ -75,30 +80,33 @@ namespace RinCore
 
         private static string AddStutterRandom(string s)
         {
-            var rand = new System.Random();
-            return Regex.Replace(s, @"\b(\w+)\b", m =>
+            return Regex.Replace(s, @"\b(\w+'?\w*)\b", m =>
             {
-                if (rand.Next(12) == 0)
+                string word = m.Groups[1].Value;
+
+                if (word.All(char.IsDigit))
+                    return word;
+
+                if (RNG.Int255 <= 20 && word.Length > 0)
                 {
-                    string w = m.Groups[1].Value;
-                    return $"{w[0]}-{w}";
+                    return $"{word[0]}-{word}";
                 }
-                return m.Value;
+
+                return word;
             });
         }
 
         private static string AddOwoEndingRandom(string s)
         {
-            var rand = new System.Random();
-            if (rand.Next(10) == 0)
+            if (RNG.Int255 <= 25)
             {
-                var owo = OwoList[rand.Next(OwoList.Length)];
+                var owo = OwoList[RNG.Int255 % OwoList.Length];
                 return s + " " + owo;
             }
 
             return Regex.Replace(s, @"!$", m =>
             {
-                var owo = OwoList[rand.Next(OwoList.Length)];
+                var owo = OwoList[RNG.Int255 % OwoList.Length];
                 return "! " + owo;
             });
         }

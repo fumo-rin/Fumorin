@@ -9,18 +9,22 @@ namespace RinCore
     {
         public static bool IsPressed(this InputActionReference reference)
         {
+            if (GeneralManager.IsPaused) return false;
             return GenericInput.GetTracker(reference)?.IsPressed ?? false;
         }
         public static bool JustPressed(this InputActionReference reference)
         {
+            if (GeneralManager.IsPaused) return false;
             return GenericInput.GetTracker(reference)?.JustPressed ?? false;
         }
         public static bool PressedLongerThan(this InputActionReference reference, float seconds)
         {
+            if (GeneralManager.IsPaused) return false;
             return GenericInput.GetTracker(reference)?.PressedLongerThan(seconds) ?? false;
         }
         public static bool ReleasedLongerThan(this InputActionReference reference, float seconds)
         {
+            if (GeneralManager.IsPaused) return false;
             return GenericInput.GetTracker(reference)?.ReleasedLongerThan(seconds) ?? false;
         }
     }

@@ -168,10 +168,9 @@ namespace RinCore
                 }
                 if (!string.IsNullOrEmpty(character) && !string.IsNullOrEmpty(message))
                 {
-                    newParts.Add(new Dialogue.DialoguePart
+                    newParts.Add(new Dialogue.DialoguePart(message)
                     {
-                        CharacterName = character,
-                        ContainedMessage = message
+                        CharacterName = character
                     });
                 }
             }

@@ -17,9 +17,22 @@ namespace RinCore
         public struct DialoguePart
         {
             [TextArea(1, 10)]
-            public string ContainedMessage;
+            [SerializeField] string ContainedMessage;
+            public string ProcessedMessage
+            {
+                get
+                {
+                    return ContainedMessage.OwoSpeak();
+                }
+            }
             public string CharacterName;
             public string Command;
+            public DialoguePart(string message)
+            {
+                ContainedMessage = message;
+                CharacterName = "";
+                Command = "";
+            }
         }
         [System.Serializable]
         public struct DialogueCollection
@@ -115,10 +128,10 @@ namespace RinCore
     #region Set Text
     public partial class Dialogue
     {
-        private static void SetTextMessage(DialoguePart p, string nameOverride = "")
+        private static void SetTextMessage(DialoguePart p, string message, string nameOverride = "")
         {
             instance.dialogueText.maxVisibleCharacters = 0;
-            instance.dialogueText.text = p.ContainedMessage;
+            instance.dialogueText.text = message;
             instance.characterNameText.text = nameOverride == "" ? p.CharacterName : nameOverride;
         }
         private static void UpdateText(int letterCount, out bool IsMessageDone)
@@ -196,7 +209,8 @@ namespace RinCore
                     ShmupCommands.TryRun(d.Command);
                     yield break;
                 }
-                if (dialoguePart.ContainedMessage.Length == 0)
+                string message = dialoguePart.ProcessedMessage;
+                if (message.Length == 0)
                 {
                     yield break;
                 }
@@ -219,13 +233,13 @@ namespace RinCore
                 {
                     Debug.LogWarning("Bad");
                 }
-                Dialogue.SetTextMessage(dialoguePart, nameOverride);
+                Dialogue.SetTextMessage(dialoguePart, message, nameOverride);
                 if (loadedChar)
                 {
                     Jiggle(jiggleChar);
                 }
                 ResetSpeech();
-                while (!isDone && currentLetter < dialoguePart.ContainedMessage.Length)
+                while (!isDone && currentLetter < message.Length)
                 {
                     while (GeneralManager.IsPaused)
                     {
@@ -235,8 +249,8 @@ namespace RinCore
                     {
                         if (!GeneralManager.IsPaused && ContinuePressed)
                         {
-                            Dialogue.UpdateText(dialoguePart.ContainedMessage.Length + 1, out isDone);
-                            currentLetter = dialoguePart.ContainedMessage.Length - 1;
+                            Dialogue.UpdateText(message.Length + 1, out isDone);
+                            currentLetter = message.Length - 1;
                             messageWait = 0f;
                             continueSkipWait = Time.unscaledTime + 0.033f;
                             while (Time.unscaledTime < continueSkipWait)
@@ -249,7 +263,7 @@ namespace RinCore
                     }
                     Dialogue.UpdateText(currentLetter + 1, out isDone);
                     bool isSpoken = true;
-                    char currentChar = dialoguePart.ContainedMessage[currentLetter];
+                    char currentChar = message[currentLetter];
 
                     if (char.IsPunctuation(currentChar) && !currentChar.RegexChar(ExcludedPunctuation))
                     {
@@ -395,7 +409,7 @@ namespace RinCore
         [SerializeField] AudioSource speechPlayer;
         [SerializeField] DialogueCharacterCollectionSO loadedCharacters;
         Coroutine activeDialogue;
-        public static void SetContinuePressedStall(float delay) => ContinuePressedStallTimeEnd = Time.unscaledTime + delay; 
+        public static void SetContinuePressedStall(float delay) => ContinuePressedStallTimeEnd = Time.unscaledTime + delay;
         static bool ContinuePressed
         {
             get
