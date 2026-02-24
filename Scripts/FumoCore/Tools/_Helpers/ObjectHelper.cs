@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class RinHelper
     {

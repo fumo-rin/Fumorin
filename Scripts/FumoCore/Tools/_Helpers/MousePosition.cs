@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class RinHelper
     {

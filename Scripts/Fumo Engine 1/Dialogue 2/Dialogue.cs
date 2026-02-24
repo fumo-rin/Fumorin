@@ -1,4 +1,4 @@
-using RinCore;
+using rinCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     #region Dialogue Part & Collection
     public partial class Dialogue
@@ -22,8 +22,8 @@ namespace RinCore
             public string ProcessedMessage
             {
                 get
-                {
-                    return ContainedMessage;
+                {//
+                    return ContainedMessage.OwoSpeak();
                 }
             }
             public string CharacterName;
@@ -60,16 +60,6 @@ namespace RinCore
         {
             SpeakValue = 0;
             wordCharCount = 0;
-        }
-    }
-    #endregion
-    #region Load & Add Dialogue
-    public partial class Dialogue
-    {
-        public static void LoadDialogue(DialogueStackSO stack, Action whenDialogueEnd = null)
-        {
-            Stop();
-            instance.activeDialogueRoutine = instance.StartCoroutine(RunDialogue(stack, 0f, whenDialogueEnd));
         }
     }
     #endregion
@@ -211,6 +201,40 @@ namespace RinCore
         public static bool TryGetCharacterOverride(string key, out DialogueCharacterSO c)
         {
             return characterOverrides.TryGetValue(key, out c);
+        }
+    }
+    #endregion
+    #region Run Dialogue
+    public partial class Dialogue
+    {
+        public static void LoadDialogue(DialogueStackSO stack, Action whenDialogueEnd = null)
+        {
+            Stop();
+            instance.activeDialogueRoutine = instance.StartCoroutine(RunDialogue(stack, 0f, whenDialogueEnd));
+        }
+        private static IEnumerator RunDialogue(DialogueStackSO stack, float delay, Action whenDialogueEnd)
+        {
+            yield return delay.WaitForSeconds(false);
+            SetBoxVisibility(true);
+            instance.playerSprite.enabled = false;
+            instance.otherSprite.enabled = false;
+            if (PlayerCharacter != null) Jiggle(PlayerCharacter);
+            yield return RunStack(stack);
+            whenDialogueEnd?.Invoke();
+            SetBoxVisibility(false);
+        }
+        public static void Stop()
+        {
+            if (instance == null)
+            {
+                return;
+            }
+            if (instance.activeDialogueRoutine != null)
+            {
+                instance.StopCoroutine(instance.activeDialogueRoutine);
+                instance.activeDialogueRoutine = null;
+            }
+            SetBoxVisibility(false);
         }
     }
     #endregion
@@ -363,8 +387,7 @@ namespace RinCore
         {
             get
             {
-                bool running = instance.activeDialogueRoutine != null && instance.visibilityAnchor.activeInHierarchy;
-                return running;
+                return RinHelper.ValidGameObjects(instance) && RinHelper.ValidGameObjects(instance.visibilityAnchor) && instance.visibilityAnchor.activeInHierarchy;
             }
         }
         private void Awake()
@@ -375,30 +398,6 @@ namespace RinCore
         private static void SetBoxVisibility(bool state)
         {
             instance.visibilityAnchor.SetActive(state);
-        }
-        private static IEnumerator RunDialogue(DialogueStackSO stack, float delay, Action whenDialogueEnd)
-        {
-            yield return delay.WaitForSeconds(false);
-            SetBoxVisibility(true);
-            instance.playerSprite.enabled = false;
-            instance.otherSprite.enabled = false;
-            if (PlayerCharacter != null) Jiggle(PlayerCharacter);
-            yield return RunStack(stack);
-            whenDialogueEnd?.Invoke();
-            SetBoxVisibility(false);
-        }
-        public static void Stop()
-        {
-            if (instance == null)
-            {
-                return;
-            }
-            if (instance.activeDialogueRoutine != null)
-            {
-                instance.StopCoroutine(instance.activeDialogueRoutine);
-                instance.activeDialogueRoutine = null;
-            }
-            SetBoxVisibility(false);
         }
     }
 }

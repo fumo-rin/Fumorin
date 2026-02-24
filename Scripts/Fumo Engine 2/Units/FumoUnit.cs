@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Unit Movers
     public enum MoveResult

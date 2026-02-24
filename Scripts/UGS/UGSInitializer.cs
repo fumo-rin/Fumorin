@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
 
-namespace RinCore.UGS
+namespace rinCore.UGS
 {
     public static class UGSInitializer
     {

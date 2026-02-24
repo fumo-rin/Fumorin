@@ -1,4 +1,4 @@
-namespace RinCore
+namespace rinCore
 {
     using System;
     using UnityEngine;

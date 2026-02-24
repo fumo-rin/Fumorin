@@ -3,7 +3,7 @@ using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditorInternal;
 #endif
-namespace RinCore
+namespace rinCore
 {
     public class SortingLayerAttribute : PropertyAttribute
     {

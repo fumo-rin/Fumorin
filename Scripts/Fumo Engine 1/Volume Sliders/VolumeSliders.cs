@@ -1,9 +1,9 @@
-using RinCore;
+using rinCore;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     public class VolumeSliders : MonoBehaviour
     {

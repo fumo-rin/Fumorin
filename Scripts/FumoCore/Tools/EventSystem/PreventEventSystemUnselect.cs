@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(UnityEngine.UI.Selectable))]
     public class PreventEventSystemUnselect : MonoBehaviour

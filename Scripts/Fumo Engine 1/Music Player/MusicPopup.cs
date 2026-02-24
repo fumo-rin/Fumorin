@@ -1,10 +1,10 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public class MusicPopup : MonoBehaviour
     {

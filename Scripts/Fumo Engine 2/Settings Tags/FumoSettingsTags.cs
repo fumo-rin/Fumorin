@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class FumoSettingsTags
     {
@@ -57,7 +57,7 @@ namespace RinCore
         static Dictionary<string, bool> boolSettingsCache = new();
         static bool initialized = false;
 
-        [RinCore.Initialize(-99999)]
+        [rinCore.Initialize(-99999)]
         private static void ResetFetch()
         {
             initialized = false;

@@ -1,7 +1,7 @@
-using RinCore;
+using rinCore;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public class UnitDamageScaler : MonoBehaviour
     {

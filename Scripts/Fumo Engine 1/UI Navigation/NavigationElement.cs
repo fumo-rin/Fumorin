@@ -1,8 +1,8 @@
-using RinCore;
+using rinCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace RinCore
+namespace rinCore
 {
     [DefaultExecutionOrder(100)]
     public class NavigationElement : MonoBehaviour, IDeselectHandler

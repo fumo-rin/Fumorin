@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class Components
     {

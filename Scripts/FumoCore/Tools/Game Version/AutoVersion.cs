@@ -8,7 +8,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif
 
-namespace RinCore
+namespace rinCore
 {
     public static class VersionManager
     {

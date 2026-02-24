@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace RinCore
+namespace rinCore
 {
     public static class GameObjectExtensions
     {

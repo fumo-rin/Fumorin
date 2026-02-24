@@ -1,7 +1,7 @@
-using RinCore;
+using rinCore;
 using UnityEngine;
 using UnityEngine.UI;
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(Button))]
     public class FumoMenuSceneButton : MonoBehaviour

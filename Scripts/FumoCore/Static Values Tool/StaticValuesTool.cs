@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace RinCore
+namespace rinCore
 {
     // --- Attribute for static fields ---
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]

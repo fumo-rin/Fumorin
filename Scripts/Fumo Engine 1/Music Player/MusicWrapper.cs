@@ -1,10 +1,10 @@
-using RinCore;
+using rinCore;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
 
 
-namespace RinCore
+namespace rinCore
 {
     #region Music Clip Create
     using UnityEditor;

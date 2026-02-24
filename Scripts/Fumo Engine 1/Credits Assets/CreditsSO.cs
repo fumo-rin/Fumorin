@@ -1,10 +1,10 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     public partial class CreditsSO

@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
-using RinCore.UGS;
-using RinCore;
-namespace RinCore
+using rinCore.UGS;
+using rinCore;
+namespace rinCore
 {
     [RequireComponent(typeof(TMP_InputField))]
     public class FumoLeaderboardNameSetter : MonoBehaviour

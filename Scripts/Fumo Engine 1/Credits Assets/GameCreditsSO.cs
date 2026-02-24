@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using RinCore;
+using rinCore;
 using UnityEditor;
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     public partial class GameCreditsSO

@@ -1,11 +1,11 @@
-﻿using RinCore;
+﻿using rinCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class FloatExtensions
     {

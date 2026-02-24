@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-namespace RinCore
+namespace rinCore
 {
     public class RebindsLoader : MonoBehaviour
     {

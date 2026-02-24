@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using RinCore;
+using rinCore;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class CursorHelper
     {

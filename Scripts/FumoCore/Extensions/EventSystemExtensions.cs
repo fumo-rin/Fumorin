@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class RinHelper
     {

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.SceneManagement;
 
-namespace RinCore
+namespace rinCore
 {
     #region Loot Particle
 
@@ -263,63 +264,65 @@ namespace RinCore
                 }
             }
 
-            var invalidArrayKeys = particleArrayCache
+            var invalidArrayKeys = frameParticleArray
                 .Where(kvp => kvp.Key == null)
                 .Select(kvp => kvp.Key)
                 .ToList();
 
             foreach (var key in invalidArrayKeys)
-                particleArrayCache.Remove(key);
+                frameParticleArray.Remove(key);
         }
-        private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> particleArrayCache = new();
-        public static void RenderAnimatedPoints(this ParticleSystem ps, List<Vector2> positions, float animationDuration, bool staggerPhase = true)
+        private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> frameParticleArray = new();
+        public static void RenderPointsSingleFrame(this ParticleSystem ps, List<Vector2> positions, float sampleTime, bool staggerPhase = true)
         {
             if (ps == null || positions == null) return;
-
             int count = positions.Count;
-
-            if (!particleArrayCache.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
+            if (!frameParticleArray.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
             {
                 particleArray = new ParticleSystem.Particle[Mathf.Max(count, 64)];
-                particleArrayCache[ps] = particleArray;
+                frameParticleArray[ps] = particleArray;
             }
 
-            ParticleSystem.MainModule main = ps.main;
+            var main = ps.main;
             Color startColor = main.startColor.color;
             float startSize = main.startSize.constant;
-
-            float currentTime = Time.time;
             float baseRotationRad = main.startRotation.constant;
             float baseRotationDeg = -baseRotationRad * Mathf.Rad2Deg;
-
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             for (int i = 0; i < count; i++)
             {
-                if (particleArray[i].remainingLifetime <= 0f || particleArray[i].startLifetime != animationDuration)
-                {
-                    particleArray[i].startColor = startColor;
-                    particleArray[i].startSize = startSize;
-                    particleArray[i].startLifetime = animationDuration;
-                    particleArray[i].rotation3D = new Vector3(0f, 0f, baseRotationDeg);
-                    particleArray[i].velocity = Vector3.zero;
-                }
-
-                particleArray[i].position = new Vector3(positions[i].x, positions[i].y, 0f);
-
+                float animationDuration = main.duration;
                 float phaseOffset = 0f;
                 if (staggerPhase && count > 1)
                     phaseOffset = (animationDuration / count) * i;
 
-                float timeInCycle = (currentTime + phaseOffset) % animationDuration;
+                float timeInCycle = (sampleTime + phaseOffset) % animationDuration;
                 float remainingLifetime = animationDuration - timeInCycle;
-
                 remainingLifetime = Mathf.Max(0.001f, remainingLifetime);
 
-                particleArray[i].remainingLifetime = remainingLifetime;
+                particleArray[i] = new ParticleSystem.Particle
+                {
+                    position = new Vector3(positions[i].x, positions[i].y, 0f),
+                    startColor = startColor,
+                    startSize = startSize,
+                    startLifetime = animationDuration,
+                    remainingLifetime = remainingLifetime,
+                    rotation3D = new Vector3(0f, 0f, baseRotationDeg),
+                    velocity = Vector3.zero
+                };
             }
 
             ps.SetParticles(particleArray, count, 0);
-            if (!ps.isPlaying)
-                ps.Play();
+            ps.Simulate(0f, true, false, true);
+            ps.Pause();
+        }
+        public static void ClearPS(this ParticleSystem ps)
+        {
+            if (!RinHelper.ValidGameObjects(ps))
+            {
+                return;
+            }
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
         public static Color32 GetInitialColor32(this ParticleSystem ps)
         {

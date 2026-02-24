@@ -1,9 +1,9 @@
-using RinCore;
-using RinCore;
+using rinCore;
+using rinCore;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class RandomHelper
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(Camera))]
     public class RenderTextureDetailCamera : MonoBehaviour

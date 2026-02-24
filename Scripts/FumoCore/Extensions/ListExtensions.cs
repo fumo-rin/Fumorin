@@ -1,10 +1,10 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public enum ListAddMode
     {

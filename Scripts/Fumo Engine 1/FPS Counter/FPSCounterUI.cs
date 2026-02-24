@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
-using RinCore;
+using rinCore;
 
-namespace RinCore
+namespace rinCore
 {
     public class FPSCounterUI : MonoBehaviour
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace RinCore
+namespace rinCore
 {
     [CreateAssetMenu(fileName = "Scene String", menuName = "Core/Scriptable Helpers/Scene String")]
     public class SceneStringSO : ScriptableObject

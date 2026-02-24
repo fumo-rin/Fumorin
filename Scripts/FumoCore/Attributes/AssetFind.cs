@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     using UnityEditor;

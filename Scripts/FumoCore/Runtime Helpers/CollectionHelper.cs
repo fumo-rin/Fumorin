@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace RinCore
+namespace rinCore
 {
     #region Create Array
     public static partial class FCHelper

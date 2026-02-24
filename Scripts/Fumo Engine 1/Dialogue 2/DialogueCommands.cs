@@ -4,9 +4,9 @@ using System.Linq;
 using UnityEngine;
 using System.Reflection;
 
-namespace RinCore
+namespace rinCore
 {
-    using RinCore;
+    using rinCore;
     #region Validator
     using System.IO;
     using UnityEditor;
@@ -31,7 +31,7 @@ namespace RinCore
                 {
                     foreach (var item in commands)
                     {
-                        if (!RinCore.ShmupCommands.HasCommand(item))
+                        if (!rinCore.ShmupCommands.HasCommand(item))
                         {
                             Debug.LogError($"Invalid command '{item}' in asset: {path}", asset);
                             if (asset != null && asset.dialogueTextFile) asset.dialogueTextFile.EditorPing();

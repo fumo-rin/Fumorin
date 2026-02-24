@@ -1,11 +1,11 @@
-using RinCore;
+using rinCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public class BossExplosion
     {

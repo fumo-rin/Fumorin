@@ -1,9 +1,9 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Attack Tick
     public partial class TickManager

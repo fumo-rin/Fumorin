@@ -1,11 +1,11 @@
-﻿using RinCore;
+﻿using rinCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class BadWords
     {

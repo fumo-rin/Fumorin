@@ -1,9 +1,9 @@
-using RinCore;
+using rinCore;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-namespace RinCore
+namespace rinCore
 {
     public class MusicRoom : MonoBehaviour
     {

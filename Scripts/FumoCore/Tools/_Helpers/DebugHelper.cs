@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Drawline
     public static partial class RinHelper // Draw Line

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(RawImage))]
     public class RenderTextureReceiverImage : MonoBehaviour

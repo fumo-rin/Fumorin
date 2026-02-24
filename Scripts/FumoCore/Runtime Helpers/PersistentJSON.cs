@@ -52,11 +52,11 @@ public static partial class PersistentJSON
         BitConverter.DoubleToInt64Bits(value);
     public static double ToDouble(this long bits) =>
         BitConverter.Int64BitsToDouble(bits);
-    private static string EncryptString(string plainText)
+    public static string EncryptString(this string plainText, string salt = "Mofumofumo")
     {
         using (Aes aes = Aes.Create())
         {
-            var key = new Rfc2898DeriveBytes(EncryptionKey, Encoding.UTF8.GetBytes("Mofumofumo"));
+            var key = new Rfc2898DeriveBytes(EncryptionKey, Encoding.UTF8.GetBytes(salt));
             aes.Key = key.GetBytes(32);
             aes.IV = key.GetBytes(16);
 
@@ -68,11 +68,11 @@ public static partial class PersistentJSON
             }
         }
     }
-    private static string DecryptString(string cipherText)
+    public static string DecryptString(this string cipherText, string salt = "Mofumofumo")
     {
         using (Aes aes = Aes.Create())
         {
-            var key = new Rfc2898DeriveBytes(EncryptionKey, Encoding.UTF8.GetBytes("Mofumofumo"));
+            var key = new Rfc2898DeriveBytes(EncryptionKey, Encoding.UTF8.GetBytes(salt));
             aes.Key = key.GetBytes(32);
             aes.IV = key.GetBytes(16);
 
@@ -99,7 +99,7 @@ public static partial class PersistentJSON
         string data = encoded.ToString();
         string hash = ComputeHash(data);
         string combined = $"{data}:{hash}";
-        string encrypted = EncryptString(combined);
+        string encrypted = combined.EncryptString();
 
         return PersistentJSON.TrySave(encrypted, key);
     }
@@ -120,7 +120,7 @@ public static partial class PersistentJSON
             return false;
         try
         {
-            string decrypted = DecryptString(encrypted);
+            string decrypted = encrypted.DecryptString();
             string[] parts = decrypted.Split(':');
             if (parts.Length != 2)
                 throw new Exception("Corrupt score data");

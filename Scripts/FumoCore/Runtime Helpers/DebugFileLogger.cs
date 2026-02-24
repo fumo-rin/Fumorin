@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class DebugFileLogger
     {

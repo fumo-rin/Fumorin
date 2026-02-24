@@ -2,10 +2,9 @@ using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
-using RinCore;
+using rinCore;
 #endif
-namespace RinCore
+namespace rinCore
 {
     [CreateAssetMenu(fileName = "New Character", menuName = "RinCore/Dialogue 2/Character")]
     public class DialogueCharacterSO : ScriptableObject

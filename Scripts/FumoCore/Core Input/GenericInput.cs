@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     public static class GenericInputExtensions
     {

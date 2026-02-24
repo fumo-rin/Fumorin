@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using RinCore;
+using rinCore;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(TMP_Dropdown))]
     public class ResetWindow : MonoBehaviour

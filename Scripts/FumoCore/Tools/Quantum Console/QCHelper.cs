@@ -4,7 +4,7 @@ using UnityEngine;
 using QFSW.QC;
 using System;
 
-namespace RinCore
+namespace rinCore
 {
     public static class QCHelper
     {

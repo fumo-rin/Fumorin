@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace RinCore
+namespace rinCore
 {
     public static partial class RinHelper
     {

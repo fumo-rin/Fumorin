@@ -1,11 +1,11 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     public class RebindButton : MonoBehaviour
     {

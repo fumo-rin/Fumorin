@@ -2,11 +2,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
-using RinCore;
+using rinCore;
 using System.Collections.Generic;
 using System.IO;
 
-namespace RinCore
+namespace rinCore
 {
     [DefaultExecutionOrder(1)]
     public class RebindHandler : MonoBehaviour

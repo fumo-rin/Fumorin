@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     /// <summary>
     /// Scene-bound runner for stage routines.

@@ -1,8 +1,8 @@
-using RinCore;
+using rinCore;
 using QFSW.QC;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public class RenderTextureDetail : MonoBehaviour
     {

@@ -60,7 +60,7 @@ public static class AudioUtils
     }
 }
 #endif
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]

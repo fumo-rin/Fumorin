@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     public static partial class FCEHelper

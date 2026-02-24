@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [System.Serializable]
     public abstract class UnitAction

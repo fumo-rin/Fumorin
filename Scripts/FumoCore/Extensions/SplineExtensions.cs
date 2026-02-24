@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Mathematics;
 using UnityEngine.Splines;
-namespace RinCore
+namespace rinCore
 {
     [System.Serializable]
     public class SplinePathSettings

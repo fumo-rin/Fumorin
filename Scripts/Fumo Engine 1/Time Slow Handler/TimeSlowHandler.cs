@@ -1,9 +1,9 @@
-using RinCore;
+using rinCore;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Singleton & Setup
     public partial class TimeSlowHandler : MonoBehaviour

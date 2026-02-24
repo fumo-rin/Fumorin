@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-namespace RinCore
+namespace rinCore
 {
     public enum PointerButton
     {

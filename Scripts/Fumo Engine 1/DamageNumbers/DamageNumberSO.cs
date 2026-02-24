@@ -5,8 +5,8 @@ using Unity.Mathematics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine.UIElements;
 using System.Globalization;
-using RinCore;
-namespace RinCore
+using rinCore;
+namespace rinCore
 {
     public class DamageNumberWrapper
     {

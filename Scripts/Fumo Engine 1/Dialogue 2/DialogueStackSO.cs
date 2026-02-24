@@ -1,4 +1,4 @@
-﻿using RinCore;
+﻿using rinCore;
 using System;
 using UnityEngine;
 using System.Collections.Generic;
@@ -10,13 +10,13 @@ using UnityEditor;
 using System.IO;
 using UnityEditor.VersionControl;
 #endif
-namespace RinCore
+namespace rinCore
 {
     #region Speech
     [System.Serializable]
     public class DialogueSpeechData
     {
-        [SerializeField] float volume = 1f;
+        [SerializeField, Range(0f, 1f)] float volume = 1f;
         [SerializeField] List<AudioClip> speechClips = new();
         public bool GetWord(int hashValue, out AudioClip result)
         {

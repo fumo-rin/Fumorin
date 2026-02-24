@@ -8,7 +8,7 @@ using System;
 using UnityEngine.AddressableAssets;
 using System.Security.Cryptography;
 
-namespace RinCore
+namespace rinCore
 {
     public static class AddressablesTools
     {

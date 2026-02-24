@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using RinCore;
+using rinCore;
 using UnityEngine.EventSystems;
 
-namespace RinCore
+namespace rinCore
 {
     public class NavigatorUI : MonoBehaviour
     {

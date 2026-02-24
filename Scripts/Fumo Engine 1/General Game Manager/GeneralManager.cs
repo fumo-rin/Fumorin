@@ -1,4 +1,4 @@
-using RinCore;
+using rinCore;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 using System;
 using UnityEditor;
 
-namespace RinCore
+namespace rinCore
 {
     #region Funny Explosion
     public partial class GeneralManager

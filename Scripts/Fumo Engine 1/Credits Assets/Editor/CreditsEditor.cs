@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
 #if UNITY_EDITOR
     public class CreditsEditor : EditorWindow

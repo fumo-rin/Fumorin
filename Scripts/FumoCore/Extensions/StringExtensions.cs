@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public static class GameobjectNameCleaner
     {

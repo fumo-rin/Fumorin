@@ -1,11 +1,55 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-namespace RinCore
+namespace rinCore
 {
     public static partial class RinHelper
     {
-        public static class Vec2List
+        #region Curved Line
+        public static partial class Vec2List
+        {
+            /// <summary>
+            /// Generates a curved 2D line from start to end with curvature and side bias.
+            /// Can generate only a fraction of the curve using tMax (0..1).
+            /// </summary>
+            /// <param name="start">Start point</param>
+            /// <param name="end">End point</param>
+            /// <param name="curvature">Curve intensity relative to distance (0 = straight line)</param>
+            /// <param name="leftBias">True = curve to left, False = curve to right</param>
+            /// <param name="segments">Number of points along the curve</param>
+            /// <param name="tMax">Fraction of the curve to generate (0..1)</param>
+            /// <param name="minDistance">Minimum distance to apply curve</param>
+            /// <returns>List of Vector2 points along the curve</returns>
+            public static List<Vector2> CurvedLineLerp(Vector2 start, Vector2 end, float curvature, bool leftBias, int segments = 20, float tMax = 1f, float minDistance = 0.01f)
+            {
+                List<Vector2> points = new List<Vector2>();
+
+                float distance = Vector2.Distance(start, end);
+                if (distance < minDistance || tMax <= 0f)
+                {
+                    points.Add(start);
+                    return points;
+                }
+                tMax = Mathf.Clamp01(tMax);
+                Vector2 dirNormalized = (end - start) / distance;
+                Vector2 perp = leftBias ? new Vector2(-dirNormalized.y, dirNormalized.x) : new Vector2(dirNormalized.y, -dirNormalized.x);
+
+                Vector2 midpoint = start + (end - start) * 0.5f;
+                Vector2 control = midpoint + perp * curvature * distance;
+
+                int steps = Mathf.Max(1, segments);
+                for (int i = 0; i <= steps; i++)
+                {
+                    float t = i / (float)steps * tMax;
+                    Vector2 point = Mathf.Pow(1 - t, 2) * start + 2 * (1 - t) * t * control + Mathf.Pow(t, 2) * end;
+                    points.Add(point);
+                }
+
+                return points;
+            }
+        }
+        #endregion
+        public static partial class Vec2List
         {
             /// <summary>
             /// Equilateral triangle (3 points), normalized to unit circle.

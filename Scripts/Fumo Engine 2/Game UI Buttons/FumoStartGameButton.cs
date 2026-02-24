@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using RinCore;
+using rinCore;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(Button))]
     public abstract class FumoStartGameButton : MonoBehaviour

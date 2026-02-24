@@ -1,10 +1,10 @@
-using RinCore;
+using rinCore;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.Composites;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(Button))]
     public class RenderTextureDetailButton : MonoBehaviour

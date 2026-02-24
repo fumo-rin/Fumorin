@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace RinCore
+namespace rinCore
 {
     #region Bad Words List (yea maybe dont open this region on stream idk man)
     public static partial class BadWords

@@ -1,8 +1,8 @@
-using RinCore;
+using rinCore;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [CreateAssetMenu(menuName = "Bremsengine/Music Room Tracklist")]
     public class MusicRoomTracklist : ScriptableObject

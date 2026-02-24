@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore.Assets.Bremsengine.Sprite
+namespace rinCore.Assets.Bremsengine.Sprite
 {
     public class SpriteColorSetter : MonoBehaviour
     {

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace RinCore
+namespace rinCore
 {
     #region Static Extension
     public static partial class ACWrapperExtensions

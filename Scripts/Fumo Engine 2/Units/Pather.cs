@@ -1,11 +1,11 @@
 using UnityEngine;
-using RinCore;
+using rinCore;
 using Pathfinding;
 using Pathfinding.RVO;
 using System;
 using System.Collections;
 
-namespace RinCore
+namespace rinCore
 {
     public class PathBuilder
     {

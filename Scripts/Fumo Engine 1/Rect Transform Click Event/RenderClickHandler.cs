@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace RinCore
+namespace rinCore
 {
     #region Render Texture Click
     public partial class RenderClickHandler : IPointerDownHandler

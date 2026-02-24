@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [CreateAssetMenu(fileName ="Float Value", menuName ="Core/Scriptable Helpers/Float SO")]
     public class FloatSO : ScriptableObject

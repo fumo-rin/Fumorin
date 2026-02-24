@@ -1,10 +1,10 @@
 using Pathfinding.Graphs.Grid;
-using RinCore;
+using rinCore;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Base RNG Builder
     public static partial class RNG

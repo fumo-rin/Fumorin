@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     public class UISounds
     {

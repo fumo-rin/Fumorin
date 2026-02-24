@@ -1,11 +1,11 @@
-﻿using RinCore;
+﻿using rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RinCore
+namespace rinCore
 {
     #region Play Mode
     public partial class MusicPlayer

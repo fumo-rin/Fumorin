@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     #region Managed Reference List (Dropdown List)
 #if UNITY_EDITOR

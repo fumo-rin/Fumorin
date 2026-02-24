@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(TMP_Text))]
     public class GameNameText : MonoBehaviour

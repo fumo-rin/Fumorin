@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace RinCore
+namespace rinCore
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class Initialize : Attribute

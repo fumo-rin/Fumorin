@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace RinCore
+namespace rinCore
 {
     #region IEnumerable
     public static partial class FieldValidator

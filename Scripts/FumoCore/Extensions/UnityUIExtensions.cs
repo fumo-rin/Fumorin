@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace RinCore
+namespace rinCore
 {
     public static class UnityUIExtensions
     {

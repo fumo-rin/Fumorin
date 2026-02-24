@@ -1,9 +1,9 @@
-using RinCore;
+using rinCore;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RinCore
+namespace rinCore
 {
     [RequireComponent(typeof(TMP_Text))]
     public class RebindTextDisplay : MonoBehaviour
