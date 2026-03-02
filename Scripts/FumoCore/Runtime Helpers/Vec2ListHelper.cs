@@ -150,6 +150,21 @@ namespace rinCore
                 public List<Vector2> points;
                 public List<Vector2> tangents;
                 public float angleStep; // radians per step
+                public struct spiralSegment
+                {
+                    public Vector2 point, tangent;
+                }
+                public IEnumerable<spiralSegment> Sequence()
+                {
+                    for (int i = 0; i < points.Count; i++)
+                    {
+                        yield return new spiralSegment()
+                        {
+                            point = points[i],
+                            tangent = tangents[i],
+                        };
+                    }
+                }
             }
 
             /// <summary>

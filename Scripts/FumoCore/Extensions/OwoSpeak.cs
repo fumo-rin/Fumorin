@@ -67,17 +67,14 @@ namespace rinCore
                 s = AddStutterRandom(s);
                 s = AddOwoEndingRandom(s);
             }
-
             // Restore links
             s = Regex.Replace(s, @"owo(\d+)", m =>
             {
                 int index = int.Parse(m.Groups[1].Value) - 1;
                 return links[index];
             });
-
             return s;
         }
-
         private static string AddStutterRandom(string s)
         {
             return Regex.Replace(s, @"\b(\w+'?\w*)\b", m =>
@@ -95,7 +92,6 @@ namespace rinCore
                 return word;
             });
         }
-
         private static string AddOwoEndingRandom(string s)
         {
             if (RNG.Int255 <= 25)

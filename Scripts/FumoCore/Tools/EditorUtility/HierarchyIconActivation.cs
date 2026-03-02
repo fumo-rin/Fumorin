@@ -13,7 +13,7 @@ namespace rinCore
         }
         private static void PressItem(int instanceID, Rect selection)
         {
-            GameObject obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+            GameObject obj = EditorUtility.EntityIdToObject(instanceID) as GameObject;
             if (obj == null) return;
             Rect rect = new Rect(selection.x, selection.y, 15f, selection.height);
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition))

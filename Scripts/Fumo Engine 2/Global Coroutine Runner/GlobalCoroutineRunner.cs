@@ -8,7 +8,7 @@ namespace rinCore
 {
     public static class GlobalCoroutineRunnerExtensions
     {
-        public static Coroutine RunRoutine(this IEnumerator co, string? keyOverride = null, bool persistAcrossScenes = false)
+        public static Coroutine RunRoutine(this IEnumerator co, string keyOverride = null, bool persistAcrossScenes = false)
         {
             return GlobalCoroutineRunner.StartRoutine(keyOverride ?? nameof(co), co, persistAcrossScenes);
         }

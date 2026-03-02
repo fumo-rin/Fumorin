@@ -22,8 +22,8 @@ namespace rinCore
             public string ProcessedMessage
             {
                 get
-                {//
-                    return ContainedMessage.OwoSpeak();
+                {
+                    return ContainedMessage;
                 }
             }
             public string CharacterName;
@@ -75,7 +75,6 @@ namespace rinCore
         private static void UpdateText(int letterCount, out bool IsMessageDone)
         {
             IsMessageDone = false;
-            Debug.Log("TT:" + letterCount.ToString() + " : ");
             instance.dialogueText.maxVisibleCharacters = letterCount;
             if (instance.dialogueText.text.Length <= letterCount)
             {

@@ -1,5 +1,3 @@
-using rinCore;
-using rinCore;
 using System.Collections.Generic;
 using UnityEngine;
 
