@@ -240,128 +240,141 @@ namespace rinCore
     public partial class Dialogue : MonoBehaviour
     {
         #region Run Dialogue
-        static readonly HashSet<char> ExcludedPunctuation = new()
-{
-    '\'', '"', '‘', '’', '“', '”', ','
-};
+        static readonly HashSet<char> ExcludedPunctuation = new() { '\'', '"', '‘', '’', '“', '”', ',' };
         static IEnumerator RunStack(DialogueStackSO stack)
         {
-            float continueStallTime = Time.unscaledTime + 1f;
-            bool StalledContinue()
-            {
-                return Time.unscaledTime < continueStallTime;
-            }
+            const float HOLD_THRESHOLD = 0.85f;
+            const float CHAR_DELAY = 0.015f;
+            const float PUNCTUATION_DELAY = 0.25f;
+            const float PAUSE_DELAY = 0.05f;
+            const float NATURAL_WAIT = 5f;
+
             DialogueCharacterSO resultCharacter;
-            void IncrementSpeak(char toAdd)
+
+            void EndWord(bool fastForward = false)
             {
-                SpeakValue += toAdd.GetHashCode();
-                wordCharCount++;
-                if (wordCharCount >= CHAR_COUNT_TO_SPEAK)
-                {
-                    EndWord();
-                }
-            }
-            void EndWord()
-            {
-                if (instance == null)
-                {
-                    return;
-                }
-                bool foundCharacter = false;
-                foundCharacter = resultCharacter != null;
-                if (!foundCharacter)
-                {
-#if UNITY_EDITOR
-                    Debug.LogWarning("Missing Character to jiggle");
-#endif
-                    return;
-                }
-                if (SpeakValue > 0f)
+                if (instance == null || resultCharacter == null) return;
+
+                if (!fastForward && SpeakValue > 0)
                 {
                     resultCharacter.Speak(instance.speechPlayer, SpeakValue);
                     Jiggle(resultCharacter);
                 }
+
                 SpeakValue = 0;
                 wordCharCount = 0;
             }
-            bool isPauseChar(char c) => (char.IsSymbol(c) || char.IsWhiteSpace(c));
+
+            void IncrementSpeak(char c, bool fastForward)
+            {
+                if (char.IsLetterOrDigit(c) && !fastForward)
+                    SpeakValue += c.GetHashCode();
+
+                wordCharCount++;
+
+                if (wordCharCount >= CHAR_COUNT_TO_SPEAK)
+                    EndWord(fastForward);
+            }
+
+            bool IsPauseChar(char c) => char.IsSymbol(c) || char.IsWhiteSpace(c);
+
             foreach (var d in stack.DialogueParts)
             {
-                continueStallTime = Time.unscaledTime + 0.1f;
                 stack.TryGetCharacter(d.CharacterName, out resultCharacter);
                 Jiggle(resultCharacter);
-                if (!string.IsNullOrWhiteSpace(d.Command))
-                {
-                    if (ShmupCommands.TryRun(d.Command))
-                    {
-                        continue;
-                    }
-                }
-                int currentLetterIndex = 0;
+
+                if (!string.IsNullOrWhiteSpace(d.Command) && ShmupCommands.TryRun(d.Command))
+                    continue;
+
                 string message = d.ProcessedMessage;
-                bool isDone = false;
-                string nameOverride = "";
-                float speakingWait = Time.unscaledTime + 0.05f;
-                Dialogue.SetTextMessage(d, message, nameOverride);
+                Dialogue.SetTextMessage(d, message);
                 instance.dialogueText.ForceMeshUpdate();
                 ResetSpeech();
 
+                int charIndex = 0;
+                bool messageDone = false;
+                float charTimer = 0f;
+                bool allowHoldSkip = false;
 
-
-
-                while (!isDone && currentLetterIndex < message.Length)
+                while (!messageDone && charIndex < message.Length)
                 {
                     while (GeneralManager.IsPaused)
-                    {
                         yield return null;
-                    }
-                    while (Time.unscaledTime < speakingWait)
-                    {
-                        if (!GeneralManager.IsPaused && ContinuePressedOrHeldForALongTime && !StalledContinue())
-                        {
-                            Dialogue.UpdateText(message.Length + 1, out isDone);
-                            currentLetterIndex = message.Length - 1;
-                            speakingWait = 0f;
-                        }
-                        yield return null;
-                    }
-                    Dialogue.UpdateText(currentLetterIndex + 1, out isDone);
-                    bool isSpoken = true;
-                    char currentChar = message[currentLetterIndex];
 
-                    if (char.IsPunctuation(currentChar) && !currentChar.RegexChar(ExcludedPunctuation))
+                    char currentChar = message[charIndex];
+                    bool isExcluded = ExcludedPunctuation.Contains(currentChar);
+
+                    if (ShmupInput.SkipDialogueJustPressed)
                     {
-                        speakingWait = Time.unscaledTime + 0.25f;
-                        isSpoken = false;
-                        EndWord();
+                        Dialogue.UpdateText(message.Length, out messageDone);
+                        EndWord(false);
+                        yield return null;
+                        break;
                     }
-                    else if (isPauseChar(currentChar))
+
+                    if (charIndex > 0 && ShmupInput.SkipDialoguePressedLongerThan(HOLD_THRESHOLD))
+                        allowHoldSkip = true;
+
+                    if (charTimer == 0f)
                     {
-                        speakingWait = Time.unscaledTime + 0.05f;
-                        isSpoken = false;
-                        EndWord();
+                        Dialogue.UpdateText(charIndex + 1, out messageDone);
+
+                        if (isExcluded || (char.IsLetterOrDigit(currentChar)))
+                            IncrementSpeak(currentChar, allowHoldSkip);
+                        else
+                            EndWord(allowHoldSkip);
                     }
-                    else
+
+                    float delay = CHAR_DELAY;
+
+                    if (isExcluded)
                     {
-                        speakingWait = Time.unscaledTime + 0.015f;
+                        delay = CHAR_DELAY;
                     }
-                    if (isSpoken)
+                    else if (char.IsPunctuation(currentChar))
                     {
-                        IncrementSpeak(currentChar);
+                        delay = PUNCTUATION_DELAY;
                     }
-                    currentLetterIndex++;
+                    else if (IsPauseChar(currentChar))
+                    {
+                        delay = PAUSE_DELAY;
+                    }
+
+                    if (allowHoldSkip)
+                        delay *= 0.05f;
+
+                    // 3. The Waiting Room
+                    charTimer += Mathf.Min(Time.unscaledDeltaTime, 0.033f);
+                    if (charTimer < delay)
+                    {
+                        yield return null;
+                        continue;
+                    }
+
+                    // 4. Reset for next character
+                    charTimer = 0f;
+                    charIndex++;
+                    yield return null;
                 }
-                EndWord();
-                speakingWait = Time.unscaledTime + 999999f;
-                IEnumerator wait = new WaitForContinueOrTime(5f);
-                while (wait.MoveNext())
+
+                EndWord(allowHoldSkip);
+
+                float waitEnd = Time.unscaledTime + NATURAL_WAIT;
+                while (Time.unscaledTime < waitEnd)
                 {
+                    if (GeneralManager.IsPaused)
+                        waitEnd += Time.unscaledDeltaTime;
+                    else if (ShmupInput.SkipDialogueJustPressed || ShmupInput.SkipDialoguePressedLongerThan(HOLD_THRESHOLD))
+                    {
+                        yield return null;
+                        break;
+                    }
                     yield return null;
                 }
             }
-            yield return null;
-            yield return null;
-            if (instance != null) instance.activeDialogueRoutine = null;
+
+            if (instance != null)
+                instance.activeDialogueRoutine = null;
         }
         #endregion
         static DialogueCharacterSO PlayerCharacter;

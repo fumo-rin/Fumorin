@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace rinCore
@@ -442,6 +443,17 @@ namespace rinCore
             currentSpeedAlongDir = Mathf.Max(currentSpeedAlongDir, -Mathf.Abs(maxSpeed));
             Vector2 newVelocity = velocity - Vector2.Dot(velocity, dir) * dir + dir * currentSpeedAlongDir;
             return newVelocity;
+        }
+        public static LineRenderer SetPositions(this LineRenderer r, List<Vector2> positions)
+        {
+            Vector3[] vectors = new Vector3[positions.Count];
+            r.positionCount = positions.Count;
+            for (int i = 0; i < positions.Count; i++)
+            {
+                vectors[i] = positions[i];
+            }
+            r.SetPositions(vectors);
+            return r;
         }
     }
 }
