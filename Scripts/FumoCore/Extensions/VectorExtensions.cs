@@ -89,6 +89,24 @@ namespace rinCore
     }
     public static class VectorExtensions
     {
+        #region VecInt
+        public static Vector3Int Int3(this Vector2 v)
+        {
+            return new Vector3Int(v.x.ToInt(), v.y.ToInt(), 0);
+        }
+        public static Vector2Int Int2(this Vector2 v)
+        {
+            return new Vector2Int(v.x.ToInt(), v.y.ToInt());
+        }
+        public static Vector3Int Int3(this Vector3 v)
+        {
+            return new Vector3Int(v.x.ToInt(), v.y.ToInt(), v.z.ToInt());
+        }
+        public static Vector2Int Int2(this Vector3 v)
+        {
+            return new Vector2Int(v.x.ToInt(), v.y.ToInt());
+        }
+        #endregion
         public static Vector3 ToXZ(this Vector3 v)
         {
             return new()

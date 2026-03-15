@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace rinCore
+namespace RinCore
 {
     /// <summary>
     /// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Packages/com.fumorin.tools/Rin Input.inputactions".
@@ -111,6 +111,15 @@ namespace rinCore
                     ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Click Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""5718d6c7-44be-44ce-88b0-313a5104df26"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -410,6 +419,17 @@ namespace rinCore
                     ""action"": ""RightStick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ebd7213d-e69b-40eb-9f7c-9e1cbab4fe2d"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse;Gamepad"",
+                    ""action"": ""Click Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1653,6 +1673,45 @@ namespace rinCore
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Platformer"",
+            ""id"": ""55f82aaf-98e2-47dd-8a09-d1eb8b54fd86"",
+            ""actions"": [
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""189d803d-5d16-47a6-afb4-137caf93df7a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""4966ab5b-8827-444b-bac6-799d3117ec41"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""203ef526-b3df-4430-a6b3-f9bc30d3e59b"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1722,6 +1781,7 @@ namespace rinCore
             m_Fumo = asset.FindActionMap("Fumo", throwIfNotFound: true);
             m_Fumo_LeftStick = m_Fumo.FindAction("LeftStick", throwIfNotFound: true);
             m_Fumo_RightStick = m_Fumo.FindAction("RightStick", throwIfNotFound: true);
+            m_Fumo_ClickAttack = m_Fumo.FindAction("Click Attack", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1764,6 +1824,9 @@ namespace rinCore
             m_Runescape_SettingsPanel = m_Runescape.FindAction("Settings Panel", throwIfNotFound: true);
             m_Runescape_MusicPanel = m_Runescape.FindAction("Music Panel", throwIfNotFound: true);
             m_Runescape_ExitPanel = m_Runescape.FindAction("Exit Panel", throwIfNotFound: true);
+            // Platformer
+            m_Platformer = asset.FindActionMap("Platformer", throwIfNotFound: true);
+            m_Platformer_Jump = m_Platformer.FindAction("Jump", throwIfNotFound: true);
         }
 
         ~@RinInput()
@@ -1774,6 +1837,7 @@ namespace rinCore
             UnityEngine.Debug.Assert(!m_Shmup.enabled, "This will cause a leak and performance issues, RinInput.Shmup.Disable() has not been called.");
             UnityEngine.Debug.Assert(!m_Dialogue.enabled, "This will cause a leak and performance issues, RinInput.Dialogue.Disable() has not been called.");
             UnityEngine.Debug.Assert(!m_Runescape.enabled, "This will cause a leak and performance issues, RinInput.Runescape.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Platformer.enabled, "This will cause a leak and performance issues, RinInput.Platformer.Disable() has not been called.");
         }
 
         /// <summary>
@@ -1851,6 +1915,7 @@ namespace rinCore
         private List<IFumoActions> m_FumoActionsCallbackInterfaces = new List<IFumoActions>();
         private readonly InputAction m_Fumo_LeftStick;
         private readonly InputAction m_Fumo_RightStick;
+        private readonly InputAction m_Fumo_ClickAttack;
         /// <summary>
         /// Provides access to input actions defined in input action map "Fumo".
         /// </summary>
@@ -1870,6 +1935,10 @@ namespace rinCore
             /// Provides access to the underlying input action "Fumo/RightStick".
             /// </summary>
             public InputAction @RightStick => m_Wrapper.m_Fumo_RightStick;
+            /// <summary>
+            /// Provides access to the underlying input action "Fumo/ClickAttack".
+            /// </summary>
+            public InputAction @ClickAttack => m_Wrapper.m_Fumo_ClickAttack;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1902,6 +1971,9 @@ namespace rinCore
                 @RightStick.started += instance.OnRightStick;
                 @RightStick.performed += instance.OnRightStick;
                 @RightStick.canceled += instance.OnRightStick;
+                @ClickAttack.started += instance.OnClickAttack;
+                @ClickAttack.performed += instance.OnClickAttack;
+                @ClickAttack.canceled += instance.OnClickAttack;
             }
 
             /// <summary>
@@ -1919,6 +1991,9 @@ namespace rinCore
                 @RightStick.started -= instance.OnRightStick;
                 @RightStick.performed -= instance.OnRightStick;
                 @RightStick.canceled -= instance.OnRightStick;
+                @ClickAttack.started -= instance.OnClickAttack;
+                @ClickAttack.performed -= instance.OnClickAttack;
+                @ClickAttack.canceled -= instance.OnClickAttack;
             }
 
             /// <summary>
@@ -2729,6 +2804,102 @@ namespace rinCore
         /// Provides a new <see cref="RunescapeActions" /> instance referencing this action map.
         /// </summary>
         public RunescapeActions @Runescape => new RunescapeActions(this);
+
+        // Platformer
+        private readonly InputActionMap m_Platformer;
+        private List<IPlatformerActions> m_PlatformerActionsCallbackInterfaces = new List<IPlatformerActions>();
+        private readonly InputAction m_Platformer_Jump;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Platformer".
+        /// </summary>
+        public struct PlatformerActions
+        {
+            private @RinInput m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public PlatformerActions(@RinInput wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Platformer/Jump".
+            /// </summary>
+            public InputAction @Jump => m_Wrapper.m_Platformer_Jump;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Platformer; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="PlatformerActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(PlatformerActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="PlatformerActions" />
+            public void AddCallbacks(IPlatformerActions instance)
+            {
+                if (instance == null || m_Wrapper.m_PlatformerActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_PlatformerActionsCallbackInterfaces.Add(instance);
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="PlatformerActions" />
+            private void UnregisterCallbacks(IPlatformerActions instance)
+            {
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PlatformerActions.UnregisterCallbacks(IPlatformerActions)" />.
+            /// </summary>
+            /// <seealso cref="PlatformerActions.UnregisterCallbacks(IPlatformerActions)" />
+            public void RemoveCallbacks(IPlatformerActions instance)
+            {
+                if (m_Wrapper.m_PlatformerActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="PlatformerActions.AddCallbacks(IPlatformerActions)" />
+            /// <seealso cref="PlatformerActions.RemoveCallbacks(IPlatformerActions)" />
+            /// <seealso cref="PlatformerActions.UnregisterCallbacks(IPlatformerActions)" />
+            public void SetCallbacks(IPlatformerActions instance)
+            {
+                foreach (var item in m_Wrapper.m_PlatformerActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_PlatformerActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="PlatformerActions" /> instance referencing this action map.
+        /// </summary>
+        public PlatformerActions @Platformer => new PlatformerActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
         /// Provides access to the input control scheme.
@@ -2815,6 +2986,13 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRightStick(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Click Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnClickAttack(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
@@ -3079,6 +3257,21 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnExitPanel(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Platformer" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="PlatformerActions.AddCallbacks(IPlatformerActions)" />
+        /// <seealso cref="PlatformerActions.RemoveCallbacks(IPlatformerActions)" />
+        public interface IPlatformerActions
+        {
+            /// <summary>
+            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnJump(InputAction.CallbackContext context);
         }
     }
 }

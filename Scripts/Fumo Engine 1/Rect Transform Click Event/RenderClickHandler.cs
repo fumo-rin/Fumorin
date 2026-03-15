@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 namespace rinCore
 {
     #region Render Texture Click
-    public partial class RenderClickHandler : IPointerDownHandler
+    public partial class RenderClickHandler : IPointerMoveHandler
     {
         private void ScaleRenderClickToCameraWorldPosition
             (out Vector2 worldPosition, Vector2 normalizedClick, Camera fallbackCamera)
@@ -35,7 +35,7 @@ namespace rinCore
             normalizedPosition = Rect.PointToNormalized(rendererRect.rect, localPosition);
             return true;
         }
-        public void OnPointerDown(PointerEventData eventData)
+        public void OnPointerMove(PointerEventData eventData)
         {
             if (RenderTextureContainsMousePosition(out Vector2 click, eventData, renderTexture))
             {

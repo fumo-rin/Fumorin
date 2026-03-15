@@ -297,7 +297,13 @@ namespace rinCore
         {
             transform.position = worldPosition;
         }
-        public Vector2 CurrentPosition => transform.position;
+        public virtual Vector2 CurrentPosition
+        {
+            get
+            {
+                return transform.position;
+            }
+        }
         public float UnitRadius => 0.5f;
         [SerializeField] Rigidbody2D rb;
         public Rigidbody2D RB => rb;
@@ -345,6 +351,7 @@ namespace rinCore
                 }
             }
             WhenUpdate();
+            
         }
         protected abstract void WhenAwake();
         protected abstract void WhenStart();
