@@ -44,8 +44,7 @@ MonoBehaviour:
     - Audio Engine
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: 0259b81d29ccf6b4abd1d86ed40cbae0, type: 2}
+  m_Settings: {fileID: 11400000, guid: 83601607327bd124f87361e8e40ab17f, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 667c578be4eaff7488bd4853fb460c7e, type: 2}
-    - {fileID: 11400000, guid: 403948191309f7f4b948be60e76baa00, type: 2}
+    - {fileID: 11400000, guid: d479525f91d9af04d9496f06154ecc7c, type: 2}

@@ -246,6 +246,69 @@ namespace rinCore
         }
     }
     #endregion
+    #region Enemy Collection & Cast
+    public partial class FumoUnit
+    {
+        static HashSet<FumoUnit> aliveEnemies = new();
+        public struct AliveSetterPacket
+        {
+            public bool ForceOverride;
+            public bool OverrideAliveState;
+            public AliveSetterPacket(bool forceoveride = false)
+            {
+                ForceOverride = forceoveride;
+                OverrideAliveState = false;
+            }
+        }
+        protected void MaintainAliveEnemy(FumoUnit unit, AliveSetterPacket packet)
+        {
+            if (packet.ForceOverride)
+            {
+                if (packet.OverrideAliveState)
+                {
+                    aliveEnemies.Add(unit);
+                    return;
+                }
+                aliveEnemies.Remove(unit);
+                return;
+            }
+            if (unit == null)
+            {
+                return;
+            }
+            if (unit.IsAlive)
+            {
+                aliveEnemies.Add(unit);
+                return;
+            }
+            aliveEnemies.Remove(unit);
+        }
+        public bool TryAs<T>(T type) where T : Component
+        {
+            T result = null;
+            if (this is T item)
+            {
+                result = item;
+                return result;
+            }
+            return result != null;
+        }
+        public static IEnumerable<FumoUnit> AliveEnemiesList
+        {
+            get
+            {
+                if (aliveEnemies == null || aliveEnemies.Count < 1)
+                {
+                    yield break;
+                }
+                foreach (var item in aliveEnemies)
+                {
+                    yield return item;
+                }
+            }
+        }
+    }
+    #endregion
     public abstract partial class FumoUnit : MonoBehaviour
     {
         public static FumoUnit Player { get; protected set; }
@@ -351,7 +414,6 @@ namespace rinCore
                 }
             }
             WhenUpdate();
-            
         }
         protected abstract void WhenAwake();
         protected abstract void WhenStart();
