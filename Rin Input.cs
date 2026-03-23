@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace rinCore
+namespace RinCore
 {
     /// <summary>
     /// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Packages/com.fumorin.tools/Rin Input.inputactions".
@@ -98,8 +98,8 @@ namespace rinCore
                     ""name"": ""LeftStick"",
                     ""type"": ""Value"",
                     ""id"": ""17e20bd4-10b6-45c8-ae66-181290169736"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": ""StickDeadzone"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": ""StickDeadzone,DeltaTimeScale"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
@@ -107,15 +107,24 @@ namespace rinCore
                     ""name"": ""RightStick"",
                     ""type"": ""Value"",
                     ""id"": ""b3a84277-c3d4-40f8-90d9-108359f0bb30"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""expectedControlType"": ""Analog"",
                     ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Click Attack"",
+                    ""name"": ""ClickLeft"",
                     ""type"": ""Button"",
                     ""id"": ""5718d6c7-44be-44ce-88b0-313a5104df26"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ClickRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""a293aba2-b420-494c-b9b8-e29c54ad6c81"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -427,7 +436,18 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""Click Attack"",
+                    ""action"": ""ClickLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a11f2e8c-0e40-4752-8922-3a2940ceadb3"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse;Gamepad"",
+                    ""action"": ""ClickRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1781,7 +1801,8 @@ namespace rinCore
             m_Fumo = asset.FindActionMap("Fumo", throwIfNotFound: true);
             m_Fumo_LeftStick = m_Fumo.FindAction("LeftStick", throwIfNotFound: true);
             m_Fumo_RightStick = m_Fumo.FindAction("RightStick", throwIfNotFound: true);
-            m_Fumo_ClickAttack = m_Fumo.FindAction("Click Attack", throwIfNotFound: true);
+            m_Fumo_ClickLeft = m_Fumo.FindAction("ClickLeft", throwIfNotFound: true);
+            m_Fumo_ClickRight = m_Fumo.FindAction("ClickRight", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1915,7 +1936,8 @@ namespace rinCore
         private List<IFumoActions> m_FumoActionsCallbackInterfaces = new List<IFumoActions>();
         private readonly InputAction m_Fumo_LeftStick;
         private readonly InputAction m_Fumo_RightStick;
-        private readonly InputAction m_Fumo_ClickAttack;
+        private readonly InputAction m_Fumo_ClickLeft;
+        private readonly InputAction m_Fumo_ClickRight;
         /// <summary>
         /// Provides access to input actions defined in input action map "Fumo".
         /// </summary>
@@ -1936,9 +1958,13 @@ namespace rinCore
             /// </summary>
             public InputAction @RightStick => m_Wrapper.m_Fumo_RightStick;
             /// <summary>
-            /// Provides access to the underlying input action "Fumo/ClickAttack".
+            /// Provides access to the underlying input action "Fumo/ClickLeft".
             /// </summary>
-            public InputAction @ClickAttack => m_Wrapper.m_Fumo_ClickAttack;
+            public InputAction @ClickLeft => m_Wrapper.m_Fumo_ClickLeft;
+            /// <summary>
+            /// Provides access to the underlying input action "Fumo/ClickRight".
+            /// </summary>
+            public InputAction @ClickRight => m_Wrapper.m_Fumo_ClickRight;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1971,9 +1997,12 @@ namespace rinCore
                 @RightStick.started += instance.OnRightStick;
                 @RightStick.performed += instance.OnRightStick;
                 @RightStick.canceled += instance.OnRightStick;
-                @ClickAttack.started += instance.OnClickAttack;
-                @ClickAttack.performed += instance.OnClickAttack;
-                @ClickAttack.canceled += instance.OnClickAttack;
+                @ClickLeft.started += instance.OnClickLeft;
+                @ClickLeft.performed += instance.OnClickLeft;
+                @ClickLeft.canceled += instance.OnClickLeft;
+                @ClickRight.started += instance.OnClickRight;
+                @ClickRight.performed += instance.OnClickRight;
+                @ClickRight.canceled += instance.OnClickRight;
             }
 
             /// <summary>
@@ -1991,9 +2020,12 @@ namespace rinCore
                 @RightStick.started -= instance.OnRightStick;
                 @RightStick.performed -= instance.OnRightStick;
                 @RightStick.canceled -= instance.OnRightStick;
-                @ClickAttack.started -= instance.OnClickAttack;
-                @ClickAttack.performed -= instance.OnClickAttack;
-                @ClickAttack.canceled -= instance.OnClickAttack;
+                @ClickLeft.started -= instance.OnClickLeft;
+                @ClickLeft.performed -= instance.OnClickLeft;
+                @ClickLeft.canceled -= instance.OnClickLeft;
+                @ClickRight.started -= instance.OnClickRight;
+                @ClickRight.performed -= instance.OnClickRight;
+                @ClickRight.canceled -= instance.OnClickRight;
             }
 
             /// <summary>
@@ -2987,12 +3019,19 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRightStick(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Click Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "ClickLeft" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnClickAttack(InputAction.CallbackContext context);
+            void OnClickLeft(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ClickRight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnClickRight(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

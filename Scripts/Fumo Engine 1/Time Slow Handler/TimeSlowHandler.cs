@@ -2,6 +2,7 @@ using rinCore;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace rinCore
 {
@@ -188,6 +189,7 @@ namespace rinCore
 
             Time.timeScale = CalculateFinalTimescale();
             Time.fixedDeltaTime = 0.01667f * Time.timeScale;
+            InputSystem.Update();
         }
     }
     #endregion

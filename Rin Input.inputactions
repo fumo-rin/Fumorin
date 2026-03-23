@@ -10,8 +10,8 @@
                     "name": "LeftStick",
                     "type": "Value",
                     "id": "17e20bd4-10b6-45c8-ae66-181290169736",
-                    "expectedControlType": "Vector2",
-                    "processors": "StickDeadzone",
+                    "expectedControlType": "Analog",
+                    "processors": "StickDeadzone,DeltaTimeScale",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -19,15 +19,24 @@
                     "name": "RightStick",
                     "type": "Value",
                     "id": "b3a84277-c3d4-40f8-90d9-108359f0bb30",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Analog",
                     "processors": "StickDeadzone",
                     "interactions": "",
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Click Attack",
+                    "name": "ClickLeft",
                     "type": "Button",
                     "id": "5718d6c7-44be-44ce-88b0-313a5104df26",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ClickRight",
+                    "type": "Button",
+                    "id": "a293aba2-b420-494c-b9b8-e29c54ad6c81",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -339,7 +348,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse;Gamepad",
-                    "action": "Click Attack",
+                    "action": "ClickLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a11f2e8c-0e40-4752-8922-3a2940ceadb3",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse;Gamepad",
+                    "action": "ClickRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
