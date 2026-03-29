@@ -161,6 +161,10 @@ namespace rinCore
 
         private static float simulatedSlowCurrent = 1f;
         private static float simulatedSlowTarget = 1f;
+        private void Start()
+        {
+            Time.fixedDeltaTime = 0.01667f;
+        }
         private void LateUpdate()
         {
             float deltaTime = Time.unscaledDeltaTime;
@@ -188,7 +192,6 @@ namespace rinCore
             SimulatedSlowdown = totalSlow;
 
             Time.timeScale = CalculateFinalTimescale();
-            Time.fixedDeltaTime = 0.01667f * Time.timeScale;
             InputSystem.Update();
         }
     }
