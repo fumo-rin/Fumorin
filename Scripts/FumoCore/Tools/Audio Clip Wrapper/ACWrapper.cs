@@ -134,18 +134,10 @@ namespace rinCore
         public string SoundName = "Headhunter, Leather Belt";
         [Range(0f, 1f)]
         [SerializeField] float soundVolume = 0.7f;
-        [SerializeField] AudioMixerGroup audioMixerOverride;
 #if UNITY_EDITOR
         [System.NonSerialized]
         public bool loopInEditor = false;
 #endif
-        public void ApplyMixerOverride(AudioSource source)
-        {
-            if (audioMixerOverride != null)
-            {
-                source.outputAudioMixerGroup = audioMixerOverride;
-            }
-        }
         [field: SerializeField] public List<ACWrapperEntry> soundClips { get; private set; } = new();
         public void CreateFrom(AudioClip clip)
         {
@@ -215,7 +207,6 @@ namespace rinCore
                 source.pitch = item.PitchOrigin.Spread(item.PitchVariancePercent);
                 source.loop = false;
 
-                a.ApplyMixerOverride(source);
                 player.transform.position = position;
                 source.Play();
 
@@ -364,7 +355,6 @@ namespace rinCore
                 a.clip = entry.clip;
                 a.pitch = entry.PitchOrigin.Spread(entry.PitchVariancePercent);
                 a.volume = sound.GetVolume(index);
-                sound.ApplyMixerOverride(a);
                 a.Set3D(sound);
                 a.Play();
             }
