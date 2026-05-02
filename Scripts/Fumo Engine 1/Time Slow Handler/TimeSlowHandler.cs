@@ -192,6 +192,7 @@ namespace rinCore
             SimulatedSlowdown = totalSlow;
 
             Time.timeScale = CalculateFinalTimescale();
+            //Time.fixedDeltaTime = (1f / Time.timeScale).Min(1f / 60f);
             InputSystem.Update();
         }
     }
