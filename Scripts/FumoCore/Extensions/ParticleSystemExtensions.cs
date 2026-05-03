@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Analytics;
 using UnityEngine.SceneManagement;
 
 namespace rinCore
@@ -164,7 +163,7 @@ namespace rinCore
             ps.Play();
         }
         private static readonly Dictionary<ParticleSystem, ParticleSystem> particleCache = new();
-        public static void EmitSingleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color? colorOverride = null)
+        public static void EmitSingleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color? colorOverride = null, float sizeMultiplier = 1f)
         {
             if (prefab == null)
             {
@@ -191,7 +190,7 @@ namespace rinCore
                 position = position,
                 velocity = velocity ?? Vector3.zero,
                 startColor = colorOverride ?? main.startColor.Evaluate(),
-                startSize = main.startSize.Evaluate(),
+                startSize = main.startSize.Evaluate() * sizeMultiplier,
                 startLifetime = finalLifetime,
             };
 
@@ -264,65 +263,63 @@ namespace rinCore
                 }
             }
 
-            var invalidArrayKeys = frameParticleArray
+            var invalidArrayKeys = particleArrayCache
                 .Where(kvp => kvp.Key == null)
                 .Select(kvp => kvp.Key)
                 .ToList();
 
             foreach (var key in invalidArrayKeys)
-                frameParticleArray.Remove(key);
+                particleArrayCache.Remove(key);
         }
-        private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> frameParticleArray = new();
-        public static void RenderPointsSingleFrame(this ParticleSystem ps, List<Vector2> positions, float sampleTime, bool staggerPhase = true)
+        private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> particleArrayCache = new();
+        public static void RenderAnimatedPoints(this ParticleSystem ps, List<Vector2> positions, float animationDuration, bool staggerPhase = true)
         {
             if (ps == null || positions == null) return;
+
             int count = positions.Count;
-            if (!frameParticleArray.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
+
+            if (!particleArrayCache.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
             {
                 particleArray = new ParticleSystem.Particle[Mathf.Max(count, 64)];
-                frameParticleArray[ps] = particleArray;
+                particleArrayCache[ps] = particleArray;
             }
 
-            var main = ps.main;
+            ParticleSystem.MainModule main = ps.main;
             Color startColor = main.startColor.color;
             float startSize = main.startSize.constant;
+
+            float currentTime = Time.time;
             float baseRotationRad = main.startRotation.constant;
             float baseRotationDeg = -baseRotationRad * Mathf.Rad2Deg;
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
             for (int i = 0; i < count; i++)
             {
-                float animationDuration = main.duration;
+                if (particleArray[i].remainingLifetime <= 0f || particleArray[i].startLifetime != animationDuration)
+                {
+                    particleArray[i].startColor = startColor;
+                    particleArray[i].startSize = startSize;
+                    particleArray[i].startLifetime = animationDuration;
+                    particleArray[i].rotation3D = new Vector3(0f, 0f, baseRotationDeg);
+                    particleArray[i].velocity = Vector3.zero;
+                }
+
+                particleArray[i].position = new Vector3(positions[i].x, positions[i].y, 0f);
+
                 float phaseOffset = 0f;
                 if (staggerPhase && count > 1)
                     phaseOffset = (animationDuration / count) * i;
 
-                float timeInCycle = (sampleTime + phaseOffset) % animationDuration;
+                float timeInCycle = (currentTime + phaseOffset) % animationDuration;
                 float remainingLifetime = animationDuration - timeInCycle;
+
                 remainingLifetime = Mathf.Max(0.001f, remainingLifetime);
 
-                particleArray[i] = new ParticleSystem.Particle
-                {
-                    position = new Vector3(positions[i].x, positions[i].y, 0f),
-                    startColor = startColor,
-                    startSize = startSize,
-                    startLifetime = animationDuration,
-                    remainingLifetime = remainingLifetime,
-                    rotation3D = new Vector3(0f, 0f, baseRotationDeg),
-                    velocity = Vector3.zero
-                };
+                particleArray[i].remainingLifetime = remainingLifetime;
             }
 
             ps.SetParticles(particleArray, count, 0);
-            ps.Simulate(0f, true, false, true);
-            ps.Pause();
-        }
-        public static void ClearPS(this ParticleSystem ps)
-        {
-            if (!RinHelper.ValidGameObjects(ps))
-            {
-                return;
-            }
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (!ps.isPlaying)
+                ps.Play();
         }
         public static Color32 GetInitialColor32(this ParticleSystem ps)
         {

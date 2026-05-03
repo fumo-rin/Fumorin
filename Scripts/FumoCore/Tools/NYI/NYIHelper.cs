@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace rinCore
 {
-    [AttributeUsage(AttributeTargets.All, Inherited = true)]
+    [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
     public class NYIAttribute : Attribute
     {
         public virtual string Category { get; private set; } = "Default";

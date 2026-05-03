@@ -101,6 +101,8 @@ public static partial class PersistentJSON
         string combined = $"{data}:{hash}";
         string encrypted = combined.EncryptString();
 
+        Debug.Log($"Storing score: {score} : key: {key}");
+
         return PersistentJSON.TrySave(encrypted, key);
     }
     [QFSW.QC.Command("-test-score-fetch")]
@@ -117,7 +119,10 @@ public static partial class PersistentJSON
     {
         score = 0d;
         if (!PersistentJSON.TryLoad(out string encrypted, key))
+        {
+            Debug.Log($"Failed to Fetch score. Fallback: {score} : key: {key}");
             return false;
+        }
         try
         {
             string decrypted = encrypted.DecryptString();
@@ -132,6 +137,7 @@ public static partial class PersistentJSON
 
             long encoded = long.Parse(data);
             score = encoded.ToDouble();
+            Debug.Log($"Fetching score: {score} : key: {key}");
             return true;
         }
         catch (Exception ex)

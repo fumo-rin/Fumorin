@@ -6,7 +6,6 @@ namespace rinCore
     public class SpriteFlashMaterial : MonoBehaviour
     {
         [SerializeField] SpriteMaterialQueue materialQueue;
-
         [ContextMenu("Activate Flash")]
         public void TriggerFlashMaterial(float duration)
         {

@@ -16,7 +16,7 @@ namespace rinCore.UGS
         private const int MaxRetries = 3;
         private const int RetryDelayMs = 2000;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInitialize()
         {
             _ = InitializeAsync();

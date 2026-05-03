@@ -313,10 +313,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   funnyExplosion: {fileID: 6656727562651948476, guid: 50d7626662ba2eb4680659d317b75ee8, type: 3}
+  Explosion3D: {fileID: 0}
   funnyExplosionSound: {fileID: 11400000, guid: 0ead8eef1f870ce43b9c8b3c9ce9bae4, type: 2}
-  breakDownScore: 1
-  visibleScoreDivisor: 0.01
-  visibleScoreMultiplier: 100
   pauseKeybind: {fileID: 7771889369536338279, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
 --- !u!114 &1779381781154097865
 MonoBehaviour:
@@ -346,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9106ec666f6da4e4786a93200f4cbcad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingScene: {fileID: 11400000, guid: 6ac1b0f402c48174c8e50007f1c6ce3d, type: 2}
+  startingScene: {fileID: 11400000, guid: 9ac2b125f6a81b04ca14a6031c9663e9, type: 2}
   loadingScreen: {fileID: 1779604231228070957}
   loadingScreenText: {fileID: 879523235413287891}
 --- !u!114 &1088297479297689608
