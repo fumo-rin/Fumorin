@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 namespace rinCore
@@ -29,6 +31,15 @@ namespace rinCore
                 }
             }
             return result;
+        }
+        public static Coroutine StartCoroutineWithCallback<T>(this T host, IEnumerator routine, Action onComplete) where T : MonoBehaviour
+        {
+            return host.StartCoroutine(Wrap(routine, onComplete));
+        }
+        private static IEnumerator Wrap(IEnumerator routine, Action onComplete)
+        {
+            yield return routine;
+            onComplete?.Invoke();
         }
     }
 }

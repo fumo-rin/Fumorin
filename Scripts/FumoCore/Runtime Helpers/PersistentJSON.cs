@@ -135,7 +135,9 @@ public static partial class PersistentJSON
             if (hash != ComputeHash(data))
                 throw new Exception("Score tampering detected!");
 
+            Debug.Log(data);
             long encoded = long.Parse(data);
+            Debug.Log(encoded);
             score = encoded.ToDouble();
             Debug.Log($"Fetching score: {score} : key: {key}");
             return true;

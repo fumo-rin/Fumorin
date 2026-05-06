@@ -23,6 +23,7 @@ namespace rinCore
                     return;
                 }
                 gameObject.AddComponent<AudioListener>();
+                DontDestroyOnLoad(gameObject);
             }
         }
         public static ALHandler CreateOrUpdate(Transform t)

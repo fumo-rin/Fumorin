@@ -18,7 +18,8 @@ namespace rinCore
         }
         private void PressStart()
         {
-            sceneToLoad.Load();
+            if (sceneToLoad != null)
+                sceneToLoad.Load();
         }
     }
 }

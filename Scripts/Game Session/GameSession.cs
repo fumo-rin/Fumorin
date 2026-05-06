@@ -23,7 +23,7 @@ namespace rinCore
                 {
                     score = session.scoringData.ProcessedFinalScore;
                 }
-                t1.text = score.ToString();
+                t1.text = score.ToThousandsString(0, " ");
             }
             if (components.highscoreText is TMP_Text t2)
             {
@@ -32,7 +32,7 @@ namespace rinCore
                 {
                     hiScore = session.scoringData.HighScore;
                 }
-                t2.text = hiScore.ToString();
+                t2.text = hiScore.ToThousandsString(0, " ");
             }
         }
         #endregion
@@ -74,7 +74,11 @@ namespace rinCore
             if (CurrentAs(out GameSession session))
             {
                 var data = session.scoringData;
-                PersistentJSON.SaveScore(data.ProcessedFinalScore, data.FileFriendlyKey);
+                PersistentJSON.LoadScore(data.FileFriendlyKey, out double storedScore);
+                if (data.ProcessedFinalScore > storedScore)
+                {
+                    PersistentJSON.SaveScore(data.ProcessedFinalScore, data.FileFriendlyKey);
+                }
                 return true;
             }
             return false;

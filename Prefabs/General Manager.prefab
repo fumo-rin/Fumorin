@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9106ec666f6da4e4786a93200f4cbcad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingScene: {fileID: 11400000, guid: 9ac2b125f6a81b04ca14a6031c9663e9, type: 2}
+  startingScene: {fileID: 11400000, guid: ab63050f81166364093125ea0d6540ce, type: 2}
   loadingScreen: {fileID: 1779604231228070957}
   loadingScreenText: {fileID: 879523235413287891}
 --- !u!114 &1088297479297689608
