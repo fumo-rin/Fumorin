@@ -221,6 +221,10 @@ namespace rinCore
         {
             return Mathf.MoveTowards(f, other, step);
         }
+        public static float LerpTowards(this float f, float other, float speed)
+        {
+            return Mathf.Lerp(f, other, speed);
+        }
         public static string ToThousandsString(this float value, int decimals = 0, string thousandsSeparator = ",", CultureInfo culture = null)
         {
             culture ??= CultureInfo.CurrentCulture;

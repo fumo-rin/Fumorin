@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace rinCore
 {
+    #region Stalled Game Logic
+    public abstract partial class GameSession
+    {
+        public virtual bool GameLogicStalled { get; }
+    }
+    #endregion
     #region Scoring
     public partial class GameSession
     {

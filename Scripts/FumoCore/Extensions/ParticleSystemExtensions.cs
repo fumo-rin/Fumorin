@@ -377,53 +377,48 @@ namespace rinCore
                 particleArrayCache.Remove(key);
         }
         private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> particleArrayCache = new();
+
         public static void RenderAnimatedPoints(this ParticleSystem ps, List<Vector2> positions, float animationDuration, bool staggerPhase = true)
         {
-            if (ps == null || positions == null) return;
+            if (ps == null || positions == null)
+                return;
 
             int count = positions.Count;
 
             if (!particleArrayCache.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
             {
-                particleArray = new ParticleSystem.Particle[Mathf.Max(count, 64)];
+                particleArray = new ParticleSystem.Particle[Mathf.Max(count, 128)];
                 particleArrayCache[ps] = particleArray;
             }
 
-            ParticleSystem.MainModule main = ps.main;
-            Color startColor = main.startColor.color;
-            float startSize = main.startSize.constant;
+            int existingCount = ps.GetParticles(particleArray);
 
-            float currentTime = Time.time;
-            float baseRotationRad = main.startRotation.constant;
-            float baseRotationDeg = -baseRotationRad * Mathf.Rad2Deg;
+            ParticleSystem.MainModule main = ps.main;
+            float startSize = main.startSize.constant;
+            Color startColor = main.startColor.color;
 
             for (int i = 0; i < count; i++)
             {
-                if (particleArray[i].remainingLifetime <= 0f || particleArray[i].startLifetime != animationDuration)
+                if (i >= existingCount || particleArray[i].remainingLifetime <= 0)
                 {
+                    particleArray[i].startLifetime = animationDuration;
+                    particleArray[i].remainingLifetime = animationDuration;
+
+                    if (staggerPhase && count > 1)
+                    {
+                        particleArray[i].remainingLifetime = animationDuration - ((animationDuration / count) * i % animationDuration);
+                    }
+
                     particleArray[i].startColor = startColor;
                     particleArray[i].startSize = startSize;
-                    particleArray[i].startLifetime = animationDuration;
-                    particleArray[i].rotation3D = new Vector3(0f, 0f, baseRotationDeg);
-                    particleArray[i].velocity = Vector3.zero;
                 }
 
                 particleArray[i].position = new Vector3(positions[i].x, positions[i].y, 0f);
-
-                float phaseOffset = 0f;
-                if (staggerPhase && count > 1)
-                    phaseOffset = (animationDuration / count) * i;
-
-                float timeInCycle = (currentTime + phaseOffset) % animationDuration;
-                float remainingLifetime = animationDuration - timeInCycle;
-
-                remainingLifetime = Mathf.Max(0.001f, remainingLifetime);
-
-                particleArray[i].remainingLifetime = remainingLifetime;
             }
 
-            ps.SetParticles(particleArray, count, 0);
-            if (!ps.isPlaying)
+            ps.SetParticles(particleArray, count);
+
+            if (!ps.isPlaying && count > 0)
                 ps.Play();
         }
         public static Color32 GetInitialColor32(this ParticleSystem ps)
