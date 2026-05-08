@@ -3,9 +3,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
 
 namespace rinCore
 {
+    #region Meth
+    public static partial class TransformExtensions
+    {
+        #region UI Recttransform Size
+        /// <summary>
+        /// Sets the RectTransform height while preserving current width.
+        /// Value is in Canvas UI units (usually pixels).
+        /// </summary>
+        public static void SetHeight(this RectTransform rectTransform, float height)
+        {
+            Vector2 size = rectTransform.sizeDelta;
+            size.y = height;
+            rectTransform.sizeDelta = size;
+        }
+
+        /// <summary>
+        /// Int overload for convenience.
+        /// </summary>
+        public static void SetHeight(this RectTransform rectTransform, int height)
+        {
+            rectTransform.SetHeight((float)height);
+        }
+        #endregion
+        #region Naming
+        private static readonly Regex UnityNameSuffixRegex = new Regex(@"(\s\(\d+\)|\.\d+|-\d+)$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Removes Unity-generated duplicate naming suffixes
+        /// from the Transform name.
+        /// </summary>
+        public static string GetCleanName(this Transform transform)
+        {
+            if (transform == null)
+                return string.Empty;
+
+            return transform.name.StripUnityNameSuffix();
+        }
+
+        /// <summary>
+        /// Removes Unity-generated duplicate naming suffixes
+        /// from a string.
+        /// </summary>
+        public static string StripUnityNameSuffix(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            return UnityNameSuffixRegex.Replace(input, "");
+        }
+        #endregion
+    }
+    #endregion
     public static class GameObjectExtensions
     {
         public static void MoveToSceneOf(this GameObject gameObject, GameObject targetObject)

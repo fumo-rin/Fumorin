@@ -53,6 +53,16 @@ namespace rinCore
             }
             return false;
         }
+        public static double ReadCurrentRawScore(out double score)
+        {
+            score = 0d;
+            if (CurrentAs(out GameSession session))
+            {
+                var data = session.scoringData;
+                score = data.RawScore;
+            }
+            return score;
+        }
         [QFSW.QC.Command("-sTest-addscore-extras")]
         public static bool TryAddScoreExtras(double rawExtrasScore, string scoreItemName)
         {

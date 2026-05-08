@@ -139,6 +139,159 @@ namespace rinCore
             }
             return result.ToString();
         }
+        public struct PrettyNameSettings
+        {
+            public bool SpaceByCapitals;
+            public bool RemoveSpaces;
+            public bool PostNaturalCapitals; //will make the first letter only, capital. the rest will be normal capital.
+            public bool PreserveUnderscore;
+            public bool PreserveNumbers;
+            public bool PreserveBrackets;
+            public char[] preservedCharacters;
+
+            public PrettyNameSettings(params char[] preservedCharacters) : this()
+            {
+                this.SpaceByCapitals = true;
+                this.RemoveSpaces = false;
+                this.PostNaturalCapitals = true;
+                this.PreserveUnderscore = false;
+                this.PreserveNumbers = true;
+                this.PreserveBrackets = true;
+                this.preservedCharacters = preservedCharacters;
+            }
+        }
+        #region Evil blackmagic from hell
+        public static string PrettyName(this string input, PrettyNameSettings settings)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            StringBuilder builder = new StringBuilder();
+            char previous = '\0';
+
+            bool IsPreserved(char c)
+            {
+                if (settings.preservedCharacters == null)
+                    return false;
+
+                for (int i = 0; i < settings.preservedCharacters.Length; i++)
+                {
+                    if (settings.preservedCharacters[i] == c)
+                        return true;
+                }
+
+                return false;
+            }
+
+            bool IsBracket(char c)
+            {
+                return c == '(' || c == ')' ||
+                       c == '[' || c == ']' ||
+                       c == '{' || c == '}';
+            }
+
+            bool IsOpeningBracket(char c)
+            {
+                return c == '(' || c == '[' || c == '{';
+            }
+
+            bool BuilderEndsWithSpace()
+            {
+                return builder.Length > 0 &&
+                       char.IsWhiteSpace(builder[builder.Length - 1]);
+            }
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                char current = input[i];
+
+                // Remove duplicate spaces
+                if (char.IsWhiteSpace(current))
+                {
+                    if (!settings.RemoveSpaces && !BuilderEndsWithSpace())
+                        builder.Append(' ');
+
+                    previous = current;
+                    continue;
+                }
+
+                // Underscore handling
+                if (current == '_')
+                {
+                    if (settings.PreserveUnderscore)
+                    {
+                        builder.Append(current);
+                    }
+                    else if (!settings.RemoveSpaces && !BuilderEndsWithSpace())
+                    {
+                        builder.Append(' ');
+                    }
+
+                    previous = current;
+                    continue;
+                }
+
+                // Number handling
+                if (char.IsDigit(current) && !settings.PreserveNumbers)
+                {
+                    previous = current;
+                    continue;
+                }
+
+                // Bracket handling
+                if (IsBracket(current) && !settings.PreserveBrackets)
+                {
+                    previous = current;
+                    continue;
+                }
+
+                // Explicit preserved chars
+                if (IsPreserved(current))
+                {
+                    builder.Append(current);
+                    previous = current;
+                    continue;
+                }
+
+                // Add spacing before capitals
+                // Example:
+                // HelloWorld -> Hello World
+                // Boss(TextValue) -> Boss(Text Value)
+                if (settings.SpaceByCapitals &&
+                    i > 0 &&
+                    char.IsUpper(current) &&
+                    !char.IsUpper(previous) &&
+                    !char.IsWhiteSpace(previous) &&
+                    previous != '_' &&
+                    !IsOpeningBracket(previous) &&
+                    !BuilderEndsWithSpace())
+                {
+                    builder.Append(' ');
+                }
+
+                // Normalize capitalization
+                if (settings.PostNaturalCapitals)
+                {
+                    bool shouldCapitalize =
+                        builder.Length == 0 ||
+                        char.IsWhiteSpace(previous) ||
+                        previous == '_' ||
+                        previous == '-' ||
+                        previous == '.' ||
+                        IsOpeningBracket(previous);
+
+                    current = shouldCapitalize
+                        ? char.ToUpper(current)
+                        : char.ToLower(current);
+                }
+
+                builder.Append(current);
+                previous = current;
+            }
+
+            return builder.ToString().Trim();
+        }
+        #endregion
         public static string SafeString(this string input, bool preserveCapitals = true, bool removeSpaces = true, bool preserveUnderscore = true, bool preserveNumbers = true)
         {
             if (string.IsNullOrEmpty(input))

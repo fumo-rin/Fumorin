@@ -28,6 +28,7 @@ namespace rinCore
             return GenericInput.GetTracker(reference)?.ReleasedLongerThan(seconds) ?? false;
         }
     }
+    [DefaultExecutionOrder(-123)]
     public static class InputActionRawExtensions
     {
         /// <summary>

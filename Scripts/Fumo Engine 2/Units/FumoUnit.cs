@@ -293,7 +293,7 @@ namespace rinCore
             }
             return result != null;
         }
-        public static IEnumerable<FumoUnit> AliveEnemiesList
+        public static IEnumerable<FumoUnit> AliveEnemies
         {
             get
             {
@@ -303,7 +303,8 @@ namespace rinCore
                 }
                 foreach (var item in aliveEnemies)
                 {
-                    yield return item;
+                    if (item != null && item.gameObject != null && item.IsAlive)
+                        yield return item;
                 }
             }
         }
@@ -365,6 +366,10 @@ namespace rinCore
         {
             get
             {
+                if (transform == null)
+                {
+                    return Vector2.zero;
+                }
                 return transform.position;
             }
         }

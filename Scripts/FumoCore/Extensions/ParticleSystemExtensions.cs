@@ -155,6 +155,111 @@ namespace rinCore
     }
 
     #endregion
+    #region Pooled Particle single play
+    public static partial class ParticleSystemExtensions
+    {
+        private class PooledParticle
+        {
+            public ParticleSystem system;
+            public bool inUse;
+            public int sceneId;
+        }
+        private static readonly Dictionary<ParticleSystem, List<PooledParticle>> _pool = new();
+        private static readonly Dictionary<ParticleSystem, Coroutine> _releaseRoutines = new();
+        private static int _activeSceneId;
+        [Initialize(-100000)]
+        private static void InitParticlePool()
+        {
+            _activeSceneId = SceneManager.GetActiveScene().buildIndex;
+
+            SceneManager.sceneLoaded += (_, __) =>
+            {
+                _activeSceneId = SceneManager.GetActiveScene().buildIndex;
+                ValidatePools();
+            };
+
+            SceneManager.sceneUnloaded += _ =>
+            {
+                ValidatePools();
+            };
+        }
+        private static void ValidatePools()
+        {
+            foreach (var kvp in _pool)
+            {
+                var list = kvp.Value;
+                for (int i = list.Count - 1; i >= 0; i--)
+                {
+                    var p = list[i];
+                    if (p == null || p.system == null || p.sceneId != _activeSceneId)
+                    {
+                        if (p?.system != null)
+                            Object.Destroy(p.system.gameObject);
+                        list.RemoveAt(i);
+                    }
+                }
+            }
+        }
+        public static void PlayCachedOnce(this ParticleSystem prefab, Vector3 position)
+        {
+            if (prefab == null) return;
+            if (!_pool.TryGetValue(prefab, out var list))
+                _pool[prefab] = list = new List<PooledParticle>();
+
+            PooledParticle instance = null;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (!list[i].inUse && list[i].system != null)
+                {
+                    instance = list[i];
+                    break;
+                }
+            }
+            if (instance == null)
+            {
+                var ps = Object.Instantiate(prefab);
+                ps.gameObject.SetActive(true);
+
+                instance = new PooledParticle
+                {
+                    system = ps,
+                    sceneId = _activeSceneId,
+                    inUse = false
+                };
+
+                list.Add(instance);
+            }
+            instance.inUse = true;
+            var system = instance.system;
+            var t = system.transform;
+
+            t.position = position;
+            t.rotation = prefab.transform.rotation;
+            t.localScale = prefab.transform.localScale;
+
+            system.Clear(true);
+            system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            system.Play(true);
+
+            if (!_releaseRoutines.TryGetValue(prefab, out var co) || co == null)
+                _releaseRoutines[prefab] = Host.StartCoroutine(ReleaseWhenDone(instance));
+        }
+        private static IEnumerator ReleaseWhenDone(PooledParticle instance)
+        {
+            var ps = instance.system;
+            if (ps == null) yield break;
+
+            while (ps != null && ps.IsAlive(true))
+                yield return null;
+
+            if (ps != null)
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            instance.inUse = false;
+        }
+    }
+    #endregion
     public static partial class ParticleSystemExtensions
     {
         public static void PlayIfNotPlaying(this ParticleSystem ps)
@@ -163,11 +268,11 @@ namespace rinCore
             ps.Play();
         }
         private static readonly Dictionary<ParticleSystem, ParticleSystem> particleCache = new();
-        public static void EmitSingleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color? colorOverride = null, float sizeMultiplier = 1f)
+        public static void EmitSingleParticleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color? colorOverride = null, float sizeMultiplier = 1f)
         {
             if (prefab == null)
             {
-                Debug.LogWarning("Particle System Extensions - " + nameof(EmitSingleCached) + " called with null prefab.");
+                Debug.LogWarning("Particle System Extensions - " + nameof(EmitSingleParticleCached) + " called with null prefab.");
                 return;
             }
 
