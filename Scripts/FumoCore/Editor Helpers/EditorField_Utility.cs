@@ -459,6 +459,66 @@ namespace rinCore
     }
 #endif
     #endregion
+    #region List Dropdown
+#if UNITY_EDITOR
+    public static partial class EF_Utility
+    {
+        public static T EF_ListDropdown<T>(
+            Rect rect,
+            string label,
+            List<T> sourceList,
+            T currentValue,
+            Func<T, string> displayName = null)
+        {
+            if (sourceList == null || sourceList.Count == 0)
+            {
+                EditorGUI.LabelField(rect, label, "(Empty List)");
+                return currentValue;
+            }
+
+            displayName ??= (item) =>
+            {
+                if (item == null)
+                    return "(None)";
+
+                return item.ToString();
+            };
+
+            List<string> options = new() { "(None)" };
+            options.AddRange(sourceList.Select(displayName));
+
+            int currentIndex = 0;
+
+            if (currentValue != null)
+            {
+                int foundIndex = sourceList.IndexOf(currentValue);
+
+                if (foundIndex < 0)
+                {
+                    foundIndex = sourceList.FindIndex(x =>
+                        EqualityComparer<T>.Default.Equals(x, currentValue));
+                }
+
+                currentIndex = foundIndex >= 0 ? foundIndex + 1 : 0;
+            }
+
+            int newIndex = EditorGUI.Popup(
+                rect,
+                label,
+                currentIndex,
+                options.ToArray());
+
+            if (newIndex == currentIndex)
+                return currentValue;
+
+            if (newIndex <= 0)
+                return default;
+
+            return sourceList[newIndex - 1];
+        }
+    }
+#endif
+    #endregion
     #region Sprite Field
     public static partial class EF_Utility
     {

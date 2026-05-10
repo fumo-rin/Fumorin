@@ -249,6 +249,12 @@ namespace rinCore
     #region Enemy Collection & Cast
     public partial class FumoUnit
     {
+        public static void ForceRemoveAliveEnemy(FumoUnit enemy)
+        {
+            if (aliveEnemies == null)
+                return;
+            aliveEnemies.Remove(enemy);
+        }
         static HashSet<FumoUnit> aliveEnemies = new();
         public struct AliveSetterPacket
         {

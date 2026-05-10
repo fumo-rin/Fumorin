@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace rinCore
 {
@@ -12,6 +14,7 @@ namespace rinCore
     {
         [SerializeField] private ScenePairSO startingScene;
         [SerializeField] private GameObject loadingScreen;
+        [SerializeField] private Image fadingImage;
         [SerializeField] private TMP_Text loadingScreenText;
 
         internal static SceneLoader Instance { get; private set; }
@@ -107,7 +110,7 @@ namespace rinCore
         }
 
         #region Public Wrapper
-        public static void LoadScenePair(ScenePairSO pair, Action payload = null)
+        public static void LoadScenePair(ScenePairSO pair, Action payload = null, float delay = 0.25f)
         {
             if (Instance != null)
             {
@@ -122,18 +125,56 @@ namespace rinCore
                         Instance.loadingScreen.SetActive(false);
                     return;
                 }
-                Instance.StartCoroutine(Instance.CO_LoadScenePair(pair, payload));
+                Instance.StartCoroutine(Instance.CO_LoadScenePair(pair, payload, delay));
             }
         }
         #endregion
 
         #region Core Coroutine
-        private IEnumerator CO_LoadScenePair(ScenePairSO pair, Action payload)
+        private IEnumerator CO_LoadScenePair(ScenePairSO pair, Action payload, float delay)
         {
             if (pair == null) yield break;
             if (IsLoading) yield break;
 
             IsLoading = true;
+
+            EventSystem s = EventSystem.current;
+            if (s != null)
+            {
+                s.enabled = false;
+            }
+            #region Fade In & Delay
+            Image loadBackground = fadingImage;
+            if (delay > 0f)
+            {
+                float remainingDelay = delay;
+                if (loadBackground == null)
+                {
+                    yield return new WaitForSecondsRealtime(delay);
+                }
+                else
+                {
+                    loadBackground.color = loadBackground.color.Opacity(0);
+                    if (loadingScreen != null)
+                        loadingScreen.SetActive(true);
+                    if (loadingScreenText != null)
+                        loadingScreenText.text = "Loading: 0%";
+                    while (remainingDelay > 0f && loadBackground != null)
+                    {
+                        float lerp01 = 1f - (remainingDelay / delay.Max(0.0001f));
+                        lerp01 = lerp01.Clamp(0f, 1f);
+                        byte opacity = lerp01.MapFrom01(0f, 255f).Floor().ToByte();
+                        loadBackground.color = loadBackground.color.Opacity(opacity);
+                        remainingDelay -= Time.unscaledDeltaTime;
+                        yield return null;
+                    }
+                }
+            }
+            if (loadBackground != null)
+            {
+                loadBackground.color = loadBackground.color.Opacity(255);
+            }
+            #endregion
 
             if (loadingScreen != null)
                 loadingScreen.SetActive(true);
@@ -230,6 +271,10 @@ namespace rinCore
 
             if (loadingScreen != null)
                 loadingScreen.SetActive(false);
+            if (s != null)
+            {
+                s.enabled = true;
+            }
         }
 
         #endregion

@@ -27,7 +27,7 @@ namespace rinCore
                 });
             }
             if (sceneToLoad != null)
-                sceneToLoad.Load();
+                SceneLoader.LoadScenePair(sceneToLoad, null, 0.25f);
         }
     }
 }

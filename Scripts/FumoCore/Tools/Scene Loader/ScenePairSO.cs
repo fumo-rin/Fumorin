@@ -25,10 +25,6 @@ namespace rinCore
                 return list;
             }
         }
-        public void Load(System.Action payload = null)
-        {
-            SceneLoader.LoadScenePair(this, payload);
-        }
         public SceneReference MainScene => mainScene;
         public IReadOnlyList<SceneReference> AdditiveScenes => additiveScenes;
     }
