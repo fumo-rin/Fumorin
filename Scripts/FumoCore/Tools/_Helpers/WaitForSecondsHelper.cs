@@ -18,7 +18,6 @@ namespace rinCore
             {
                 return null;
             }
-
             if (!cached)
             {
                 return new UnityEngine.WaitForSeconds(seconds);
