@@ -19,7 +19,7 @@ namespace rinCore
         {
             public TMP_Text scoreText, highscoreText;
         }
-        public static void TryApplySession(GameSessionScoreComponents components)
+        public static void ApplySessionToScoreComponents(GameSessionScoreComponents components)
         {
             bool hasSession = CurrentAs(out GameSession session);
             if (components.scoreText is TMP_Text t1)
@@ -127,21 +127,18 @@ namespace rinCore
     public abstract partial class GameSession
     {
         [System.Serializable]
-        public class sessionData
+        public class scoringSession
         {
-            private string cachedStorageKey = "default";
-            public string ScoreStorageKey
+            [field: SerializeField] public string ScoreStorageKey { get; private set; } = "default";
+            public void Reset()
             {
-                get
-                {
-                    return cachedStorageKey;
-                }
-                set
-                {
-                    Debug.Log("Setting Storage key : " + value);
-                    cachedStorageKey = value;
-                    HighScore = TryFetchHighscore(cachedStorageKey);
-                }
+                RawScore = 0d;
+                RawExtrasScore = 0d;
+            }
+            public void Continue()
+            {
+                RawScore = 0d;
+                RawExtrasScore += 1d;
             }
             public string FileFriendlyKey => Application.productName.SafeRemoveWords() + "_" + ScoreStorageKey.SafeRemoveWords();
             public double RawScore;
@@ -162,30 +159,8 @@ namespace rinCore
                 }
             }
         }
-        sessionData scoringData;
-        public GameSession(sessionData data, bool cancelPrevious)
-        {
-            if (currentSession != null)
-            {
-                if (cancelPrevious)
-                {
-                    EndSession(new()
-                    {
-                        SubmitScore = false
-                    });
-                }
-                else
-                {
-                    EndSession(new()
-                    {
-                        SubmitScore = true
-                    });
-                }
-            }
-
-            scoringData = data;
-            StartSession(this);
-        }
+        [SerializeField] scoringSession scoringData;
+        public string LeaderboardKey => scoringData.ScoreStorageKey;
         public bool SessionAs<T>(out T result) where T : GameSession
         {
             if (this is T t)
@@ -197,10 +172,22 @@ namespace rinCore
             return false;
         }
         static GameSession currentSession;
-        private static void StartSession(GameSession s)
+        public static void StartSession(GameSession s)
         {
+            if (currentSession != null)
+            {
+                EndSession(new()
+                {
+                    SubmitScore = false
+                });
+            }
+            s.scoringData.Reset();
             currentSession = s;
+            s.WhenStartSession();
+            s.scoringData.HighScore = TryFetchHighscore(s.scoringData.ScoreStorageKey);
         }
+        protected abstract void WhenStartSession();
+        protected abstract void WhenEndSession();
         public static bool CurrentAs<T>(out T result) where T : GameSession
         {
             result = null;
@@ -214,14 +201,17 @@ namespace rinCore
         {
             public bool SubmitScore = false;
         }
-        public static void EndSession(in EndSessionSettings settings)
+        public static void EndSession(EndSessionSettings settings)
         {
             if (settings.SubmitScore)
             {
                 UploadLeaderboardSession();
             }
+            if (CurrentAs(out GameSession s))
+            {
+                s.WhenEndSession();
+            }
             currentSession = null;
         }
-
     }
 }

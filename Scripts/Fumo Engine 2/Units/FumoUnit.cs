@@ -319,7 +319,7 @@ namespace rinCore
             if (Player is T p)
             {
                 player = p;
-                return player != null && p.gameObject.activeInHierarchy;
+                return player != null && p.gameObject != null;
             }
             else
             {
@@ -342,6 +342,7 @@ namespace rinCore
             cast = default;
             return false;
         }
+        public virtual void ForceKill() { }
         public bool IsAlive => CalculateAlive();
         protected abstract bool CalculateAlive();
         public Vector2 NearestOnNavmeshOrCurrentPosition(float randomRange = 0, Vector2? offset = null)

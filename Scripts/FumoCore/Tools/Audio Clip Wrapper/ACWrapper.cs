@@ -160,7 +160,7 @@ namespace rinCore
         [field: SerializeField] public float singleRepeatLockoutTime { get; private set; } = 0f;
         [field: SerializeField] public bool Is3D { get; private set; }
         private float nextPlayTime;
-        public bool ReplayTimeAllowed() => (nextPlayTime - Time.unscaledTime).Absolute() > singleRepeatLockoutTime;
+        public bool ReplayTimeAllowed() => (nextPlayTime - Time.unscaledTime).Absolute() > 1f || Time.unscaledTime >= nextPlayTime;
         public float GetNextPlayTime()
         {
             return nextPlayTime;
@@ -173,7 +173,8 @@ namespace rinCore
         {
             EditorPlay(this);
         }
-        internal static Dictionary<AudioClip, AudioSource> editorTestPlayers; private static ACWrapper currentLoopingWrapper;
+        internal static Dictionary<AudioClip, AudioSource> editorTestPlayers;
+        private static ACWrapper currentLoopingWrapper;
         private static double loopRestartTime = 0;
         private static bool isLooping = false;
 

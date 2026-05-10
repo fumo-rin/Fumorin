@@ -8,6 +8,7 @@ namespace rinCore
     {
         Button b;
         [SerializeField] ScenePairSO sceneToLoad;
+        [SerializeField] bool EndSession;
         private void Awake()
         {
             b = GetComponent<Button>();
@@ -18,6 +19,13 @@ namespace rinCore
         }
         private void PressStart()
         {
+            if (EndSession)
+            {
+                GameSession.EndSession(new()
+                {
+                    SubmitScore = true
+                });
+            }
             if (sceneToLoad != null)
                 sceneToLoad.Load();
         }

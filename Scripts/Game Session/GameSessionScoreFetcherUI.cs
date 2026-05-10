@@ -7,7 +7,7 @@ namespace rinCore
         [SerializeField] GameSession.GameSessionScoreComponents scoreText;
         private void LateUpdate()
         {
-            GameSession.TryApplySession(scoreText);
+            GameSession.ApplySessionToScoreComponents(scoreText);
         }
     }
 }

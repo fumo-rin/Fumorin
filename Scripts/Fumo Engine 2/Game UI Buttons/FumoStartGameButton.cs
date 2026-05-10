@@ -8,7 +8,7 @@ namespace rinCore
     public abstract class FumoStartGameButton : MonoBehaviour
     {
         Button b;
-        protected abstract string GamemodeString { get; }
+        protected abstract string LeaderboardKey { get; }
         private void Awake()
         {
             b = GetComponent<Button>();
@@ -19,8 +19,8 @@ namespace rinCore
         }
         private void PressStart()
         {
-            FumoLeaderboard.CurrentLeaderboardKey = (Application.productName + "_" + GamemodeString);
-            Debug.Log("Starting Game...");
+            FumoLeaderboard.CurrentLeaderboardKey = LeaderboardKey;
+            Debug.Log("Starting Game with Leaderboard Key : " + LeaderboardKey);
             StartGamePayload();
         }
         protected abstract void StartGamePayload();

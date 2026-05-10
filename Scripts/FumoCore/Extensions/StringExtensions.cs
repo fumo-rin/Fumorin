@@ -166,9 +166,40 @@ namespace rinCore
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
+            input = input.Trim();
+            if (input.EndsWith("(Clone)", StringComparison.Ordinal))
+            {
+                input = input.Substring(0, input.Length - "(Clone)".Length).TrimEnd();
+            }
+
+            while (input.Length > 0)
+            {
+                int close = input.LastIndexOf(')');
+                if (close != input.Length - 1)
+                    break;
+
+                int open = input.LastIndexOf('(');
+                if (open < 0 || open > close)
+                    break;
+
+                bool numeric = true;
+
+                for (int i = open + 1; i < close; i++)
+                {
+                    if (!char.IsDigit(input[i]))
+                    {
+                        numeric = false;
+                        break;
+                    }
+                }
+                if (!numeric)
+                    break;
+
+                input = input.Substring(0, open).TrimEnd();
+            }
             StringBuilder builder = new StringBuilder();
             char previous = '\0';
-
+            #region Helper
             bool IsPreserved(char c)
             {
                 if (settings.preservedCharacters == null)
@@ -200,12 +231,12 @@ namespace rinCore
                 return builder.Length > 0 &&
                        char.IsWhiteSpace(builder[builder.Length - 1]);
             }
+            #endregion
 
             for (int i = 0; i < input.Length; i++)
             {
                 char current = input[i];
 
-                // Remove duplicate spaces
                 if (char.IsWhiteSpace(current))
                 {
                     if (!settings.RemoveSpaces && !BuilderEndsWithSpace())
@@ -215,7 +246,6 @@ namespace rinCore
                     continue;
                 }
 
-                // Underscore handling
                 if (current == '_')
                 {
                     if (settings.PreserveUnderscore)
@@ -231,21 +261,18 @@ namespace rinCore
                     continue;
                 }
 
-                // Number handling
                 if (char.IsDigit(current) && !settings.PreserveNumbers)
                 {
                     previous = current;
                     continue;
                 }
 
-                // Bracket handling
                 if (IsBracket(current) && !settings.PreserveBrackets)
                 {
                     previous = current;
                     continue;
                 }
 
-                // Explicit preserved chars
                 if (IsPreserved(current))
                 {
                     builder.Append(current);
@@ -253,10 +280,6 @@ namespace rinCore
                     continue;
                 }
 
-                // Add spacing before capitals
-                // Example:
-                // HelloWorld -> Hello World
-                // Boss(TextValue) -> Boss(Text Value)
                 if (settings.SpaceByCapitals &&
                     i > 0 &&
                     char.IsUpper(current) &&
@@ -269,7 +292,6 @@ namespace rinCore
                     builder.Append(' ');
                 }
 
-                // Normalize capitalization
                 if (settings.PostNaturalCapitals)
                 {
                     bool shouldCapitalize =
