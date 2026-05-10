@@ -178,7 +178,7 @@ namespace rinCore
             }
 
             Type type = target.GetType();
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance/* | BindingFlags.NonPublic*/);
 
             foreach (var field in fields)
             {
