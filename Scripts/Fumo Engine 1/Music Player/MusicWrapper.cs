@@ -95,14 +95,12 @@ namespace rinCore
         {
             IEnumerator CO_PlayWhenReady()
             {
-                Debug.Log("Playing : " + p.TrackName);
+                Debug.Log("Now Playing : " + p.TrackName);
                 while (!MusicPlayer.IsReady)
                 {
-                    Debug.Log("Stalling Music...");
                     yield return null;
                 }
                 MusicPlayer.PlayMusicWrapper(p);
-                Debug.Log("Now Playing");
                 musicPlayNextRoutine = null;
             }
             if (musicPlayNextRoutine != null)

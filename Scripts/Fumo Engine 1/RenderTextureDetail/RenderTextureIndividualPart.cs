@@ -7,7 +7,7 @@ namespace rinCore
         [SerializeField] RenderTexture t;
         delegate void ScreenSizeChange(int x, int y);
         private static event ScreenSizeChange WhenChangeSize;
-        static (int, int) screenSize = (480, 640);
+        static (int, int) screenSize = (360, 480);
         private void Start()
         {
             WhenChangeSize += SetLocalSize;

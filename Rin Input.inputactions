@@ -1090,6 +1090,17 @@
                 },
                 {
                     "name": "",
+                    "id": "92e935f5-fc5b-4146-960b-af5c1a6fa23d",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "7e57f419-cc3a-47e2-8a8f-6f59cfccb58e",
                     "path": "<Gamepad>/start",
                     "interactions": "",

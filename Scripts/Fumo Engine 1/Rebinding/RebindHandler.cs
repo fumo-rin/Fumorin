@@ -53,6 +53,10 @@ namespace rinCore
             instance = this;
             CreatedButtons.Clear();
             SetUIVisibility(startOpen);
+            if (buttonPrefab.gameObject.activeInHierarchy)
+            {
+                buttonPrefab.gameObject.SetActive(false);
+            }
         }
 
         private void Start()
@@ -62,6 +66,7 @@ namespace rinCore
             {
                 item.asset.Enable();
                 RebindButton spawned = Instantiate(buttonPrefab, buttonsContainer);
+                spawned.gameObject.SetActive(true);
                 NavigationElement e = null;
                 if (iteration == 0)
                 {

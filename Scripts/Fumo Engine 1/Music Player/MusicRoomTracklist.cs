@@ -7,7 +7,7 @@ namespace rinCore
     [CreateAssetMenu(menuName = "Bremsengine/Music Room Tracklist")]
     public class MusicRoomTracklist : ScriptableObject
     {
-        public List<MusicWrapper> TrackList = new();
+        public List<MusicWrapper> TrackList;
         public bool QueueRandomTrack(in Queue<MusicWrapper> Playlist)
         {
             Debug.Log("T");

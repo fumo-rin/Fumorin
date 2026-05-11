@@ -13,9 +13,12 @@ namespace rinCore
         protected virtual List<MusicWrapper> Tracklist()
         {
             List<MusicWrapper> result = new();
-            foreach (var track in trackList.TrackList)
+            if (trackList != null && trackList.TrackList != null && trackList.TrackList.Count > 0)
             {
-                result.AddIfDoesntExist(track);
+                foreach (var track in trackList.TrackList)
+                {
+                    result.AddIfDoesntExist(track);
+                }
             }
             return result;
         }

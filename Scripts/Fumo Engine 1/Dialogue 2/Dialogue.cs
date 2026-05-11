@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace rinCore
@@ -138,7 +139,7 @@ namespace rinCore
             }
             Image image = null;
 
-            bool isPlayer = PlayerCharacter.characterName == character.characterName;
+            bool isPlayer = PlayerCharacter == null ? false : PlayerCharacter.characterName == character.characterName;
             if (isPlayer)
             {
                 instance.playerChatAnimator.SetTrigger(instance.animationChatStringKey);
@@ -214,6 +215,7 @@ namespace rinCore
         private static IEnumerator RunDialogue(DialogueStackSO stack, float delay, Action whenDialogueEnd)
         {
             yield return delay.WaitForSeconds(false);
+            unscaledDialogueStartTime = Time.unscaledTime;
             SetBoxVisibility(true);
             instance.playerSprite.enabled = false;
             instance.otherSprite.enabled = false;
@@ -239,11 +241,11 @@ namespace rinCore
     #endregion
     public partial class Dialogue : MonoBehaviour
     {
+        const float HOLD_THRESHOLD = 0.85f;
         #region Run Dialogue
         static readonly HashSet<char> ExcludedPunctuation = new() { '\'', '"', '‘', '’', '“', '”', ',' };
         static IEnumerator RunStack(DialogueStackSO stack)
         {
-            const float HOLD_THRESHOLD = 0.85f;
             const float CHAR_DELAY = 0.015f;
             const float PUNCTUATION_DELAY = 0.25f;
             const float PAUSE_DELAY = 0.05f;
@@ -304,15 +306,14 @@ namespace rinCore
                     char currentChar = message[charIndex];
                     bool isExcluded = ExcludedPunctuation.Contains(currentChar);
 
-                    if (ShmupInput.SkipDialogueJustPressed)
+                    if (Dialogue.instance.SkipDialogueKey.JustPressed())
                     {
                         Dialogue.UpdateText(message.Length, out messageDone);
                         EndWord(false);
                         yield return null;
                         break;
                     }
-
-                    if (charIndex > 0 && ShmupInput.SkipDialoguePressedLongerThan(HOLD_THRESHOLD))
+                    if (charIndex > 0 && ContinuePressedOrHeldForALongTime)
                         allowHoldSkip = true;
 
                     if (charTimer == 0f)
@@ -364,7 +365,7 @@ namespace rinCore
                 {
                     if (GeneralManager.IsPaused)
                         waitEnd += Time.unscaledDeltaTime;
-                    else if (ShmupInput.SkipDialogueJustPressed || ShmupInput.SkipDialoguePressedLongerThan(HOLD_THRESHOLD))
+                    else if (ContinuePressedOrHeldForALongTime)
                     {
                         yield return null;
                         break;
@@ -388,11 +389,19 @@ namespace rinCore
         [SerializeField] GameObject visibilityAnchor;
         [SerializeField] AudioSource speechPlayer;
         Coroutine activeDialogueRoutine;
+        [SerializeField] InputActionReference SkipDialogueKey;
+        static float unscaledDialogueStartTime;
         static bool ContinuePressedOrHeldForALongTime
         {
             get
             {
-                return ShmupInput.SkipDialogueJustPressed || (ShmupInput.SkipDialoguePressedLongerThan(0.85f));
+                if (instance is Dialogue d)
+                {
+                    bool stalled = unscaledDialogueStartTime + HOLD_THRESHOLD >= Time.unscaledTime;
+                    return d.SkipDialogueKey.JustPressed() ||
+                         (!stalled && d.SkipDialogueKey.PressedLongerThan(HOLD_THRESHOLD));
+                }
+                return false;
             }
         }
         public static bool IsRunning

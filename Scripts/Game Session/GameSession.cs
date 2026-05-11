@@ -13,6 +13,12 @@ namespace rinCore
     #region Scoring
     public partial class GameSession
     {
+        #region Invalidation
+        public delegate bool ScoreSessionInvalidator();
+        public static event ScoreSessionInvalidator WhenInvalidationCheck;
+        private static bool IsSessionScoreValid() => WhenInvalidationCheck?.Invoke() ?? true;
+        #endregion
+
         #region Apply Text
         [System.Serializable]
         public struct GameSessionScoreComponents
@@ -87,7 +93,7 @@ namespace rinCore
         }
         public static bool TryStoreSessionHighscore()
         {
-            if (CurrentAs(out GameSession session))
+            if (CurrentAs(out GameSession session) && IsSessionScoreValid())
             {
                 var data = session.scoringData;
                 PersistentJSON.LoadScore(data.FileFriendlyKey, out double storedScore);
@@ -109,7 +115,7 @@ namespace rinCore
         [QFSW.QC.Command("-sTest-ugs-storescore")]
         public static void UploadLeaderboardSession()
         {
-            if (CurrentAs(out GameSession session))
+            if (CurrentAs(out GameSession session) && IsSessionScoreValid())
             {
                 var data = session.scoringData;
                 long submitableScore = session.scoringData.ProcessedFinalScore.ToLong();
@@ -151,7 +157,7 @@ namespace rinCore
                 {
                     double processedVisibleScore = ((float)RawScore).ReverseQuantize(((float)ScoreDivisor));
                     double processedFinal = processedVisibleScore + RawExtrasScore;
-                    if (processedFinal > HighScore)
+                    if (processedFinal > HighScore && IsSessionScoreValid())
                     {
                         HighScore = processedFinal;
                     }
@@ -159,7 +165,7 @@ namespace rinCore
                 }
             }
         }
-        [SerializeField] scoringSession scoringData;
+        [SerializeField] protected scoringSession scoringData;
         public string LeaderboardKey => scoringData.ScoreStorageKey;
         public bool SessionAs<T>(out T result) where T : GameSession
         {
@@ -203,6 +209,14 @@ namespace rinCore
         }
         public static void EndSession(EndSessionSettings settings)
         {
+            if (TryStoreSessionHighscore())
+            {
+                Debug.Log("Stored Highscore");
+            }
+            else
+            {
+                Debug.Log("Didn't Store Highscore.");
+            }
             if (settings.SubmitScore)
             {
                 UploadLeaderboardSession();

@@ -7,7 +7,8 @@ using UnityEngine.UI;
 namespace rinCore
 {
     [RequireComponent(typeof(Button))]
-    public class RenderTextureDetailButton : MonoBehaviour
+    public class 
+        DetailButton : MonoBehaviour
     {
         [SerializeField] RenderTextureDetail.RenderMode detail = RenderTextureDetail.RenderMode.Highres;
         private void Start()
