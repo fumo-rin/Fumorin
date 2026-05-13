@@ -404,6 +404,7 @@ namespace rinCore
             {
                 return;
             }
+            if (actionTable == null) actionTable = new();
             foreach (var item in actionTable.ToList())
             {
                 if (item.Value != null)

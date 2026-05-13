@@ -121,6 +121,8 @@ namespace rinCore
         }
         public void OnBeforeSerialize()
         {
+            if (this == null)
+                return;
             if (SoundName == "Headhunter, Leather Belt")
             {
                 SoundName = name;
