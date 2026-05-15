@@ -143,8 +143,14 @@ namespace rinCore
             }
             public void Continue()
             {
+                if (WhenInvalidationCheck?.Invoke() ?? true)
+                {
+                    UploadLeaderboardSession();
+                }
+
                 RawScore = 0d;
                 RawExtrasScore += 1d;
+
             }
             public string FileFriendlyKey => Application.productName.SafeRemoveWords() + "_" + ScoreStorageKey.SafeRemoveWords();
             public double RawScore;

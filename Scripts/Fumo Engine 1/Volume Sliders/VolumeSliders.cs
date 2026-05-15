@@ -29,15 +29,19 @@ namespace rinCore
             v.SetMixers(dialogue, dialogueVolume);
             Destroy(v.gameObject);
         }
+        private void StoreValue(string key, float value)
+        {
+            StoredVolume = value;
+            PersistentJSON.TrySave(value, key);
+            //PlayerPrefs.SetFloat(key, value);
+        }
         private bool TryGetSavedValue(string key, out float value)
         {
-            value = StoredVolume;
-            if (PlayerPrefs.HasKey(key))
+            if (!PersistentJSON.TryLoad(out value, key))
             {
-                value = PlayerPrefs.GetFloat(key);
-                return true;
+                value = -7f;
             }
-            return false;
+            return true;
         }
         private void OnEnable()
         {
@@ -71,11 +75,6 @@ namespace rinCore
             if (effectsSlider) effectsSlider.onValueChanged.RemoveListener(delegate { ReadEffectsSlider(); });
             if (musicSlider) musicSlider.onValueChanged.RemoveListener(delegate { ReadMusicSlider(); });
             if (dialogueSlider) dialogueSlider.onValueChanged.RemoveListener(delegate { ReadDialogueSlider(); });
-        }
-        private void StoreValue(string key, float value)
-        {
-            StoredVolume = value;
-            PlayerPrefs.SetFloat(key, value);
         }
         private void SetMixers(AudioMixer[] mixers, float value)
         {

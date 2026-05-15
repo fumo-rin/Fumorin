@@ -1,3 +1,4 @@
+using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Search;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -106,6 +107,15 @@ namespace rinCore
             PersistentJSON.TrySave(stickDeadZone, "Stick Deadzone");
             Debug.Log("Updated stick deadzone :" + value.ToString("F2"));
             return stickDeadZone;
+        }
+        public static bool ProcessWithDeadzone(in Vector2 input, out Vector2 result)
+        {
+            result = input;
+            if (input.magnitude <= stickDeadZone)
+            {
+                result = Vector2.zero;
+            }
+            return result != Vector2.zero;
         }
     }
     #endregion
