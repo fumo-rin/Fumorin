@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace RinCore
+namespace rinCore
 {
     /// <summary>
     /// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Packages/com.fumorin.tools/Rin Input.inputactions".
@@ -95,7 +95,7 @@ namespace RinCore
             ""id"": ""3f718b42-3a85-4c53-ac11-f6db7ff0fddd"",
             ""actions"": [
                 {
-                    ""name"": ""LeftStick"",
+                    ""name"": ""Movement"",
                     ""type"": ""Value"",
                     ""id"": ""17e20bd4-10b6-45c8-ae66-181290169736"",
                     ""expectedControlType"": ""Analog"",
@@ -139,7 +139,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad;Keyboard&Mouse"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -150,7 +150,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -161,7 +161,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -172,7 +172,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -183,7 +183,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -194,7 +194,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -205,7 +205,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -216,7 +216,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad;Keyboard&Mouse"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -227,7 +227,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad;Keyboard&Mouse"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -238,7 +238,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad;Keyboard&Mouse"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -249,7 +249,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -260,7 +260,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -271,7 +271,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -282,7 +282,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -293,7 +293,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -304,7 +304,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -315,7 +315,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -326,7 +326,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -337,7 +337,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -348,7 +348,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -359,7 +359,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -370,7 +370,7 @@ namespace RinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""LeftStick"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -1272,8 +1272,8 @@ namespace RinCore
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""ba880139-72f5-40b7-9ce1-045cec281081"",
-                    ""path"": ""<Keyboard>/z"",
+                    ""id"": ""085d5793-b8b6-4163-90f8-0aa527d6e664"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1283,8 +1283,8 @@ namespace RinCore
                 },
                 {
                     ""name"": """",
-                    ""id"": ""085d5793-b8b6-4163-90f8-0aa527d6e664"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""id"": ""ba880139-72f5-40b7-9ce1-045cec281081"",
+                    ""path"": ""<Keyboard>/z"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1810,7 +1810,7 @@ namespace RinCore
 }");
             // Fumo
             m_Fumo = asset.FindActionMap("Fumo", throwIfNotFound: true);
-            m_Fumo_LeftStick = m_Fumo.FindAction("LeftStick", throwIfNotFound: true);
+            m_Fumo_Movement = m_Fumo.FindAction("Movement", throwIfNotFound: true);
             m_Fumo_RightStick = m_Fumo.FindAction("RightStick", throwIfNotFound: true);
             m_Fumo_ClickLeft = m_Fumo.FindAction("ClickLeft", throwIfNotFound: true);
             m_Fumo_ClickRight = m_Fumo.FindAction("ClickRight", throwIfNotFound: true);
@@ -1945,7 +1945,7 @@ namespace RinCore
         // Fumo
         private readonly InputActionMap m_Fumo;
         private List<IFumoActions> m_FumoActionsCallbackInterfaces = new List<IFumoActions>();
-        private readonly InputAction m_Fumo_LeftStick;
+        private readonly InputAction m_Fumo_Movement;
         private readonly InputAction m_Fumo_RightStick;
         private readonly InputAction m_Fumo_ClickLeft;
         private readonly InputAction m_Fumo_ClickRight;
@@ -1961,9 +1961,9 @@ namespace RinCore
             /// </summary>
             public FumoActions(@RinInput wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "Fumo/LeftStick".
+            /// Provides access to the underlying input action "Fumo/Movement".
             /// </summary>
-            public InputAction @LeftStick => m_Wrapper.m_Fumo_LeftStick;
+            public InputAction @Movement => m_Wrapper.m_Fumo_Movement;
             /// <summary>
             /// Provides access to the underlying input action "Fumo/RightStick".
             /// </summary>
@@ -2002,9 +2002,9 @@ namespace RinCore
             {
                 if (instance == null || m_Wrapper.m_FumoActionsCallbackInterfaces.Contains(instance)) return;
                 m_Wrapper.m_FumoActionsCallbackInterfaces.Add(instance);
-                @LeftStick.started += instance.OnLeftStick;
-                @LeftStick.performed += instance.OnLeftStick;
-                @LeftStick.canceled += instance.OnLeftStick;
+                @Movement.started += instance.OnMovement;
+                @Movement.performed += instance.OnMovement;
+                @Movement.canceled += instance.OnMovement;
                 @RightStick.started += instance.OnRightStick;
                 @RightStick.performed += instance.OnRightStick;
                 @RightStick.canceled += instance.OnRightStick;
@@ -2025,9 +2025,9 @@ namespace RinCore
             /// <seealso cref="FumoActions" />
             private void UnregisterCallbacks(IFumoActions instance)
             {
-                @LeftStick.started -= instance.OnLeftStick;
-                @LeftStick.performed -= instance.OnLeftStick;
-                @LeftStick.canceled -= instance.OnLeftStick;
+                @Movement.started -= instance.OnMovement;
+                @Movement.performed -= instance.OnMovement;
+                @Movement.canceled -= instance.OnMovement;
                 @RightStick.started -= instance.OnRightStick;
                 @RightStick.performed -= instance.OnRightStick;
                 @RightStick.canceled -= instance.OnRightStick;
@@ -3016,12 +3016,12 @@ namespace RinCore
         public interface IFumoActions
         {
             /// <summary>
-            /// Method invoked when associated input action "LeftStick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Movement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnLeftStick(InputAction.CallbackContext context);
+            void OnMovement(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "RightStick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

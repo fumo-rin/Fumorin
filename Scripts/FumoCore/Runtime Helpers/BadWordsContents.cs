@@ -6,6 +6,8 @@ namespace rinCore
     {
         public static readonly HashSet<string> BadWordsList = new()
         {
+            "killyourself","killmyself","kys","killing","killer",
+
   "2 girls 1 cup",
   "2g1c",
   "4r5e",
@@ -117,9 +119,6 @@ namespace rinCore
   "auto erotic",
   "autoerotic",
   "ayir",
-  "azazel",
-  "azz",
-  "azzhole",
   "b a s t a r d",
   "b i t c h",
   "b o o b",

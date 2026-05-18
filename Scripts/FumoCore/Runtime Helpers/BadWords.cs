@@ -91,14 +91,16 @@ namespace rinCore
             generatedName = generatedName.ClampLength(characterLimit);
             return generatedName.SafeString(preserveCapitals: true, removeSpaces: true, preserveUnderscore: false);
         }
-        public static bool CleanReplaceFunny(string input, HashSet<string> badWords, out string clean, int characterLimit = 12)
+        public static bool CleanReplaceFunny(string input, HashSet<string> badWords, out string clean, out string debugOffense, int characterLimit = 12)
         {
+            debugOffense = "";
             clean = input;
             if (string.IsNullOrWhiteSpace(input) || badWords == null || badWords.Count == 0)
                 return false;
             string normalizedInput = input.SafeString(preserveCapitals: false, removeSpaces: true, preserveUnderscore: true);
             foreach (var badWord in badWords)
             {
+                debugOffense = badWord;
                 if (normalizedInput.Contains(badWord, StringComparison.OrdinalIgnoreCase))
                 {
                     clean = RNG.Byte255 > 150 ? CleanNameGen(characterLimit, cute1, cute2, cute3) : CleanNameGen(characterLimit, cute1, cute2);

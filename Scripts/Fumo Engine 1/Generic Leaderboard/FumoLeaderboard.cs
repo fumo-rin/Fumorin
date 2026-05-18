@@ -22,6 +22,7 @@ namespace rinCore
         [SerializeField] private TMP_Text pageText;
         private int currentIndex = 0;
         private int currentPage = 0;
+        int buildVersion;
 
         private void CycleLeaderboard(int delta)
         {
@@ -35,6 +36,8 @@ namespace rinCore
             CurrentLeaderboardKey = leaderBoardKeys[currentIndex];
             UpdateLeaderboardLabel();
             UpdatePageLabel();
+
+            Build(CurrentLeaderboardKey, currentPage);
         }
 
         private void CyclePage(int delta)
@@ -89,12 +92,7 @@ namespace rinCore
         public static string CurrentLeaderboardKey
         {
             get => _currentLeaderboardKey;
-            set
-            {
-                _currentLeaderboardKey = value;
-                if (instance != null)
-                    instance.Build(value, instance.currentPage);
-            }
+            set => _currentLeaderboardKey = value;
         }
 
         static FumoLeaderboard instance;
@@ -112,20 +110,24 @@ namespace rinCore
 
         private void Start()
         {
+            copyableEntry.gameObject.SetActive(false);
             copyableEntry.Clear();
             for (int i = 0; i < count; i++)
             {
                 var clone = copyableEntry.Spawn2D(Vector2.zero, copyableEntry.transform.parent);
                 board.Add(clone);
                 clone.Clear();
+                clone.gameObject.SetActive(true);
                 clone.transform.localScale = Vector3.one;
             }
-            copyableEntry.gameObject.SetActive(false);
             StartLeaderboardSelector();
+            if (!string.IsNullOrEmpty(CurrentLeaderboardKey))
+                Build(CurrentLeaderboardKey, currentPage);
         }
 
         private async void Build(string key, int page = 0)
         {
+            int version = ++buildVersion;
             if (string.IsNullOrEmpty(key))
             {
                 Debug.LogWarning("Leaderboard ID not set!");
@@ -137,6 +139,8 @@ namespace rinCore
                 Debug.LogWarning("[FumoLeaderboard] UGS not ready, cannot fetch leaderboard yet.");
                 return;
             }
+            if (version != buildVersion)
+                return;
             if (cachedLeaderboards.TryGetValue(key, out var pageDict) && pageDict.TryGetValue(page, out var cachedData))
             {
                 ApplyCachedEntries(cachedData);
@@ -157,6 +161,9 @@ namespace rinCore
                     }
                 );
 
+                if (version != buildVersion)
+                    return;
+
                 var cacheList = new List<(long score, string player)>();
 
                 for (int i = 0; i < board.Count; i++)
@@ -165,6 +172,13 @@ namespace rinCore
                     {
                         var data = scoresResponse.Results[i];
                         string playerName = string.IsNullOrEmpty(data.PlayerName) ? data.PlayerId : data.PlayerName;
+                        if (BadWords.CleanReplaceFunny(playerName.RemoveAfter("#").Letterize(), BadWords.BadWordsList, out string clean, out string badWord, 16))
+                        {
+#if UNITY_EDITOR
+                            Debug.Log($"Replacing {playerName} with {clean}... Reason : {badWord}");
+#endif
+                            playerName = clean;
+                        }
                         long score = data.Score.ToLong();
                         board[i].Set(score, playerName, offset + i + 1);
                         cacheList.Add((score, playerName));

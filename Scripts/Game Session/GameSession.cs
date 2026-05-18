@@ -91,10 +91,12 @@ namespace rinCore
             }
             return false;
         }
-        public static bool TryStoreSessionHighscore()
+        public static bool TryStoreSessionHighscore(out bool validScore)
         {
+            validScore = false;
             if (CurrentAs(out GameSession session) && IsSessionScoreValid())
             {
+                validScore = true;
                 var data = session.scoringData;
                 PersistentJSON.LoadScore(data.FileFriendlyKey, out double storedScore);
                 if (data.ProcessedFinalScore > storedScore)
@@ -143,7 +145,15 @@ namespace rinCore
             }
             public void Continue()
             {
-                if (WhenInvalidationCheck?.Invoke() ?? true)
+                if (TryStoreSessionHighscore(out bool validScore))
+                {
+                    Debug.Log("Stored Highscore");
+                }
+                else
+                {
+                    Debug.Log("Didn't Store Highscore.");
+                }
+                if (validScore)
                 {
                     UploadLeaderboardSession();
                 }
@@ -215,7 +225,7 @@ namespace rinCore
         }
         public static void EndSession(EndSessionSettings settings)
         {
-            if (TryStoreSessionHighscore())
+            if (TryStoreSessionHighscore(out bool validScore))
             {
                 Debug.Log("Stored Highscore");
             }
@@ -223,7 +233,7 @@ namespace rinCore
             {
                 Debug.Log("Didn't Store Highscore.");
             }
-            if (settings.SubmitScore)
+            if (settings.SubmitScore && validScore)
             {
                 UploadLeaderboardSession();
             }
@@ -232,6 +242,10 @@ namespace rinCore
                 s.WhenEndSession();
             }
             currentSession = null;
+        }
+        private static void SubmitScores()
+        {
+
         }
     }
 }

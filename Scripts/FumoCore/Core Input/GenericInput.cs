@@ -1,4 +1,3 @@
-using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Search;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -86,12 +85,45 @@ namespace rinCore
     #region Sticks & Deadzone
     public partial class GenericInput
     {
-        static float stickDeadZone = 0.4f;
+        static float cachedDeadZone;
+        static float stickDeadZone
+        {
+            get
+            {
+                return cachedDeadZone;
+            }
+            set
+            {
+                cachedDeadZone = value;
+                Debug.Log("Set Deadzone: " + cachedDeadZone);
+            }
+        }
         [SerializeField] InputActionReference moveInput, lookInput;
         static Vector2 cachedMove, cachedLook;
+        public static Vector2 Look
+        {
+            get
+            {
+                if (instance == null)
+                    return Vector2.zero;
 
-        public static Vector2 Look => instance == null ? Vector2.zero : cachedLook.magnitude >= stickDeadZone.Clamp(0.05f, 0.95f) ? cachedLook : Vector2.zero;
-        public static Vector2 Move => instance == null ? Vector2.zero : cachedMove.magnitude >= stickDeadZone.Clamp(0.05f, 0.95f) ? cachedMove : Vector2.zero;
+                ProcessWithDeadzone(cachedLook, out var result);
+
+                return result;
+            }
+        }
+        public static Vector2 Move
+        {
+            get
+            {
+                if (instance == null)
+                    return Vector2.zero;
+
+                ProcessWithDeadzone(cachedMove, out var result);
+
+                return result;
+            }
+        }
         public static float FetchDeadzone()
         {
             if (PersistentJSON.TryLoad(out float value, "Stick Deadzone"))
@@ -103,18 +135,15 @@ namespace rinCore
         [QFSW.QC.Command("-input-deadzone")]
         public static float UpdateDeadzone(float value)
         {
-            stickDeadZone = Mathf.Clamp(value, 0.05f, 1f);
+            stickDeadZone = Mathf.Clamp(value, 0.1f, 0.8f);
             PersistentJSON.TrySave(stickDeadZone, "Stick Deadzone");
             Debug.Log("Updated stick deadzone :" + value.ToString("F2"));
             return stickDeadZone;
         }
         public static bool ProcessWithDeadzone(in Vector2 input, out Vector2 result)
         {
-            result = input;
-            if (input.magnitude <= stickDeadZone)
-            {
-                result = Vector2.zero;
-            }
+            result.x = Mathf.Abs(input.x) >= stickDeadZone ? input.x : 0f;
+            result.y = Mathf.Abs(input.y) >= stickDeadZone ? input.y : 0f;
             return result != Vector2.zero;
         }
     }
@@ -157,6 +186,10 @@ namespace rinCore
             instance = this;
             if (moveInput != null) moveInput.action.Enable();
             if (lookInput != null) lookInput.action.Enable();
+        }
+        private void Start()
+        {
+            UpdateDeadzone(FetchDeadzone());
         }
 
         private void Update()

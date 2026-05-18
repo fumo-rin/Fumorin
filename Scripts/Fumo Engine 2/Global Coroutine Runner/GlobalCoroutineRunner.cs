@@ -85,49 +85,33 @@ namespace rinCore
 
             return c;
         }
-
-        public static void StopCoroutine(string key, Coroutine coroutine, bool persistAcrossScenes = false)
+        public static void StopAllOfKey(params string[] keyIndices)
         {
-            if (coroutine == null || string.IsNullOrEmpty(key)) return;
-
-            string trackedKey = ResolveKey(key, persistAcrossScenes);
-
-            if (!trackedCoroutines.TryGetValue(trackedKey, out var list))
-                return;
-
-            if (list.Contains(coroutine))
+            foreach (string key in keyIndices)
             {
-                Instance.StopCoroutine(coroutine);
-                list.Remove(coroutine);
-            }
+                if (string.IsNullOrEmpty(key)) continue;
 
-            CleanupKey(trackedKey);
-        }
-        public static void StopAllOfKey(string key)
-        {
-            if (string.IsNullOrEmpty(key)) return;
+                var allKeys = new List<string>(trackedCoroutines.Keys);
+                var keysToRemove = new List<string>();
 
-            var allKeys = new List<string>(trackedCoroutines.Keys);
-            var keysToRemove = new List<string>();
-
-            foreach (var dictKey in allKeys)
-            {
-                if (dictKey == key || dictKey.StartsWith(key + "_"))
+                foreach (var dictKey in allKeys)
                 {
-                    if (trackedCoroutines.TryGetValue(dictKey, out var coroutineList))
+                    if (dictKey == key || dictKey.StartsWith(key + "_"))
                     {
-                        foreach (var c in coroutineList)
+                        if (trackedCoroutines.TryGetValue(dictKey, out var coroutineList))
                         {
-                            if (c != null)
-                                Instance.StopCoroutine(c);
+                            foreach (var c in coroutineList)
+                            {
+                                if (c != null)
+                                    Instance.StopCoroutine(c);
+                            }
+                            keysToRemove.Add(dictKey);
                         }
-                        keysToRemove.Add(dictKey);
                     }
                 }
+                foreach (var k in keysToRemove)
+                    trackedCoroutines.Remove(k);
             }
-
-            foreach (var k in keysToRemove)
-                trackedCoroutines.Remove(k);
         }
         public static void StopAll()
         {

@@ -15,8 +15,6 @@ namespace rinCore
 
         [SerializeField] InputActionReference bindAction;
         RebindHandler handler;
-
-        static InputActionRebindingExtensions.RebindingOperation rebindingOperation;
         static RebindButton currentRebind;
         static int lastBindingIndex;
 
@@ -28,9 +26,9 @@ namespace rinCore
         {
             currentRebind = null;
             lastBindingIndex = 0;
-            if (rebindingOperation != null)
+            if (RebindHandler.rebindingOperation != null)
             {
-                rebindingOperation.Dispose();
+                RebindHandler.rebindingOperation.Dispose();
             }
         }
         public void AssignRebindHandler(RebindHandler handler, InputActionReference inputAction)
@@ -77,7 +75,7 @@ namespace rinCore
             if (buttonText != null)
                 buttonText.text = "Waiting for input...";
 
-            rebindingOperation = bindAction.action.PerformInteractiveRebinding(targetBindingIndex)
+            RebindHandler.rebindingOperation = bindAction.action.PerformInteractiveRebinding(targetBindingIndex)
                 .WithControlsExcluding("Mouse")
                 .OnMatchWaitForAnother(0.1f)
                 .OnComplete(op => RebindComplete(targetBindingIndex))
@@ -114,7 +112,7 @@ namespace rinCore
 
         private void RebindComplete(int index)
         {
-            rebindingOperation?.Dispose();
+            RebindHandler.rebindingOperation?.Dispose();
             bindAction.action.Enable();
             SaveBinds();
             FetchBindingText(index);

@@ -28,21 +28,11 @@ namespace rinCore
         private void OnDestroy()
         {
             string nameToSend = storedName;
-
-            if (BadWords.CleanReplaceFunny(storedName.Letterize(), BadWords.BadWordsList, out string clean, field.characterLimit))
+            /*if (BadWords.CleanReplaceFunny(storedName.Letterize(), BadWords.BadWordsList, out string clean, field.characterLimit))
             {
                 nameToSend = clean;
-            }
+            }*/
             _ = UGSInitializer.SetPlayerNameAsync(nameToSend);
-        }
-        async void SetName(string n)
-        {
-            if (!wasChanged)
-            {
-                return;
-            }
-            wasChanged = false;
-            await UGSInitializer.SetPlayerNameAsync(n);
         }
         private void WhenUpdateField(string s)
         {
