@@ -7,19 +7,16 @@ using UnityEngine.SceneManagement;
 namespace rinCore
 {
     #region Single Channel
-
-    public static partial class AudioEngine
+    public partial class AudioEngine
     {
-        static Dictionary<ACWrapperEntry, AudioSource> singleChannels;
-
-        private static bool TrySingleChannel(ACWrapperEntry entry, out AudioSource source)
+        Dictionary<ACWrapperEntry, AudioSource> singleChannels;
+        private bool TrySingleChannel(ACWrapperEntry entry, ACWrapper wrapper, out AudioSource source)
         {
             source = null;
 
             if (singleChannels == null)
                 singleChannels = new();
 
-            // Remove destroyed references automatically
             if (singleChannels.TryGetValue(entry, out source))
             {
                 if (source == null)
@@ -29,24 +26,43 @@ namespace rinCore
                 }
             }
 
-            if (source == null)
+            if (source == null && instance != null && RinHelper.ValidGameObjects(instance))
             {
-                source = RequestChannel(entry.ToString(), SceneRoot);
-                source.outputAudioMixerGroup = SingleChannelsMixer;
+                AudioSource copy = Source3DSingle;
+                switch (wrapper.soundMode)
+                {
+                    case ACWrapper.SoundPlayMode.Single3D:
+                        break;
+                    case ACWrapper.SoundPlayMode.Single2D:
+                        copy = Source2DSingle;
+                        break;
+                    case ACWrapper.SoundPlayMode.Dynamic3D:
+                        copy = Source3DDynamic;
+                        break;
+                    case ACWrapper.SoundPlayMode.Dynamic2D:
+                        copy = Source2DDynamic;
+                        break;
+                    default:
+                        break;
+                }
+                source = RequestChannel(entry.ToString(), SceneRoot, copy);
                 singleChannels[entry] = source;
             }
 
             return source != null;
         }
     }
-
     #endregion
     #region Play Sound
 
-    public static partial class AudioEngine
+    public partial class AudioEngine
     {
         internal static void PlayWrapper(ACWrapper a, Vector2 position)
         {
+            if (instance is not AudioEngine engine)
+            {
+                return;
+            }
             if (a.singleRepeatLockoutTime > 0f)
             {
                 if (!a.ReplayTimeAllowed())
@@ -57,15 +73,15 @@ namespace rinCore
 
             for (int i = 0; i < a.soundClips.Count; i++)
             {
-                if (a.singleChannel && TrySingleChannel(a.Entries[i], out AudioSource s))
+                if (engine.TrySingleChannel(a.Entries[i], a, out AudioSource s))
                 {
                     s.transform.position = position;
                     s.PlayWrapper(a, i);
                 }
                 else
                 {
-                    SoundIteration = SoundQueue.Dequeue();
-                    SoundQueue.Enqueue(SoundIteration);
+                    SoundIteration = engine.SoundQueue.Dequeue();
+                    engine.SoundQueue.Enqueue(SoundIteration);
 
                     SoundIteration.transform.position = position;
                     SoundIteration.PlayWrapper(a, i);
@@ -76,26 +92,17 @@ namespace rinCore
 
     #endregion
     [DefaultExecutionOrder(5)]
-    public static partial class AudioEngine
+    public partial class AudioEngine : MonoBehaviour
     {
-        public static AudioMixerGroup DynamicChannelsMixer { get; private set; }
-        public static AudioMixerGroup SingleChannelsMixer { get; private set; }
-
-        const string DynamicChannelsKey = "Dynamic Channels";
-        const string SingleChannelsKey = "Single Channels";
-        const string AudioEngineAddressableKey = "Audio Engine";
-
-        const string AudioEngine3DPlayerName = "3D Audio Channel";
-        const string AudioEngine2DPlayerName = "2D Audio Channel";
-
-        public static AudioSource Source3D;
-        public static AudioSource Source2D;
+        static AudioEngine instance;
+        public AudioSource Source3DSingle;
+        public AudioSource Source2DSingle;
+        public AudioSource Source3DDynamic;
+        public AudioSource Source2DDynamic;
 
         public const int SoundChannels = 32;
-
         static Transform cachedRoot;
         static Transform cachedDynamicStack;
-
         static Transform SceneRoot
         {
             get
@@ -107,7 +114,6 @@ namespace rinCore
                 return cachedRoot;
             }
         }
-
         static Transform DynamicStack
         {
             get
@@ -120,109 +126,46 @@ namespace rinCore
                 return cachedDynamicStack;
             }
         }
-
-        static Queue<AudioSource> SoundQueue;
-        static List<AudioSource> SoundStack;
-        static AudioSource SoundIteration;
-
-        private static AudioSource RequestChannel(string name, Transform parent)
+        [Initialize(-9999999)]
+        static void ReinitializeACW()
+        {
+            instance = null;
+        }
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+                return;
+            }
+            Destroy(gameObject);
+        }
+        Queue<AudioSource> SoundQueue = new();
+        List<AudioSource> SoundStack = new();
+        static AudioSource SoundIteration = new();
+        private AudioSource RequestChannel(string name, Transform parent, AudioSource m)
         {
             GameObject g = new GameObject("Channel " + name);
             g.transform.SetParent(parent, false);
 
             var source = g.AddComponent<AudioSource>();
+            Debug.Log(m);
+            source.outputAudioMixerGroup = m.outputAudioMixerGroup;
             source.playOnAwake = false;
             source.loop = false;
 
             return source;
         }
-        #region Initialization
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Initialize()
+        public void Initialize()
         {
-            singleChannels = new();
-            SoundQueue = new();
-            SoundStack = new();
-            SceneManager.sceneUnloaded -= OnSceneUnloaded;
-            SceneManager.sceneUnloaded += OnSceneUnloaded;
             AudioSource iteration;
             for (int i = 0; i < SoundChannels; i++)
             {
-                iteration = RequestChannel(i.ToString(), DynamicStack);
+                iteration = RequestChannel(i.ToString(), DynamicStack, Source3DDynamic);
                 SoundQueue.Enqueue(iteration);
                 SoundStack.Add(iteration);
             }
         }
-        static void OnSceneUnloaded(Scene scene)
-        {
-            singleChannels?.Clear();
-            if (cachedRoot != null)
-            {
-                Object.Destroy(cachedRoot.gameObject);
-                cachedRoot = null;
-            }
-        }
-        #endregion
-        #region After Scene Load
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        public static void AfterSceneLoad()
-        {
-            void DynamicsSetup(IList<AudioMixerGroup> mixers)
-            {
-                foreach (var group in mixers)
-                {
-                    if (group != null)
-                        DynamicChannelsMixer = group;
-                }
-
-                if (DynamicChannelsMixer == null)
-                {
-                    Debug.LogWarning("Failed to find Mixer group for Dynamic Channels.");
-                }
-
-                foreach (var channel in SoundStack)
-                {
-                    if (channel != null)
-                        channel.outputAudioMixerGroup = DynamicChannelsMixer;
-                }
-            }
-
-            void SingleChannelsSetup(IList<AudioMixerGroup> mixers)
-            {
-                foreach (var group in mixers)
-                {
-                    if (group != null)
-                        SingleChannelsMixer = group;
-                }
-
-                if (SingleChannelsMixer == null)
-                {
-                    Debug.LogWarning("Failed to find Mixer group for Single Channels.");
-                }
-            }
-
-            void SetupSources(IList<GameObject> sourceObjects)
-            {
-                foreach (GameObject g in sourceObjects)
-                {
-                    if (g == null) continue;
-
-                    if (g.TryGetComponent(out AudioSource source))
-                    {
-                        if (source.transform.name == AudioEngine3DPlayerName)
-                            Source3D = source;
-
-                        if (source.transform.name == AudioEngine2DPlayerName)
-                            Source2D = source;
-                    }
-                }
-            }
-
-            rinCore.AddressablesTools.LoadKeys<AudioMixerGroup>(DynamicChannelsKey, DynamicsSetup);
-            rinCore.AddressablesTools.LoadKeys<AudioMixerGroup>(SingleChannelsKey, SingleChannelsSetup);
-            rinCore.AddressablesTools.LoadKeys<GameObject>(AudioEngineAddressableKey, SetupSources);
-        }
-
-        #endregion
     }
 }

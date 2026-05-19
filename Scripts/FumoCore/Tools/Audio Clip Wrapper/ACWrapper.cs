@@ -154,11 +154,18 @@ namespace rinCore
                         Volume = 0.7f,
                     }
                 };
-            singleChannel = true;
+            soundMode = SoundPlayMode.Single3D;
             Is3D = true;
             singleRepeatLockoutTime = 0.02f;
         }
-        [field: SerializeField] public bool singleChannel { get; private set; } = false;
+        public enum SoundPlayMode
+        {
+            Single3D,
+            Single2D,
+            Dynamic3D,
+            Dynamic2D
+        }
+        [field: SerializeField] public SoundPlayMode soundMode { get; private set; } = SoundPlayMode.Single3D;
         [field: SerializeField] public float singleRepeatLockoutTime { get; private set; } = 0f;
         [field: SerializeField] public bool Is3D { get; private set; }
         private float nextPlayTime;
@@ -358,32 +365,7 @@ namespace rinCore
                 a.clip = entry.clip;
                 a.pitch = entry.PitchOrigin.Spread(entry.PitchVariancePercent);
                 a.volume = sound.GetVolume(index);
-                a.Set3D(sound);
                 a.Play();
-            }
-        }
-        private static void Set3D(this AudioSource a, ACWrapper w, float? maxDistance = null)
-        {
-            float _maxDistance;
-            if (w.Is3D)
-            {
-                if (AudioEngine.Source3D is AudioSource a3D and not null)
-                {
-                    _maxDistance = (maxDistance ?? a3D.maxDistance).Max(20f);
-                    a.rolloffMode = AudioRolloffMode.Custom;
-                    a.SetCustomCurve(AudioSourceCurveType.CustomRolloff, a3D.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
-                    a.SetCustomCurve(AudioSourceCurveType.SpatialBlend, a3D.GetCustomCurve(AudioSourceCurveType.SpatialBlend));
-                    a.SetCustomCurve(AudioSourceCurveType.Spread, a3D.GetCustomCurve(AudioSourceCurveType.Spread));
-                    a.maxDistance = _maxDistance;
-                    return;
-                }
-            }
-            if (AudioEngine.Source2D is AudioSource a2D and not null)
-            {
-                a.rolloffMode = AudioRolloffMode.Custom;
-                a.SetCustomCurve(AudioSourceCurveType.CustomRolloff, a2D.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
-                a.SetCustomCurve(AudioSourceCurveType.SpatialBlend, a2D.GetCustomCurve(AudioSourceCurveType.SpatialBlend));
-                a.SetCustomCurve(AudioSourceCurveType.Spread, a2D.GetCustomCurve(AudioSourceCurveType.Spread));
             }
         }
     }
