@@ -9,8 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8191310995169310511}
-  - component: {fileID: 4132112604765343376}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: GM Explosion UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,19 +36,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!210 &4132112604765343376
-SortingGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3188763763513401036}
-  m_Enabled: 1
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: -99
-  m_SortAtRoot: 1
-  m_Sort3DAs2D: 0
 --- !u!1 &8477492284401305303
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,7 +48,7 @@ GameObject:
   - component: {fileID: 3381924123087242598}
   - component: {fileID: 8535040475042495194}
   - component: {fileID: 4347198588260328268}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
