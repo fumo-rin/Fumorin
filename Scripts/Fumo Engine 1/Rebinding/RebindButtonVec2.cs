@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
-    public class RebindButtonVec2 : MonoBehaviour
+    internal class RebindButtonVec2 : MonoBehaviour
     {
         [SerializeField] Button upButton;
         [SerializeField] Button downButton;

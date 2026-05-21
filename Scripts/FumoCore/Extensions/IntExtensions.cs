@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -7,6 +7,65 @@ namespace rinCore
 {
     public static class IntExtensions
     {
+        #region Primes Gen
+        public static IEnumerable<int> Primes(this int count, int start = 2)
+        {
+            static bool IsPrime(int value, List<int> primes)
+            {
+                if (value < 2)
+                    return false;
+                if (value == 2)
+                    return true;
+                if ((value & 1) == 0)
+                    return false;
+                int limit = (int)Math.Sqrt(value);
+                foreach (int prime in primes)
+                {
+                    if (prime > limit)
+                        break;
+
+                    if (value % prime == 0)
+                        return false;
+                }
+                return true;
+            }
+            if (count <= 0)
+                yield break;
+            start = start == int.MinValue ? int.MaxValue : Math.Abs(start);
+            if (start < 2) start = 2;
+            int candidate = start;
+            if (candidate == 2)
+            {
+                yield return 2;
+                if (--count == 0)
+                    yield break;
+                candidate = 3;
+            }
+            else if ((candidate & 1) == 0)
+            {
+                candidate++;
+            }
+            List<int> knownPrimes = new() { 2 };
+            for (int i = 3; i <= Math.Sqrt(candidate); i += 2)
+            {
+                if (IsPrime(i, knownPrimes))
+                    knownPrimes.Add(i);
+            }
+            while (count > 0 && candidate > 0)
+            {
+                if (IsPrime(candidate, knownPrimes))
+                {
+                    knownPrimes.Add(candidate);
+                    yield return candidate;
+                    count--;
+                }
+                if (candidate >= int.MaxValue - 2)
+                    yield break;
+                candidate += 2;
+            }
+        }
+
+        #endregion
         public static int Clamp(this int i, int min, int max)
         {
             return Mathf.Clamp(i, min, max);
@@ -37,12 +96,12 @@ namespace rinCore
         }
         public static int RandomBetween(this int i, int min, int max)
         {
-            i = Random.Range(min, max);
+            i = RNG.FloatRange(min.AsFloat(), max.AsFloat()).ToInt();
             return i;
         }
         public static int Spread(this int i, float percentage = 5f)
         {
-            return (int)((float)i * (Random.Range(1 - percentage.Clamp(0f, 100f) * FloatExtensions.Percent, 1 + percentage.Clamp(0f, 100f) * FloatExtensions.Percent)));
+            return (int)((float)i * (RNG.FloatRange(1 - percentage.Clamp(0f, 100f) * FloatExtensions.Percent, 1 + percentage.Clamp(0f, 100f) * FloatExtensions.Percent)));
         }
         public static int MultiplyAndFloor(this int i, float multiplier)
         {

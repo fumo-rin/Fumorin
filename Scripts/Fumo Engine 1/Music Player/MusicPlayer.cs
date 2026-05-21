@@ -263,7 +263,7 @@ namespace rinCore
         public static WaitUntil WaitForNoMusic => new WaitUntil(() => !IsPlaying);
         private IEnumerator FadeTrack(MusicWrapper newClip, float delay, float fadeDuration)
         {
-            yield return delay.WaitForSeconds(false);
+            yield return delay.WaitForSeconds(cached: false);
             if (isFading) yield break;
             isFading = true;
 

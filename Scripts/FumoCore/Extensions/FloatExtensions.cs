@@ -338,5 +338,9 @@ namespace rinCore
         {
             return f % mod;
         }
+        public static float Pow(this float f, float pow)
+        {
+            return Mathf.Pow(f, pow);
+        }
     }
 }

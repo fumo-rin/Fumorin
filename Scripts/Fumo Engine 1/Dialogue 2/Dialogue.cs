@@ -214,7 +214,7 @@ namespace rinCore
         }
         private static IEnumerator RunDialogue(DialogueStackSO stack, float delay, Action whenDialogueEnd)
         {
-            yield return delay.WaitForSeconds(false);
+            yield return delay.WaitForSeconds(cached: false);
             unscaledDialogueStartTime = Time.unscaledTime;
             SetBoxVisibility(true);
             instance.playerSprite.enabled = false;

@@ -12,28 +12,29 @@ namespace rinCore
         {
             wfsCache = new Dictionary<int, WaitForSeconds>();
         }
-        public static WaitForSeconds WaitForSeconds(this float seconds, bool cached = true)
+        public static WaitForSeconds WaitForSeconds(this float seconds, int multiplier = 1, bool cached = true)
         {
-            if (seconds <= 0f)
+            float processedSeconds = seconds * multiplier.AsFloat(1f);
+            if (processedSeconds <= 0f)
             {
                 return null;
             }
             if (!cached)
             {
-                return new UnityEngine.WaitForSeconds(seconds);
+                return new UnityEngine.WaitForSeconds(processedSeconds);
             }
             if (wfsCache.Count > 10000)
             {
                 wfsCache.Clear();
             }
-            int msKey = Mathf.RoundToInt(seconds * 1000f);
+            int msKey = Mathf.RoundToInt(processedSeconds * 1000f);
 
             if (wfsCache.TryGetValue(msKey, out WaitForSeconds value))
             {
                 return value;
             }
 
-            WaitForSeconds spawned = new WaitForSeconds(seconds);
+            WaitForSeconds spawned = new WaitForSeconds(processedSeconds);
             wfsCache[msKey] = spawned;
             return spawned;
         }
