@@ -150,7 +150,6 @@ namespace rinCore
             g.transform.SetParent(parent, false);
 
             var source = g.AddComponent<AudioSource>();
-            Debug.Log(m);
             source.outputAudioMixerGroup = m.outputAudioMixerGroup;
             source.playOnAwake = false;
             source.loop = false;
