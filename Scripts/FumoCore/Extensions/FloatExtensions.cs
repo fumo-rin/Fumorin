@@ -28,18 +28,14 @@ namespace rinCore
         {
             return a + (b - a) * lerp;
         }
-        #region Summary For Map To 01
-        /// <summary>
-        /// Maps a float value to a 0-1 range based on specified min and max.
-        /// Values below min return 0, values above max return >1.
-        /// </summary>
-        #endregion
-        public static float MapTo01(this float f, float min, float max, bool clamp = false)
+        public static float MapTo01(this float f, float a, float b, bool clamp = false)
         {
-            if (min == max)
+            if (Mathf.Approximately(a, b))
                 return 1f;
-            float f2 = clamp ? f.Clamp(min, max) : f;
-            return (f2 - min) / (max - min);
+            float min = Mathf.Min(a, b);
+            float max = Mathf.Max(a, b);
+            float value = clamp ? Mathf.Clamp(f, min, max) : f;
+            return (value - a) / (b - a);
         }
         public static float Clamp(this float f, float min, float max)
         {
@@ -85,7 +81,7 @@ namespace rinCore
         {
             if (percentage < 1f)
                 return f;
-            return f * UnityEngine.Random.Range(1 - percentage.Clamp(0f, 100f) * Percent, 1 + percentage.Clamp(0f, 100f) * Percent);
+            return f * RNG.FloatRange(1 - percentage.Clamp(0f, 100f) * Percent, 1 + percentage.Clamp(0f, 100f) * Percent);
         }
         public static float Sign(this float value) => value > 0f ? 1f : value < 0f ? -1f : 0f;
         public static int SignInt(this float f)
@@ -98,7 +94,7 @@ namespace rinCore
         }
         public static float AddRandomBetween(this float f, float min, float max)
         {
-            return f + UnityEngine.Random.Range(min, max);
+            return f + RNG.FloatRange(min, max);
         }
         public static int ToInt(this float f)
         {
@@ -148,7 +144,7 @@ namespace rinCore
         }
         public static float RandomPositiveNegativeRange(this float f)
         {
-            return RNG.RandomFloatRange(-f.Absolute(), f.Absolute());
+            return RNG.FloatRange(-f.Absolute(), f.Absolute());
         }
         public static float Quantize(this float f, float steps, bool roundUp = false)
         {
@@ -328,7 +324,7 @@ namespace rinCore
         }
         public static float Random(this (float, float) target)
         {
-            return RNG.RandomFloatRange(target.Item1, target.Item2);
+            return RNG.FloatRange(target.Item1, target.Item2);
         }
         public static float Add(this float f, float other)
         {

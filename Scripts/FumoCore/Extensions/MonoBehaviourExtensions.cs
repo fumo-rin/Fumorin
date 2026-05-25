@@ -32,12 +32,14 @@ namespace rinCore
             }
             return result;
         }
-        public static Coroutine StartCoroutineWithCallback<T>(this T host, IEnumerator routine, Action onComplete) where T : MonoBehaviour
+        public static Coroutine StartCoroutineExtras<T>(this T host, IEnumerator routine, WaitUntil wait, Action onComplete) where T : MonoBehaviour
         {
-            return host.StartCoroutine(Wrap(routine, onComplete));
+            return host.StartCoroutine(Wrap(routine, wait, onComplete));
         }
-        private static IEnumerator Wrap(IEnumerator routine, Action onComplete)
+        private static IEnumerator Wrap(IEnumerator routine, WaitUntil w, Action onComplete)
         {
+            if (w != null)
+                yield return w;
             yield return routine;
             onComplete?.Invoke();
         }

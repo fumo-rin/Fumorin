@@ -14,7 +14,7 @@ namespace rinCore
         }
         public static int Random255 => RNG.Byte255;
         public static Vector2 Vec2(float size) => RinHelper.SeededRandomVector2() * size;
-        public static float Range(float min, float max) => RNG.RandomFloatRange(min, max);
+        public static float Range(float min, float max) => RNG.FloatRange(min, max);
         public static int Sign() => RinHelper.RandomSign();
     }
 }

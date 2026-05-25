@@ -20,7 +20,7 @@ namespace rinCore
         }
         public static float SeededRandomFloat01 => NextFloat01();
         [QFSW.QC.Command("-rng-float-range")]
-        public static float RandomFloatRange(float min, float max) => min + (max - min) * SeededRandomFloat01;
+        public static float FloatRange(float min, float max) => min + (max - min) * SeededRandomFloat01;
         #endregion
 
         #region Base Generator
@@ -98,15 +98,6 @@ namespace rinCore
                 } while (v.sqrMagnitude > 1f);
                 return v;
             }
-        }
-    }
-    #endregion
-    #region Float Range
-    public static partial class RNG
-    {
-        public static float FloatRange(float min, float max)
-        {
-            return RandomFloatRange(min, max);
         }
     }
     #endregion
