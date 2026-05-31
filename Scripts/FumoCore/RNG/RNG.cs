@@ -19,7 +19,6 @@ namespace rinCore
             return value / 16777216f;
         }
         public static float SeededRandomFloat01 => NextFloat01();
-        [QFSW.QC.Command("-rng-float-range")]
         public static float FloatRange(float min, float max) => min + (max - min) * SeededRandomFloat01;
         #endregion
 

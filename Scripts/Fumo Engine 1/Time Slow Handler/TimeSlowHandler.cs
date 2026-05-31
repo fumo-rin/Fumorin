@@ -27,9 +27,6 @@ namespace rinCore
                 timeScaleTable.Clear();
             }
             slowdowns.Clear();
-            Time.maximumDeltaTime = 1f / 60f;
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 120;
         }
 
         [Initialize(-50000)]
@@ -214,7 +211,7 @@ namespace rinCore
                 toRemove = new HashSet<string>();
                 Time.maximumDeltaTime = 1f / 60f;
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = 120;
+                Application.targetFrameRate = 240;
             }
         }
         private float CalculateFinalTimescale()

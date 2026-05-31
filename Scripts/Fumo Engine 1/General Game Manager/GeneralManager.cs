@@ -145,11 +145,6 @@ namespace rinCore
         {
             Instance = null;
         }
-        [QFSW.QC.Command("FPS")]
-        private static void SetFPS(int fps)
-        {
-            Application.targetFrameRate = fps.Clamp(5, 120);
-        }
         private void OnDestroy()
         {
             if (Instance == this)

@@ -92,7 +92,6 @@ public static partial class PersistentJSON
             return Convert.ToBase64String(bytes);
         }
     }
-    [QFSW.QC.Command("-test-score-store")]
     public static bool SaveScore(double score, string key)
     {
         long encoded = score.ToLong();
@@ -105,7 +104,6 @@ public static partial class PersistentJSON
 
         return PersistentJSON.TrySave(encrypted, key);
     }
-    [QFSW.QC.Command("-test-score-fetch")]
     private static double TestFetchScore(string key)
     {
         double score = 0d;

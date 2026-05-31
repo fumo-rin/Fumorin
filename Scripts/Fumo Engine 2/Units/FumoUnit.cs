@@ -88,7 +88,6 @@ namespace rinCore
         Dictionary<string, UnitAction> actionTable = new();
         public FumoUnit SetAction(string key, UnitAction action)
         {
-            Debug.Log("Set Action : " + action.GetType());
             if (actionTable.TryGetValue(key, out UnitAction a))
             {
                 ClearAction(key);

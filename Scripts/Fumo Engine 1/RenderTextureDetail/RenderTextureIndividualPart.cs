@@ -10,6 +10,7 @@ namespace rinCore
         static (int, int) screenSize = (360, 480);
         private void Start()
         {
+            PersistentJSON.TryLoad(out screenSize, "GameRender");
             WhenChangeSize += SetLocalSize;
             if (screenSize.Item1 > 0 && screenSize.Item2 > 0)
             {
@@ -25,6 +26,7 @@ namespace rinCore
         {
             screenSize = new(x.Clamp(180, clampMax != null ? clampMax.Value.Item1 : 960), y.Clamp(240, clampMax != null ? clampMax.Value.Item2 : 1280));
             WhenChangeSize?.Invoke(screenSize.Item1, screenSize.Item2);
+            PersistentJSON.TrySave(screenSize, "GameRender");
         }
         private void SetLocalSize(int x, int y)
         {

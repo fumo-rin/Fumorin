@@ -83,6 +83,12 @@ namespace rinCore
                 return f;
             return f * RNG.FloatRange(1 - percentage.Clamp(0f, 100f) * Percent, 1 + percentage.Clamp(0f, 100f) * Percent);
         }
+        public static float SpreadWithNegative(this float f, float percentage = 5f)
+        {
+            if (percentage < 1f)
+                return f;
+            return f * RNG.FloatRange(1 - percentage.Clamp(0f, 100f) * Percent, 1 + percentage.Clamp(0f, 100f) * Percent) * RNG.RandomSign;
+        }
         public static float Sign(this float value) => value > 0f ? 1f : value < 0f ? -1f : 0f;
         public static int SignInt(this float f)
         {

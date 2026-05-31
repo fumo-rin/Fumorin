@@ -20,17 +20,17 @@ namespace rinCore
             s.minValue = minValue;
             return s;
         }
-        public static void SetXPositionOfRect(this Slider slider, RectTransform target, float percent)
+        public static void SetXPositionOfRect(this Slider slider, RectTransform target, RectTransform reference = null, float x01 = 1f)
         {
             if (slider == null || target == null)
                 return;
 
-            percent = Mathf.Clamp01(percent);
+            x01 = Mathf.Clamp01(x01);
 
-            RectTransform sliderRect = slider.fillRect != null ? slider.fillRect : slider.GetComponent<RectTransform>();
+            RectTransform sliderRect = reference != null ? reference : slider.fillRect != null ? slider.fillRect : slider.GetComponent<RectTransform>();
             float sliderWidth = sliderRect.rect.width;
 
-            float newX = Mathf.Lerp(0f, sliderWidth, percent);
+            float newX = Mathf.Lerp(0f, sliderWidth, x01);
 
             float pivotOffset = sliderWidth * sliderRect.pivot.x;
             newX -= pivotOffset;
