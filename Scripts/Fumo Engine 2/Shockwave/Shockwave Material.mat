@@ -43,11 +43,11 @@ Material:
     m_Floats:
     - _ShockwaveSpeed: 3.5
     - _ShockwaveStrength: -0.75
-    - _ShockwaveTime: 25.516413
+    - _ShockwaveTime: 20.859741
     - _Size: 0.27
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _RingSpawnPosition: {r: 0.586531, g: 0.6161129, b: 0, a: 0}
+    - _RingSpawnPosition: {r: 0.44960666, g: 0.5933385, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &5395668034398897513
