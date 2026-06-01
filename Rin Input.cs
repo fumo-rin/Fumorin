@@ -1134,6 +1134,17 @@ namespace rinCore
                 },
                 {
                     ""name"": """",
+                    ""id"": ""676901c9-0a56-401d-b4bc-149c8886f0ac"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Bomb"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""bb8cf412-5e98-4165-a0b5-010aa75dda2a"",
                     ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
@@ -1180,6 +1191,17 @@ namespace rinCore
                     ""name"": """",
                     ""id"": ""92e935f5-fc5b-4146-960b-af5c1a6fa23d"",
                     ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d4bb5301-3d67-47b0-89f6-f4e56525b2a4"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
