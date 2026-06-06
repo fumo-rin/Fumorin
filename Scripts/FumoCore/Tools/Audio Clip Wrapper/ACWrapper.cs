@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -13,7 +14,14 @@ namespace rinCore
         {
             if (a == null)
                 return;
-            AudioEngine.PlayWrapper(a, position);
+            if (a.IsNetworked)
+            {
+                NetworkedAudioEngine.PlayStatic(a, position);
+            }
+            else
+            {
+                AudioEngine.PlayWrapper(a, position);
+            }
         }
     }
     #endregion
@@ -186,6 +194,8 @@ namespace rinCore
         private static ACWrapper currentLoopingWrapper;
         private static double loopRestartTime = 0;
         private static bool isLooping = false;
+        public bool IsNetworked = false;
+        [field: SerializeField, ShowIf(nameof(IsNetworked))] public int NetworkID { get; private set; }
 
         public static void EditorPlay(ACWrapper a, bool loop = false)
         {
@@ -345,7 +355,7 @@ namespace rinCore
     #endregion
     public static class AudioExtensions
     {
-        public static bool TryPlayClip(this AudioSource a, AudioClip clip)
+        /*public static bool TryPlayClip(this AudioSource a, AudioClip clip)
         {
             ACWrapper.editorTestPlayers = null;
             if (clip == null)
@@ -354,7 +364,7 @@ namespace rinCore
             a.clip = clip;
             a.Play();
             return true;
-        }
+        }*/
         public static void PlayWrapper(this AudioSource a, ACWrapper sound, int index)
         {
             if (sound is ACWrapper audio && audio.soundClips != null)

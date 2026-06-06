@@ -108,6 +108,12 @@ namespace rinCore
             _loadedAdditives = new HashSet<SceneReference>();
             IsLoading = false;
         }
+        #region Local Load
+        public void LocalLoad(ScenePairSO pair)
+        {
+            LoadScenePair(pair);
+        }
+        #endregion
 
         #region Public Wrapper
         public static void LoadScenePair(ScenePairSO pair, Action payload = null, float delay = 0.25f)

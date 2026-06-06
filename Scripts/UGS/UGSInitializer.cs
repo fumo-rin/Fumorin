@@ -140,6 +140,7 @@ namespace rinCore.UGS
             try
             {
                 await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
+                UGSFumoObject.OwnerName = playerName;
                 Debug.Log($"[UGS] Player name updated to: {playerName}");
             }
             catch (Exception e)

@@ -6,13 +6,34 @@ namespace rinCore
 {
     public static class RigidBodyExtensions
     {
-        public static Vector3 VelocityTowardsXZ(this Rigidbody rb, Vector3 direction, float delta)
+        public enum VelocityMode
         {
-            return rb.linearVelocity = Vector3.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y, direction.z), delta * Time.deltaTime);
+            LerpTowards,
+            MoveTowards
         }
-        public static Vector2 VelocityTowardsX(this Rigidbody2D rb, Vector2 direction, float delta)
+        public static Vector3 VelocityTowardsXZ(this Rigidbody rb, Vector3 direction, float delta, VelocityMode mode = VelocityMode.MoveTowards)
         {
-            return rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y), delta * Time.deltaTime);
+            switch (mode)
+            {
+                case VelocityMode.LerpTowards:
+                    return rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, new(direction.x, rb.linearVelocity.y), delta * Time.deltaTime);
+                case VelocityMode.MoveTowards:
+                    return rb.linearVelocity = Vector3.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y, direction.z), delta * Time.deltaTime);
+                default:
+                    return rb.linearVelocity = Vector3.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y, direction.z), delta * Time.deltaTime);
+            }
+        }
+        public static Vector2 VelocityTowardsX(this Rigidbody2D rb, Vector2 direction, float delta, VelocityMode mode = VelocityMode.MoveTowards)
+        {
+            switch (mode)
+            {
+                case VelocityMode.LerpTowards:
+                    return rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, new(direction.x, rb.linearVelocity.y), delta * Time.deltaTime);
+                case VelocityMode.MoveTowards:
+                    return rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y), delta * Time.deltaTime);
+                default:
+                    return rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, new(direction.x, rb.linearVelocity.y), delta * Time.deltaTime);
+            }
         }
         public static Vector2 VelocityTowards(this Rigidbody2D rb, Vector2 direction, float delta)
         {

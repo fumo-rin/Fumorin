@@ -6,6 +6,56 @@ using UnityEngine.SceneManagement;
 
 namespace rinCore
 {
+    internal static class AudioEngineExtensionsInternal
+    {
+        public static void CopySettingsFrom(this AudioSource target, AudioSource template)
+        {
+            if (target == null || template == null)
+            {
+                Debug.LogWarning("AudioSource CopySettingsFrom failed: Target or Template is null.");
+                return;
+            }
+
+            target.clip = template.clip;
+            target.outputAudioMixerGroup = template.outputAudioMixerGroup;
+            target.mute = template.mute;
+            target.bypassEffects = template.bypassEffects;
+            target.bypassListenerEffects = template.bypassListenerEffects;
+            target.bypassReverbZones = template.bypassReverbZones;
+            target.playOnAwake = template.playOnAwake;
+            target.loop = template.loop;
+
+            target.priority = template.priority;
+            target.volume = template.volume;
+            target.pitch = template.pitch;
+            target.panStereo = template.panStereo;
+            target.spatialBlend = template.spatialBlend;
+            target.reverbZoneMix = template.reverbZoneMix;
+
+            target.dopplerLevel = template.dopplerLevel;
+            target.spread = template.spread;
+            target.rolloffMode = template.rolloffMode;
+            target.minDistance = template.minDistance;
+            target.maxDistance = template.maxDistance;
+
+            target.SetCustomCurve(AudioSourceCurveType.CustomRolloff, CopyCurve(template.GetCustomCurve(AudioSourceCurveType.CustomRolloff)));
+            target.SetCustomCurve(AudioSourceCurveType.SpatialBlend, CopyCurve(template.GetCustomCurve(AudioSourceCurveType.SpatialBlend)));
+            target.SetCustomCurve(AudioSourceCurveType.Spread, CopyCurve(template.GetCustomCurve(AudioSourceCurveType.Spread)));
+            target.SetCustomCurve(AudioSourceCurveType.ReverbZoneMix, CopyCurve(template.GetCustomCurve(AudioSourceCurveType.ReverbZoneMix)));
+        }
+
+        private static AnimationCurve CopyCurve(AnimationCurve sourceCurve)
+        {
+            if (sourceCurve == null) return null;
+
+            // Creates a distinct copy of the curve data and its keys
+            return new AnimationCurve(sourceCurve.keys)
+            {
+                postWrapMode = sourceCurve.postWrapMode,
+                preWrapMode = sourceCurve.preWrapMode
+            };
+        }
+    }
     #region Single Channel
     public partial class AudioEngine
     {
@@ -54,7 +104,6 @@ namespace rinCore
     }
     #endregion
     #region Play Sound
-
     public partial class AudioEngine
     {
         internal static void PlayWrapper(ACWrapper a, Vector2 position)
@@ -150,9 +199,12 @@ namespace rinCore
             g.transform.SetParent(parent, false);
 
             var source = g.AddComponent<AudioSource>();
+            source.CopySettingsFrom(m);
             source.outputAudioMixerGroup = m.outputAudioMixerGroup;
             source.playOnAwake = false;
             source.loop = false;
+
+
 
             return source;
         }
