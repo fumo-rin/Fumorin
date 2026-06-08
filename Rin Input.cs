@@ -1107,6 +1107,15 @@ namespace rinCore
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Power Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""187d2f06-0474-485d-a7b9-5718ea866656"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1272,6 +1281,28 @@ namespace rinCore
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
                     ""action"": ""Charge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""03e7b62f-e449-4b97-b9f6-d4b596249418"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Power Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1304ab8f-5792-4b60-a563-10e827eefa3d"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Power Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1860,6 +1891,7 @@ namespace rinCore
             m_Shmup_Pause = m_Shmup.FindAction("Pause", throwIfNotFound: true);
             m_Shmup_PracticeWarp = m_Shmup.FindAction("Practice Warp", throwIfNotFound: true);
             m_Shmup_Charge = m_Shmup.FindAction("Charge", throwIfNotFound: true);
+            m_Shmup_PowerFire = m_Shmup.FindAction("Power Fire", throwIfNotFound: true);
             // Dialogue
             m_Dialogue = asset.FindActionMap("Dialogue", throwIfNotFound: true);
             m_Dialogue_SkipDialogue = m_Dialogue.FindAction("Skip Dialogue", throwIfNotFound: true);
@@ -2404,6 +2436,7 @@ namespace rinCore
         private readonly InputAction m_Shmup_Pause;
         private readonly InputAction m_Shmup_PracticeWarp;
         private readonly InputAction m_Shmup_Charge;
+        private readonly InputAction m_Shmup_PowerFire;
         /// <summary>
         /// Provides access to input actions defined in input action map "Shmup".
         /// </summary>
@@ -2439,6 +2472,10 @@ namespace rinCore
             /// Provides access to the underlying input action "Shmup/Charge".
             /// </summary>
             public InputAction @Charge => m_Wrapper.m_Shmup_Charge;
+            /// <summary>
+            /// Provides access to the underlying input action "Shmup/PowerFire".
+            /// </summary>
+            public InputAction @PowerFire => m_Wrapper.m_Shmup_PowerFire;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -2483,6 +2520,9 @@ namespace rinCore
                 @Charge.started += instance.OnCharge;
                 @Charge.performed += instance.OnCharge;
                 @Charge.canceled += instance.OnCharge;
+                @PowerFire.started += instance.OnPowerFire;
+                @PowerFire.performed += instance.OnPowerFire;
+                @PowerFire.canceled += instance.OnPowerFire;
             }
 
             /// <summary>
@@ -2512,6 +2552,9 @@ namespace rinCore
                 @Charge.started -= instance.OnCharge;
                 @Charge.performed -= instance.OnCharge;
                 @Charge.canceled -= instance.OnCharge;
+                @PowerFire.started -= instance.OnPowerFire;
+                @PowerFire.performed -= instance.OnPowerFire;
+                @PowerFire.canceled -= instance.OnPowerFire;
             }
 
             /// <summary>
@@ -3215,6 +3258,13 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCharge(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Power Fire" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnPowerFire(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Dialogue" which allows adding and removing callbacks.
