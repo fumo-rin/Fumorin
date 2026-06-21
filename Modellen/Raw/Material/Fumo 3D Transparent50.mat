@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Fumo 3D Wind
-  m_Shader: {fileID: -6465566751694194690, guid: eae478b44fd2d0043a1b427368ab0ec9, type: 3}
+  m_Name: Fumo 3D Transparent50
+  m_Shader: {fileID: -6465566751694194690, guid: 9cd211ccbe5a8f34f80daa82ac081a1d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -83,7 +83,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AddPrecomputedVelocity: 0
-    - _Alpha: 1
+    - _Alpha: 0.5
     - _AlphaClip: 0
     - _AlphaToMask: 0
     - _Alpha_Clip: 0.1
@@ -117,7 +117,7 @@ Material:
     - _Surface: 0
     - _UVSec: 0
     - _VSnap: 32
-    - _Wind: 0.03
+    - _Wind: 0
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1

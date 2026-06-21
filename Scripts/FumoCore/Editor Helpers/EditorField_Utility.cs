@@ -519,6 +519,30 @@ namespace rinCore
     }
 #endif
     #endregion
+    #region Number Field
+    public static partial class EF_Utility
+    {
+#if UNITY_EDITOR
+        public static T EF_NumberField<T>(Rect rect, string label, T value) where T : struct, IConvertible
+        {
+            string currentText = Convert.ToString(value);
+            string newText = EditorGUI.TextField(rect, label, currentText);
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(newText))
+                    return default;
+
+                return (T)Convert.ChangeType(newText, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return value;
+            }
+        }
+#endif
+    }
+    #endregion
     #region Sprite Field
     public static partial class EF_Utility
     {

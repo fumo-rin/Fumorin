@@ -195,16 +195,17 @@ namespace rinCore
         {
             if (stepSize == 0f)
                 yield break;
+            const float epsilon = 0.0001f;
             stepSize = Mathf.Abs(stepSize) * (from < to ? 1f : -1f);
 
             if (from < to)
             {
-                for (float i = from; i <= to; i += stepSize)
+                for (float i = from; i <= to + epsilon; i += stepSize)
                     yield return i;
             }
             else
             {
-                for (float i = from; i >= to; i += stepSize)
+                for (float i = from; i >= to - epsilon; i += stepSize)
                     yield return i;
             }
         }
