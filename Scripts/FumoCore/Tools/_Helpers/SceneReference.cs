@@ -46,7 +46,7 @@ namespace rinCore
 
 #if UNITY_EDITOR
 
-    [CustomPropertyDrawer(typeof(rinCore.SceneReference))]
+    [CustomPropertyDrawer(typeof(SceneReference))]
     public class SceneReferenceDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

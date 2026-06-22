@@ -31,7 +31,7 @@ namespace rinCore
                 {
                     foreach (var item in commands)
                     {
-                        if (!rinCore.ShmupCommands.HasCommand(item))
+                        if (!ShmupCommands.HasCommand(item))
                         {
                             Debug.LogError($"Invalid command '{item}' in asset: {path}", asset);
                             if (asset != null && asset.dialogueTextFile) asset.dialogueTextFile.EditorPing();

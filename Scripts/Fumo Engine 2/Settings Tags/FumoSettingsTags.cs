@@ -57,7 +57,7 @@ namespace rinCore
         static Dictionary<string, bool> boolSettingsCache = new();
         static bool initialized = false;
 
-        [rinCore.Initialize(-99999)]
+        [Initialize(-99999)]
         private static void ResetFetch()
         {
             initialized = false;
