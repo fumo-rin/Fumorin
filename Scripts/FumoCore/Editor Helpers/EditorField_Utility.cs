@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using System.Globalization;
 
 namespace rinCore
 {
@@ -525,15 +526,16 @@ namespace rinCore
 #if UNITY_EDITOR
         public static T EF_NumberField<T>(Rect rect, string label, T value) where T : struct, IConvertible
         {
-            string currentText = Convert.ToString(value);
+            string currentText = Convert.ToString(value, CultureInfo.InvariantCulture);
             string newText = EditorGUI.TextField(rect, label, currentText);
 
             try
             {
                 if (string.IsNullOrWhiteSpace(newText))
                     return default;
+                newText = newText.Replace(',', '.');
 
-                return (T)Convert.ChangeType(newText, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
+                return (T)Convert.ChangeType(newText, typeof(T), CultureInfo.InvariantCulture);
             }
             catch
             {

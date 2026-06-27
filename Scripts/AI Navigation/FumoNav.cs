@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,6 +7,76 @@ namespace rinCore
 {
     public class FumoNav : MonoBehaviour
     {
+        #region AB Pathing
+        private static float CalculateLength(NavMeshPath path)
+        {
+            float length = 0f;
+
+            for (int i = 1; i < path.corners.Length; i++)
+                length += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+
+            return length;
+        }
+        private static Vector3 Sample(NavMeshPath path, float distance)
+        {
+            if (path.corners.Length == 0)
+                return Vector3.zero;
+
+            if (distance <= 0f)
+                return path.corners[0];
+
+            for (int i = 1; i < path.corners.Length; i++)
+            {
+                Vector3 a = path.corners[i - 1];
+                Vector3 b = path.corners[i];
+
+                float segment = Vector3.Distance(a, b);
+
+                if (distance <= segment)
+                    return Vector3.Lerp(a, b, distance / segment);
+
+                distance -= segment;
+            }
+
+            return path.corners[^1];
+        }
+        public Coroutine StartABPath(MonoBehaviour runner, Transform transform, Vector3 target, float maxSpeed, float minimumDuration, Action endAction, AnimationCurve pathInterpolation = null)
+        {
+            IEnumerator MoveRoutine()
+            {
+                var path = new NavMeshPath();
+                if (!NavMesh.SamplePosition(transform.position, out var startHit, 5f, NavMesh.AllAreas))
+                    yield break;
+                if (!NavMesh.SamplePosition(target, out var endHit, 5f, NavMesh.AllAreas))
+                    yield break;
+                if (!NavMesh.CalculatePath(startHit.position, endHit.position, NavMesh.AllAreas, path))
+                    yield break;
+                if (path.status != NavMeshPathStatus.PathComplete)
+                    yield break;
+
+                float length = CalculateLength(path);
+                if (length <= 0f)
+                    yield break;
+
+                float duration = Mathf.Max(minimumDuration, length / maxSpeed);
+                float elapsed = 0f;
+
+                while (elapsed < duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+                    if (pathInterpolation != null)
+                        t = pathInterpolation.Evaluate(t);
+
+                    transform.position = Sample(path, length * t);
+                    yield return null;
+                }
+                transform.position = path.corners[^1];
+                endAction?.Invoke();
+            }
+            return runner.StartCoroutine(MoveRoutine());
+        }
+        #endregion
         [Header("Path Settings")]
         [SerializeField] private float waypointTolerance = 0.8f;
         [SerializeField] private float destinationTolerance = 1.0f;
@@ -20,7 +92,18 @@ namespace rinCore
         public Vector3 Destination => destination;
         public int CurrentCornerIndex => currentCornerIndex;
         public Vector3[] PathCorners => (activePath != null && activePath.status != NavMeshPathStatus.PathInvalid) ? activePath.corners : System.Array.Empty<Vector3>();
+        public float PathLength
+        {
+            get
+            {
+                float length = 0f;
 
+                for (int i = 1; i < activePath.corners.Length; i++)
+                    length += Vector3.Distance(activePath.corners[i - 1], activePath.corners[i]);
+
+                return length;
+            }
+        }
         private void Awake()
         {
             activePath = new NavMeshPath();
