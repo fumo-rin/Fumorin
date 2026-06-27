@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   funnyExplosion: {fileID: 6656727562651948476, guid: 50d7626662ba2eb4680659d317b75ee8, type: 3}
-  Explosion3D: {fileID: 0}
+  Explosion3D: {fileID: 6112086842000205183, guid: 0b4f3dac9f756d1479a509889a008f2d, type: 3}
   funnyExplosionSound: {fileID: 11400000, guid: 0ead8eef1f870ce43b9c8b3c9ce9bae4, type: 2}
   pauseKeybind: {fileID: 7771889369536338279, guid: 34edc816a52e4fc4ab2d77bcdba58669, type: 3}
 --- !u!114 &1779381781154097865

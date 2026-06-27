@@ -99,7 +99,17 @@ namespace rinCore
             }
         }
         [SerializeField] InputActionReference moveInput, lookInput;
-        static Vector2 cachedMove, cachedLook;
+        static Vector2 cachedMove, cachedLook, cachedMouseDelta;
+        public static Vector2 MouseDeltaXY
+        {
+            get
+            {
+                if (instance == null)
+                    return Vector2.zero;
+
+                return cachedMouseDelta;
+            }
+        }
         public static Vector2 Look
         {
             get
@@ -196,6 +206,15 @@ namespace rinCore
         {
             cachedMove = moveInput.ReadRawVector2();
             cachedLook = lookInput.ReadRawVector2();
+
+            if (Mouse.current != null && lookInput.action.activeControl?.device == Mouse.current)
+            {
+                cachedMouseDelta = lookInput.ReadRawMouseDelta();
+            }
+            else
+            {
+                cachedMouseDelta = Vector2.zero;
+            }
 
             foreach (var kvp in trackers)
             {

@@ -41,13 +41,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ShockwaveSpeed: 0
+    - _ShockwaveSpeed: 3.5
     - _ShockwaveStrength: -0.75
-    - _ShockwaveTime: -3
+    - _ShockwaveTime: 89.036
     - _Size: 0.27
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _RingSpawnPosition: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _RingSpawnPosition: {r: 0.16301812, g: 0.64067703, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &5395668034398897513

@@ -101,6 +101,13 @@ namespace rinCore
             if (!Physics.Raycast(ray, out RaycastHit hit, 500f, clickMask, QueryTriggerInteraction.Ignore))
                 return;
 
+            GeneralManager.FunnyExplosion(new()
+            {
+                is3d = true,
+                playSound = true,
+                position = hit.point,
+                scale = 2f
+            });
             if (nav.SetDestination(transform.position, hit.point))
             {
                 lastPathOrigin = transform.position;

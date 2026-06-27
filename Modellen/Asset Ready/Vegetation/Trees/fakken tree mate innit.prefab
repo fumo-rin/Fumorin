@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1673153899097713870}
   - component: {fileID: 1448112631434084646}
   - component: {fileID: 9136616433333806910}
+  - component: {fileID: 3497082712041680668}
   m_Layer: 6
   m_Name: fakken tree mate innit
   m_TagString: Untagged
@@ -113,3 +114,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -5495902117074765545, guid: 0362a141cf0be5a4290d81e949bc75c0, type: 3}
+--- !u!208 &3497082712041680668
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7488914028738656346}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1.2700001, y: 1.2700001, z: 1.572}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0.07300001, y: -0.069000006, z: 1.4710001}
+  m_TimeToStationary: 0.5

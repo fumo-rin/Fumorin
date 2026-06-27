@@ -104,10 +104,10 @@ namespace rinCore
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""RightStick"",
+                    ""name"": ""Right Stick"",
                     ""type"": ""Value"",
                     ""id"": ""b3a84277-c3d4-40f8-90d9-108359f0bb30"",
-                    ""expectedControlType"": ""Analog"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -381,7 +381,7 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""RightStick"",
+                    ""action"": ""Right Stick"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -392,7 +392,7 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""RightStick"",
+                    ""action"": ""Right Stick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -403,7 +403,7 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""RightStick"",
+                    ""action"": ""Right Stick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -414,7 +414,7 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""RightStick"",
+                    ""action"": ""Right Stick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -425,9 +425,20 @@ namespace rinCore
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""RightStick"",
+                    ""action"": ""Right Stick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""013a4ba0-935a-4745-9210-212d1b814755"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Right Stick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
@@ -1864,7 +1875,7 @@ namespace rinCore
             // Fumo
             m_Fumo = asset.FindActionMap("Fumo", throwIfNotFound: true);
             m_Fumo_Movement = m_Fumo.FindAction("Movement", throwIfNotFound: true);
-            m_Fumo_RightStick = m_Fumo.FindAction("RightStick", throwIfNotFound: true);
+            m_Fumo_RightStick = m_Fumo.FindAction("Right Stick", throwIfNotFound: true);
             m_Fumo_ClickLeft = m_Fumo.FindAction("ClickLeft", throwIfNotFound: true);
             m_Fumo_ClickRight = m_Fumo.FindAction("ClickRight", throwIfNotFound: true);
             // UI
@@ -3088,7 +3099,7 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMovement(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "RightStick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Right Stick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

@@ -543,6 +543,68 @@ namespace rinCore
 #endif
     }
     #endregion
+    #region Text Field
+#if UNITY_EDITOR
+    public static partial class EF_Utility
+    {
+        public static string EF_TextField(Rect rect, string label, string value, int lines = 3)
+        {
+            value ??= string.Empty;
+
+            float labelWidth = EditorGUIUtility.labelWidth;
+
+            Rect labelRect = new Rect(rect.x, rect.y, labelWidth, RowHeight);
+            Rect textRect = new Rect(
+                labelRect.xMax,
+                rect.y,
+                rect.width - labelWidth,
+                Mathf.Max(RowHeight, lines * 18f));
+
+            EditorGUI.LabelField(labelRect, label);
+
+            GUIStyle style = new GUIStyle(EditorStyles.textArea)
+            {
+                wordWrap = true
+            };
+
+            return EditorGUI.TextArea(textRect, value, style);
+        }
+
+        public static float GetTextFieldHeight(int lines = 3)
+        {
+            return Mathf.Max(RowHeight, lines * 18f);
+        }
+    }
+#endif
+    #endregion
+    #region Color Field
+#if UNITY_EDITOR
+    public static partial class EF_Utility
+    {
+        public static Color EF_ColorField(Rect rect, string label, Color value, bool hdr = false)
+        {
+            return EditorGUI.ColorField(
+                rect,
+                new GUIContent(label),
+                value,
+                true,
+                true,
+                hdr);
+        }
+
+        public static Color32 EF_ColorField(Rect rect, string label, Color32 value, bool hdr = false)
+        {
+            return (Color32)EditorGUI.ColorField(
+                rect,
+                new GUIContent(label),
+                (Color)value,
+                true,
+                true,
+                hdr);
+        }
+    }
+#endif
+    #endregion
     #region Sprite Field
     public static partial class EF_Utility
     {
@@ -572,5 +634,16 @@ namespace rinCore
         }
 #endif
     }
+    #endregion
+    #region Enum Popup
+#if UNITY_EDITOR
+    public static partial class EF_Utility
+    {
+        public static T EF_EnumDropdown<T>(Rect rect, string label, T value) where T : Enum
+        {
+            return (T)EditorGUI.EnumPopup(rect, label, value);
+        }
+    }
+#endif
     #endregion
 }
