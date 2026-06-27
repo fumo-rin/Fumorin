@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,6 +12,47 @@ namespace rinCore
 {
     public static class GameobjectNameCleaner
     {
+        #region Tags Parser
+        public static Dictionary<string, string> ParseTags(this TextAsset textAsset)
+        {
+            Dictionary<string, string> tags = new();
+
+            if (textAsset == null)
+                return tags;
+
+            using StringReader reader = new(textAsset.text);
+
+            string currentTag = null;
+            StringBuilder builder = new();
+
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.TrimEnd();
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    if (currentTag != null)
+                        tags[currentTag] = builder.ToString().Trim();
+
+                    currentTag = line[1..^1];
+                    builder.Clear();
+                }
+                else if (currentTag != null)
+                {
+                    builder.AppendLine(line);
+                }
+            }
+            if (currentTag != null)
+                tags[currentTag] = builder.ToString().Trim();
+            return tags;
+        }
+
+        public static bool TryGetTag(this TextAsset textAsset, string tag, out string value)
+        {
+            var tags = textAsset.ParseTags();
+            return tags.TryGetValue(tag, out value);
+        }
+        #endregion
         private static string CleanName(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
