@@ -524,7 +524,7 @@ namespace rinCore
     public static partial class EF_Utility
     {
 #if UNITY_EDITOR
-        public static T EF_NumberField<T>(Rect rect, string label, T value) where T : struct, IConvertible
+        public static T EF_NumberField<T>(Rect rect, string label, T value, T min, T max) where T : struct, IConvertible, IComparable<T>
         {
             string currentText = Convert.ToString(value, CultureInfo.InvariantCulture);
             string newText = EditorGUI.TextField(rect, label, currentText);
@@ -532,10 +532,25 @@ namespace rinCore
             try
             {
                 if (string.IsNullOrWhiteSpace(newText))
-                    return default;
+                    return min;
+
                 newText = newText.Replace(',', '.');
 
-                return (T)Convert.ChangeType(newText, typeof(T), CultureInfo.InvariantCulture);
+                T result = (T)Convert.ChangeType(
+                    newText,
+                    typeof(T),
+                    CultureInfo.InvariantCulture);
+
+                if (min.CompareTo(max) > 0)
+                    (min, max) = (max, min);
+
+                if (result.CompareTo(min) < 0)
+                    return min;
+
+                if (result.CompareTo(max) > 0)
+                    return max;
+
+                return result;
             }
             catch
             {

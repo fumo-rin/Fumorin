@@ -37,13 +37,13 @@ namespace rinCore
                 DontDestroyOnLoad(gameObject);
                 if (loadingScreen != null)
                     loadingScreen.SetActive(false);
-
             }
             else
             {
                 Destroy(gameObject);
             }
         }
+
         private void Start()
         {
             _initialScene = SceneManager.GetActiveScene();
@@ -54,8 +54,7 @@ namespace rinCore
             string currentName = _initialScene.name;
             string mainName = startingScene.MainScene != null ? startingScene.MainScene.GetSceneName() : string.Empty;
             bool isMain = string.Equals(currentName, mainName, StringComparison.OrdinalIgnoreCase);
-            bool isAdditive = startingScene.AdditiveScenes.Any(s =>
-                string.Equals(currentName, s.GetSceneName(), StringComparison.OrdinalIgnoreCase));
+            bool isAdditive = startingScene.AdditiveScenes.Any(s => string.Equals(currentName, s.GetSceneName(), StringComparison.OrdinalIgnoreCase));
 
             if (isMain)
             {
@@ -97,7 +96,10 @@ namespace rinCore
             }
             else
             {
-                LoadScenePair(startingScene, null);
+                LoadScenePair(startingScene, new()
+                {
+                    Payload = null
+                });
             }
         }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -108,16 +110,15 @@ namespace rinCore
             _loadedAdditives = new HashSet<SceneReference>();
             IsLoading = false;
         }
-        #region Local Load
-        public void LocalLoad(ScenePairSO pair)
-        {
-            LoadScenePair(pair);
-        }
-        #endregion
-
         #region Public Wrapper
-        public static void LoadScenePair(ScenePairSO pair, Action payload = null, float delay = 0.25f)
+        public struct SceneLoadSettings
         {
+            public Action Payload;
+            public float Delay;
+        }
+        public static void LoadScenePair(ScenePairSO pair, SceneLoadSettings? settings = null)
+        {
+            SceneLoadSettings finalSettings = settings ?? new();
             if (Instance != null)
             {
                 if (pair == _currentScenePair)
@@ -125,13 +126,13 @@ namespace rinCore
                     WhenStartLoadingAdditives?.Invoke();
                     WhenFinishedLoadingAdditives?.Invoke();
                     IsLoading = false;
-                    payload?.Invoke();
+                    finalSettings.Payload?.Invoke();
 
                     if (Instance.loadingScreen != null)
                         Instance.loadingScreen.SetActive(false);
                     return;
                 }
-                Instance.StartCoroutine(Instance.CO_LoadScenePair(pair, payload, delay));
+                Instance.StartCoroutine(Instance.CO_LoadScenePair(pair, finalSettings.Payload, finalSettings.Delay));
             }
         }
         #endregion
@@ -139,17 +140,15 @@ namespace rinCore
         #region Core Coroutine
         private IEnumerator CO_LoadScenePair(ScenePairSO pair, Action payload, float delay)
         {
-            if (pair == null) yield break;
-            if (IsLoading) yield break;
-
+            if (pair == null || IsLoading) yield break;
             IsLoading = true;
 
             EventSystem s = EventSystem.current;
-            if (s != null)
-            {
-                s.enabled = false;
-            }
-            #region Fade In & Delay
+            if (s != null) s.enabled = false;
+
+            if (loadingScreen != null) loadingScreen.SetActive(true);
+            UpdateLoadingText(0f);
+
             Image loadBackground = fadingImage;
             if (delay > 0f)
             {
@@ -161,10 +160,6 @@ namespace rinCore
                 else
                 {
                     loadBackground.color = loadBackground.color.Opacity(0);
-                    if (loadingScreen != null)
-                        loadingScreen.SetActive(true);
-                    if (loadingScreenText != null)
-                        loadingScreenText.text = "Loading: 0%";
                     while (remainingDelay > 0f && loadBackground != null)
                     {
                         float lerp01 = 1f - (remainingDelay / delay.Max(0.0001f));
@@ -176,98 +171,136 @@ namespace rinCore
                     }
                 }
             }
-            if (loadBackground != null)
-            {
-                loadBackground.color = loadBackground.color.Opacity(255);
-            }
-            #endregion
-
-            if (loadingScreen != null)
-                loadingScreen.SetActive(true);
-            if (loadingScreenText != null)
-                loadingScreenText.text = "Loading: 0%";
+            if (loadBackground != null) loadBackground.color = loadBackground.color.Opacity(255);
 
             WhenStartLoadingAdditives?.Invoke();
 
-            void UpdateLoadingText(float progress)
-            {
-                progress = Mathf.Clamp01(progress);
-                if (loadingScreenText != null)
-                    loadingScreenText.text = $"Loading: {Mathf.RoundToInt(progress * 100f)}%";
-            }
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            bool skipMainReload = pair.MainScene != null && string.Equals(pair.MainScene.GetSceneName(), currentSceneName, StringComparison.OrdinalIgnoreCase);
 
             int totalOps = 1 + pair.AdditiveScenes.Count + _loadedAdditives.Count;
             int finishedOps = 0;
 
-            IEnumerator TrackProgress(IEnumerator operation)
+            IEnumerator WaitForAsyncOp(AsyncOperation op)
             {
-                AsyncOperation async = null;
-                while (operation.MoveNext())
+                if (op == null) yield break;
+                while (!op.isDone)
                 {
-                    if (operation.Current is AsyncOperation op)
-                        async = op;
-
-                    float opProgress = async != null ? Mathf.Clamp01(async.progress / 0.9f) : 0f;
+                    float opProgress = Mathf.Clamp01(op.progress / 0.9f);
                     float totalProgress = (finishedOps + opProgress) / totalOps;
                     UpdateLoadingText(totalProgress);
-                    yield return operation.Current;
+                    yield return null;
                 }
-
                 finishedOps++;
                 UpdateLoadingText((float)finishedOps / totalOps);
             }
-
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            bool skipMainReload = pair.MainScene != null &&
-                                  string.Equals(pair.MainScene.GetSceneName(), currentSceneName, StringComparison.OrdinalIgnoreCase);
-
             foreach (var oldAdditive in _loadedAdditives.ToList())
             {
                 if (!pair.AdditiveScenes.Any(s => s.GetSceneName() == oldAdditive.GetSceneName()))
                 {
-                    if (IsSceneLoaded(oldAdditive))
-                        yield return StartCoroutine(TrackProgress(UnloadScene(oldAdditive)));
+                    Scene sceneObj = SceneManager.GetSceneByName(oldAdditive.GetSceneName());
+                    if (sceneObj.IsValid() && sceneObj.isLoaded)
+                    {
+                        if (SceneManager.GetActiveScene() == sceneObj && SceneManager.sceneCount > 1)
+                        {
+                            for (int i = 0; i < SceneManager.sceneCount; i++)
+                            {
+                                Scene sc = SceneManager.GetSceneAt(i);
+                                if (sc != sceneObj && sc.isLoaded)
+                                {
+                                    SceneManager.SetActiveScene(sc);
+                                    break;
+                                }
+                            }
+                        }
 
+                        yield return StartCoroutine(WaitForAsyncOp(SceneManager.UnloadSceneAsync(sceneObj)));
+                    }
                     _loadedAdditives.Remove(oldAdditive);
                 }
             }
-
             if (_currentScenePair != null && !skipMainReload)
             {
                 var oldMain = _currentScenePair.MainScene;
-                if (oldMain != null && IsSceneLoaded(oldMain))
-                    yield return StartCoroutine(TrackProgress(UnloadScene(oldMain)));
+                if (oldMain != null)
+                {
+                    Scene sceneObj = SceneManager.GetSceneByName(oldMain.GetSceneName());
+                    if (sceneObj.IsValid() && sceneObj.isLoaded)
+                    {
+                        if (SceneManager.GetActiveScene() == sceneObj && SceneManager.sceneCount > 1)
+                        {
+                            for (int i = 0; i < SceneManager.sceneCount; i++)
+                            {
+                                Scene sc = SceneManager.GetSceneAt(i);
+                                if (sc != sceneObj && sc.isLoaded)
+                                {
+                                    SceneManager.SetActiveScene(sc);
+                                    break;
+                                }
+                            }
+                        }
+
+                        yield return StartCoroutine(WaitForAsyncOp(SceneManager.UnloadSceneAsync(sceneObj)));
+                    }
+                }
             }
+            if (!skipMainReload && pair.MainScene != null)
+            {
+                string mainName = pair.MainScene.GetSceneName();
+                Scene sceneObj = SceneManager.GetSceneByName(mainName);
 
-            if (!skipMainReload && pair.MainScene != null && !IsSceneLoaded(pair.MainScene))
-                yield return StartCoroutine(TrackProgress(LoadScene(pair.MainScene, true)));
+                if (!sceneObj.IsValid() || !sceneObj.isLoaded)
+                {
+                    AsyncOperation op = SceneManager.LoadSceneAsync(mainName, LoadSceneMode.Additive);
+                    yield return StartCoroutine(WaitForAsyncOp(op));
+
+                    Scene newlyLoadedMain = SceneManager.GetSceneByName(mainName);
+                    if (newlyLoadedMain.IsValid() && newlyLoadedMain.isLoaded)
+                    {
+                        SceneManager.SetActiveScene(newlyLoadedMain);
+                    }
+                }
+            }
             else if (skipMainReload)
+            {
                 SceneManager.SetActiveScene(SceneManager.GetActiveScene());
-
+            }
             foreach (var additive in pair.AdditiveScenes)
             {
                 if (!_loadedAdditives.Any(s => s.GetSceneName() == additive.GetSceneName()))
                 {
-                    yield return StartCoroutine(TrackProgress(LoadScene(additive)));
+                    string additiveName = additive.GetSceneName();
+                    AsyncOperation op = SceneManager.LoadSceneAsync(additiveName, LoadSceneMode.Additive);
+                    yield return StartCoroutine(WaitForAsyncOp(op));
+
                     _loadedAdditives.Add(additive);
                 }
             }
             Scene activeAtStart = SceneManager.GetSceneByName(currentSceneName);
-
-            bool activeWasMain = pair.MainScene != null &&
-                                 string.Equals(pair.MainScene.GetSceneName(), activeAtStart.name, StringComparison.OrdinalIgnoreCase);
-
-            bool activeWasAdditive = pair.AdditiveScenes.Any(s =>
-                                 string.Equals(s.GetSceneName(), activeAtStart.name, StringComparison.OrdinalIgnoreCase));
-
+            bool activeWasMain = pair.MainScene != null && string.Equals(pair.MainScene.GetSceneName(), activeAtStart.name, StringComparison.OrdinalIgnoreCase);
+            bool activeWasAdditive = pair.AdditiveScenes.Any(s => string.Equals(s.GetSceneName(), activeAtStart.name, StringComparison.OrdinalIgnoreCase));
             bool originalShouldBeUnloaded = _currentScenePair == null && !activeWasMain && !activeWasAdditive && activeAtStart.isLoaded;
 
             if (originalShouldBeUnloaded && SceneManager.sceneCount > 1)
             {
-                yield return StartCoroutine(TrackProgress(UnloadScene(activeAtStart)));
+                if (SceneManager.GetActiveScene() == activeAtStart)
+                {
+                    for (int i = 0; i < SceneManager.sceneCount; i++)
+                    {
+                        Scene sc = SceneManager.GetSceneAt(i);
+                        if (sc != activeAtStart && sc.isLoaded)
+                        {
+                            SceneManager.SetActiveScene(sc);
+                            break;
+                        }
+                    }
+                }
+                yield return StartCoroutine(WaitForAsyncOp(SceneManager.UnloadSceneAsync(activeAtStart)));
             }
             UpdateLoadingText(1f);
             yield return null;
+            //yield return Resources.UnloadUnusedAssets();
+            //GC.Collect();
 
             WhenFinishedLoadingAdditives?.Invoke();
 
@@ -275,104 +308,33 @@ namespace rinCore
             IsLoading = false;
             payload?.Invoke();
 
-            if (loadingScreen != null)
-                loadingScreen.SetActive(false);
-            if (s != null)
-            {
-                s.enabled = true;
-            }
+            if (loadingScreen != null) loadingScreen.SetActive(false);
+            if (s != null) s.enabled = true;
         }
 
+        private void UpdateLoadingText(float progress)
+        {
+            progress = Mathf.Clamp01(progress);
+            if (loadingScreenText != null)
+                loadingScreenText.text = $"Loading: {Mathf.RoundToInt(progress * 100f)}%";
+        }
         #endregion
 
-        #region Internal Load/Unload
+        #region Internal Load/Unload (Legacy Callbacks fallback)
         private static IEnumerator LoadScene(Scene scene)
         {
             if (!scene.IsValid() || scene.isLoaded) yield break;
             AsyncOperation op = SceneManager.LoadSceneAsync(scene.name, LoadSceneMode.Additive);
-            if (Instance.loadingScreen != null)
-                Instance.loadingScreen.SetActive(true);
             while (!op.isDone) yield return null;
             SceneManager.SetActiveScene(scene);
-        }
-
-        private static IEnumerator UnloadScene(Scene scene)
-        {
-            if (!scene.IsValid() || !scene.isLoaded || SceneManager.sceneCount <= 1) yield break;
-            if (SceneManager.GetActiveScene() == scene)
-            {
-                for (int i = 0; i < SceneManager.sceneCount; i++)
-                {
-                    Scene sc = SceneManager.GetSceneAt(i);
-                    if (sc != scene && sc.isLoaded)
-                    {
-                        SceneManager.SetActiveScene(sc);
-                        break;
-                    }
-                }
-            }
-            AsyncOperation op = SceneManager.UnloadSceneAsync(scene);
-            if (Instance.loadingScreen != null)
-                Instance.loadingScreen.SetActive(true);
-            while (!op.isDone) yield return null;
         }
         private static IEnumerator LoadScene(SceneReference sceneRef, bool setAsActive = false)
         {
             if (sceneRef == null) yield break;
-
             string name = sceneRef.GetSceneName();
-            if (Instance.loadingScreen != null)
-                Instance.loadingScreen.SetActive(true);
-
             AsyncOperation op = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-            if (op == null)
-            {
-                yield break;
-            }
             while (!op.isDone) yield return null;
-
-            Scene scene = SceneManager.GetSceneByName(name);
-
-            if (setAsActive) SceneManager.SetActiveScene(scene);
-
-            yield return null;
-        }
-        private static IEnumerator UnloadScene(SceneReference sceneRef)
-        {
-            if (sceneRef == null) yield break;
-
-            string name = sceneRef.GetSceneName();
-            Scene s = SceneManager.GetSceneByName(name);
-
-            if (!s.IsValid() || !s.isLoaded)
-                yield break;
-
-            if (SceneManager.sceneCount <= 1)
-                yield break;
-
-            if (SceneManager.GetActiveScene() == s)
-            {
-                for (int i = 0; i < SceneManager.sceneCount; i++)
-                {
-                    Scene sc = SceneManager.GetSceneAt(i);
-                    if (sc != s && sc.isLoaded)
-                    {
-                        SceneManager.SetActiveScene(sc);
-                        break;
-                    }
-                }
-            }
-
-            yield return SceneManager.UnloadSceneAsync(name);
-            yield return Resources.UnloadUnusedAssets();
-            System.GC.Collect();
-        }
-
-        private static bool IsSceneLoaded(SceneReference sceneRef)
-        {
-            if (sceneRef == null) return false;
-            Scene s = SceneManager.GetSceneByName(sceneRef.GetSceneName());
-            return s.IsValid() && s.isLoaded;
+            if (setAsActive) SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
         }
         #endregion
     }
