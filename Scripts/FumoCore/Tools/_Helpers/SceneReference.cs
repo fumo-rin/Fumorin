@@ -1,81 +1,42 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine.AddressableAssets;
 
 namespace rinCore
 {
     [System.Serializable]
+    public class AssetReferenceScene : AssetReference
+    {
+        public AssetReferenceScene(string guid) : base(guid) { }
+        public override bool ValidateAsset(string path)
+        {
+#if UNITY_EDITOR
+            var type = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(path);
+            return typeof(UnityEditor.SceneAsset).IsAssignableFrom(type);
+#else                        
+            return false;
+#endif
+        }
+    }
+
+    [System.Serializable]
     public class SceneReference
     {
-#if UNITY_EDITOR
-        [SerializeField] public SceneAsset sceneAsset;
-#endif
-        [SerializeField] private string scenePath = string.Empty;
+        [SerializeField] private AssetReferenceScene sceneReference;
+        public AssetReferenceScene AddressableReference => sceneReference;
         public string GetSceneName()
         {
-            if (string.IsNullOrEmpty(scenePath))
+            if (sceneReference == null || string.IsNullOrEmpty(sceneReference.AssetGUID))
                 return string.Empty;
-            return System.IO.Path.GetFileNameWithoutExtension(scenePath);
-        }
-        public int GetBuildIndex()
-        {
-            if (string.IsNullOrEmpty(scenePath))
-                return -1;
 
-            int sceneCount = SceneManager.sceneCountInBuildSettings;
-            for (int i = 0; i < sceneCount; i++)
-            {
-                string path = SceneUtility.GetScenePathByBuildIndex(i);
-                if (path == scenePath)
-                    return i;
-            }
-            return -1;
+            return sceneReference.AssetGUID;
         }
-        public static implicit operator string(SceneReference reference)
-        {
-            return reference?.GetSceneName() ?? string.Empty;
-        }
-        public static implicit operator int(SceneReference reference)
-        {
-            return reference?.GetBuildIndex() ?? -1;
-        }
-    }
 
 #if UNITY_EDITOR
-
-    [CustomPropertyDrawer(typeof(SceneReference))]
-    public class SceneReferenceDrawer : PropertyDrawer
-    {
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public UnityEditor.SceneAsset SceneAsset => sceneReference?.editorAsset as UnityEditor.SceneAsset;
+        public string GetEditorSceneName()
         {
-            EditorGUI.BeginProperty(position, label, property);
-
-            var sceneAssetProp = property.FindPropertyRelative("sceneAsset");
-            var scenePathProp = property.FindPropertyRelative("scenePath");
-
-            position = EditorGUI.PrefixLabel(position, label);
-            EditorGUI.PropertyField(position, sceneAssetProp, GUIContent.none);
-
-            if (sceneAssetProp.objectReferenceValue != null)
-            {
-                string newPath = AssetDatabase.GetAssetPath(sceneAssetProp.objectReferenceValue);
-                if (scenePathProp.stringValue != newPath)
-                {
-                    scenePathProp.stringValue = newPath;
-                    property.serializedObject.ApplyModifiedProperties();
-                }
-            }
-            else if (!string.IsNullOrEmpty(scenePathProp.stringValue))
-            {
-                scenePathProp.stringValue = string.Empty;
-                property.serializedObject.ApplyModifiedProperties();
-            }
-
-            EditorGUI.EndProperty();
+            return SceneAsset != null ? SceneAsset.name : "Missing/Unassigned Scene";
         }
-    }
 #endif
+    }
 }
