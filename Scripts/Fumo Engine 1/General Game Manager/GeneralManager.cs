@@ -10,6 +10,31 @@ using UnityEditor;
 
 namespace rinCore
 {
+    #region Framerate setting
+    public partial class GeneralManager
+    {
+        public const string FPS_SAVE_KEY = "TargetFramerate";
+        public static void ApplyFramerate(int fps, int min = 10, int max = 240)
+        {
+            fps = fps.Clamp(min, max);
+            PersistentJSON.TrySave(fps, FPS_SAVE_KEY);
+            Application.targetFrameRate = fps;
+        }
+        public static void ApplySavedFramerate()
+        {
+            int fps = 120;
+            if (PersistentJSON.TryLoad(out int loaded, FPS_SAVE_KEY))
+            {
+                fps = loaded;
+            }
+            else
+            {
+                PersistentJSON.TrySave(fps, FPS_SAVE_KEY);
+            }
+            Application.targetFrameRate = fps;
+        }
+    }
+    #endregion
     #region Funny Explosion
     public partial class GeneralManager
     {
@@ -172,6 +197,7 @@ namespace rinCore
                     pauseKeybind.action.Enable();
                     pauseKeybind.action.performed += PressPauseInput;
                 }
+                ApplySavedFramerate();
             }
         }
         private void StartInstance()

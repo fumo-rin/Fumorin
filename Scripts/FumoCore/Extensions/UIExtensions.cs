@@ -5,19 +5,27 @@ namespace rinCore
 {
     public static class SliderExtensions
     {
-        public static Slider SetValues(this Slider s, float value, float maxValue, float minValue)
+        public static Slider SetValues(this Slider s, float value, float maxValue, float minValue, bool withChangeEvent = false)
         {
             s.maxValue = maxValue;
             s.value = value;
             s.minValue = minValue;
+            if (withChangeEvent)
+            {
+                s.onValueChanged?.Invoke(s.value);
+            }
             return s;
         }
-        public static Slider SetValuesInt(this Slider s, int value, int maxValue, int minValue)
+        public static Slider SetValuesInt(this Slider s, int value, int maxValue, int minValue, bool withChangeEvent = false)
         {
             s.wholeNumbers = true;
             s.maxValue = maxValue;
             s.value = value;
             s.minValue = minValue;
+            if (withChangeEvent)
+            {
+                s.onValueChanged?.Invoke(s.value);
+            }
             return s;
         }
         public static void SetXPositionOfRect(this Slider slider, RectTransform target, RectTransform reference = null, float x01 = 1f)

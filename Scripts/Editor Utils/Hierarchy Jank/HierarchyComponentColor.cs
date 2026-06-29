@@ -26,6 +26,6 @@ namespace rinCore
 #endif
     public interface IHierarchyComponentColor
     {
-        public Color LabelColor { get; set; }
+        public Color LabelColor { get; }
     }
 }

@@ -169,12 +169,7 @@ namespace rinCore
             if (GeneralManager.IsPaused)
             {
                 Time.timeScale = 0f;
-                Time.fixedDeltaTime = 0f;
                 return;
-            }
-            else
-            {
-                Time.fixedDeltaTime = 0.016667f;
             }
             toRemove.Clear();
             foreach (var kvp in slowdowns)
@@ -193,7 +188,6 @@ namespace rinCore
             SimulatedSlowdown = totalSlow;
 
             Time.timeScale = CalculateFinalTimescale();
-            Time.fixedDeltaTime = (1f / Time.timeScale).Min(1f / 60f);
         }
     }
     #endregion
@@ -214,7 +208,6 @@ namespace rinCore
                 toRemove = new HashSet<string>();
                 Time.maximumDeltaTime = 1f / 60f;
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = 120;
             }
         }
         private float CalculateFinalTimescale()
