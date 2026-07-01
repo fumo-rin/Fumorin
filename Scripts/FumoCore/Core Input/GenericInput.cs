@@ -196,6 +196,10 @@ namespace rinCore
             instance = this;
             if (moveInput != null) moveInput.action.Enable();
             if (lookInput != null) lookInput.action.Enable();
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
         private void Start()
         {
