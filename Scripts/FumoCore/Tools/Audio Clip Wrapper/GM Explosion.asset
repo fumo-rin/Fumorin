@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SoundName: GM Explosion
   soundVolume: 0.7
-  audioMixerOverride: {fileID: -1549346045928506887, guid: 2d90163c4095a0a4283cc9766c8294e4, type: 2}
   <soundClips>k__BackingField:
   - clip: {fileID: 8300000, guid: 516d272f3bff7f84882c2f8ae549c2bc, type: 3}
     PitchVariancePercent: 6.3
     PitchOrigin: 1
     Volume: 0.775
     Muted: 0
-  <singleChannel>k__BackingField: 1
+  <soundMode>k__BackingField: 0
   <singleRepeatLockoutTime>k__BackingField: 0.008333334
   <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0
