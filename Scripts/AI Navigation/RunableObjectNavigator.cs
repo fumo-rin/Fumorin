@@ -4,7 +4,8 @@ namespace rinCore
 {
     public class RunnableObjectNavigator : MonoBehaviour
     {
-        [SerializeField] private Rigidbody rb;
+        [SerializeField] public Rigidbody rb;
+        [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private FumoNav nav;
 
         [Header("Movement Settings")]
@@ -52,6 +53,11 @@ namespace rinCore
             {
                 StopMovement();
                 return;
+            }
+
+            if (boxCollider != null)
+            {
+                boxCollider.HandleStepClimbing(rb, moveDir, 0.45f);
             }
             Vector3 targetVelocity = moveDir * moveSpeed;
             rb.linearVelocity = rb.VelocityTowardsXZ(targetVelocity, stopBrakingSpeed);

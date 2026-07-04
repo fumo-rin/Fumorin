@@ -22,7 +22,7 @@ namespace rinCore
         }
     }
     #endregion
-    public static partial class PhysicsExtensions
+    public static partial class Physics3DExtensions
     {
         public static bool AddImpactVelocity(this Collider collider, Impact impact, float strength = 1f) =>
             collider.AddImpactVelocity(impact.Velocity, impact.Point, strength);
@@ -48,6 +48,43 @@ namespace rinCore
             Vector3 impulse = impactVelocity * rb.mass * strength * scale;
             rb.AddForceAtPosition(impulse, hitPoint, ForceMode.Impulse);
             return true;
+        }
+    }
+    #endregion
+    #region Staircase Stepsize
+    public static partial class Physics3DExtensions
+    {
+        public static void HandleStepClimbing(this BoxCollider box, Rigidbody rb, Vector3 moveDir, float maxStepHeight, float maxSlopeAngle = 45f)
+        {
+            if (moveDir.sqrMagnitude < 0.001f) return;
+
+            Vector3 worldCenter = box.transform.TransformPoint(box.center);
+            float extentsY = (box.size.y * 0.5f) * box.transform.lossyScale.y;
+            Vector3 bottomPoint = worldCenter - new Vector3(0, extentsY, 0);
+            Vector3 direction = new Vector3(moveDir.x, 0, moveDir.z).normalized;
+            float contactCheckDistance = (box.size.z * 0.5f * box.transform.lossyScale.z) + 0.15f;
+            Vector3 lowerOrigin = bottomPoint + Vector3.up * 0.02f;
+            if (Physics.Raycast(lowerOrigin, direction, out RaycastHit hitLower, contactCheckDistance))
+            {
+                float surfaceAngle = Vector3.Angle(Vector3.up, hitLower.normal);
+                if (surfaceAngle <= maxSlopeAngle) return;
+                Vector3 upperOrigin = bottomPoint + Vector3.up * maxStepHeight;
+                if (!Physics.Raycast(upperOrigin, direction, contactCheckDistance))
+                {
+                    Vector3 downwardRayOrigin = upperOrigin + (direction * contactCheckDistance);
+                    if (Physics.Raycast(downwardRayOrigin, Vector3.down, out RaycastHit hitStepTop, maxStepHeight))
+                    {
+                        float actualStepHeight = hitStepTop.point.y - bottomPoint.y;
+                        float topSurfaceAngle = Vector3.Angle(Vector3.up, hitStepTop.normal);
+                        if (topSurfaceAngle > maxSlopeAngle) return;
+                        if (actualStepHeight > 0.02f && actualStepHeight <= maxStepHeight)
+                        {
+                            rb.position += Vector3.up * actualStepHeight;
+                            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                        }
+                    }
+                }
+            }
         }
     }
     #endregion

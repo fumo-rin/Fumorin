@@ -5,7 +5,7 @@ namespace rinCore
     [System.Serializable]
     public class QuakeMotor
     {
-        [SerializeField] private Camera viewCamera;
+        [SerializeField] private Transform viewSocket;
 
         public MoveData settings = new();
 
@@ -25,8 +25,8 @@ namespace rinCore
             float dt = Time.deltaTime;
 
             Vector3 velocity = rb.linearVelocity;
-            Vector3 forward = viewCamera.transform.forward;
-            Vector3 right = viewCamera.transform.right;
+            Vector3 forward = viewSocket.transform.forward;
+            Vector3 right = viewSocket.transform.right;
 
             forward.y = 0f;
             right.y = 0f;

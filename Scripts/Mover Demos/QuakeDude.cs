@@ -3,25 +3,26 @@ using UnityEngine.InputSystem;
 
 namespace rinCore
 {
+    [System.Serializable]
+    public class QGrounded : IGroundCheck
+    {
+        [SerializeField] BoxCollider box;
+        [SerializeField] LayerMask groundMask;
+        public bool IsGrounded => box != null && groundedFrame(box);
+        bool groundedFrame(BoxCollider box)
+        {
+            bool grounded = false;
+            Bounds b = box.bounds;
+            if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out _, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
+            {
+                grounded = true;
+            }
+            return grounded;
+        }
+    }
     public class QuakeDude : MonoBehaviour, IVelocity
     {
-        [System.Serializable]
-        public class QGrounded : IGroundCheck
-        {
-            [SerializeField] BoxCollider box;
-            [SerializeField] LayerMask groundMask;
-            public bool IsGrounded => box != null && groundedFrame(box);
-            bool groundedFrame(BoxCollider box)
-            {
-                bool grounded = false;
-                Bounds b = box.bounds;
-                if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out _, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
-                {
-                    grounded = true;
-                }
-                return grounded;
-            }
-        }
+        [SerializeField] BoxCollider stairClimber;
         [SerializeField] QuakeMotor m;
         [SerializeField] Rigidbody rb;
         [SerializeField] Transform cameraPivot;
@@ -76,6 +77,7 @@ namespace rinCore
 
             cameraPivot.localRotation = Quaternion.Euler(pitch, yaw, 0f);
 
+
             m.MoveOther(rb, GenericInput.Move, ground.IsGrounded);
             if (jumpAction.IsPressed() && ground.IsGrounded && !jumpAction.PressedLongerThan(0.4f) && lastJumpTime < Time.time + 0.15f)
             {
@@ -89,6 +91,7 @@ namespace rinCore
                 y = y.Clamp(-30, 100f);
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
             }
+            stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
         }
     }
 }

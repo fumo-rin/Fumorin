@@ -21,11 +21,6 @@ namespace rinCore
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
             Instance = this;
 
             if (dynamicNavMesh != null)
@@ -49,6 +44,8 @@ namespace rinCore
 
         private void LateUpdate()
         {
+            if (dynamicNavMesh == null)
+                return;
             if (isUpdatingMesh && navMeshUpdateOp != null && navMeshUpdateOp.isDone)
             {
                 isUpdatingMesh = false;
@@ -67,14 +64,6 @@ namespace rinCore
                 isUpdatingMesh = true;
 
                 lastBuildPosition = transform.position;
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                Instance = null;
             }
         }
     }
