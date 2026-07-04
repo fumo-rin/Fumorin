@@ -43,7 +43,7 @@ namespace rinCore
         {
             Instance = null;
         }
-        public static void PlayStatic(ACWrapper w, Vector2 pos)
+        public static void PlayStatic(ACWrapper w, Vector3 pos)
         {
             if (Instance is not NetworkedAudioEngine e)
                 return;
@@ -61,7 +61,7 @@ namespace rinCore
         }
 
         [Rpc(SendTo.Everyone)]
-        private void PlayAudioRpc(int soundId, Vector2 position)
+        private void PlayAudioRpc(int soundId, Vector3 position)
         {
             if (!AudioRegistry.TryGet(soundId, out ACWrapper wrapper))
                 return;
@@ -69,7 +69,7 @@ namespace rinCore
             AudioEngine.PlayWrapper(wrapper, position);
         }
 
-        public void PlayNetworked(ACWrapper wrapper, Vector2 position)
+        public void PlayNetworked(ACWrapper wrapper, Vector3 position)
         {
             if (wrapper == null)
                 return;

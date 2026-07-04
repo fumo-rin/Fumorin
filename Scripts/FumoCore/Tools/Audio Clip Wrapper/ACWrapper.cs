@@ -10,7 +10,7 @@ namespace rinCore
     #region Static Extension
     public static partial class ACWrapperExtensions
     {
-        public static void Play(this ACWrapper a, Vector2 position)
+        public static void Play(this ACWrapper a, Vector3 position)
         {
             if (a == null)
                 return;
@@ -166,12 +166,14 @@ namespace rinCore
             Is3D = true;
             singleRepeatLockoutTime = 0.02f;
         }
+        public bool IsDynamic => soundMode == SoundPlayMode.Dynamic3D || soundMode == SoundPlayMode.Dynamic2D;
         public enum SoundPlayMode
         {
-            Single3D,
-            Single2D,
-            Dynamic3D,
-            Dynamic2D
+            Single3D = 30,
+            Single2D = 20,
+            Single2DNonDirectional = 21,
+            Dynamic3D = 31,
+            Dynamic2D = 22
         }
         [field: SerializeField] public SoundPlayMode soundMode { get; private set; } = SoundPlayMode.Single3D;
         [field: SerializeField] public float singleRepeatLockoutTime { get; private set; } = 0f;

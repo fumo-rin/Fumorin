@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
@@ -86,6 +87,9 @@ namespace rinCore
                     case ACWrapper.SoundPlayMode.Single2D:
                         copy = Source2DSingle;
                         break;
+                    case ACWrapper.SoundPlayMode.Single2DNonDirectional:
+                        copy = Source2DSingleNondirectional;
+                        break;
                     case ACWrapper.SoundPlayMode.Dynamic3D:
                         copy = Source3DDynamic;
                         break;
@@ -106,7 +110,7 @@ namespace rinCore
     #region Play Sound
     public partial class AudioEngine
     {
-        internal static void PlayWrapper(ACWrapper a, Vector2 position)
+        internal static void PlayWrapper(ACWrapper a, Vector3 position)
         {
             if (instance is not AudioEngine engine)
             {
@@ -122,18 +126,30 @@ namespace rinCore
 
             for (int i = 0; i < a.soundClips.Count; i++)
             {
-                if (engine.TrySingleChannel(a.Entries[i], a, out AudioSource s))
+                if (!a.IsDynamic && engine.TrySingleChannel(a.Entries[i], a, out AudioSource s))
                 {
                     s.transform.position = position;
                     s.PlayWrapper(a, i);
                 }
                 else
                 {
-                    SoundIteration = engine.SoundQueue.Dequeue();
-                    engine.SoundQueue.Enqueue(SoundIteration);
+                    switch (a.soundMode)
+                    {
+                        case ACWrapper.SoundPlayMode.Dynamic3D:
+                            SoundIteration = engine.Dynamic3DQueue.Dequeue();
+                            engine.Dynamic3DQueue.Enqueue(SoundIteration);
 
-                    SoundIteration.transform.position = position;
-                    SoundIteration.PlayWrapper(a, i);
+                            SoundIteration.transform.position = position;
+                            SoundIteration.PlayWrapper(a, i);
+                            break;
+                        default:
+                            SoundIteration = engine.Dynamic2DQueue.Dequeue();
+                            engine.Dynamic2DQueue.Enqueue(SoundIteration);
+
+                            SoundIteration.transform.position = position;
+                            SoundIteration.PlayWrapper(a, i);
+                            break;
+                    }
                 }
             }
         }
@@ -146,6 +162,7 @@ namespace rinCore
         static AudioEngine instance;
         public AudioSource Source3DSingle;
         public AudioSource Source2DSingle;
+        public AudioSource Source2DSingleNondirectional;
         public AudioSource Source3DDynamic;
         public AudioSource Source2DDynamic;
 
@@ -186,11 +203,13 @@ namespace rinCore
             {
                 instance = this;
                 DontDestroyOnLoad(gameObject);
+                Initialize();
                 return;
             }
             Destroy(gameObject);
         }
-        Queue<AudioSource> SoundQueue = new();
+        Queue<AudioSource> Dynamic2DQueue = new();
+        Queue<AudioSource> Dynamic3DQueue = new();
         List<AudioSource> SoundStack = new();
         static AudioSource SoundIteration = new();
         private AudioSource RequestChannel(string name, Transform parent, AudioSource m)
@@ -210,11 +229,21 @@ namespace rinCore
         }
         public void Initialize()
         {
+            GameObject staticObject = new("Dynamic ACPlayer");
+            DontDestroyOnLoad(staticObject);
             AudioSource iteration;
             for (int i = 0; i < SoundChannels; i++)
             {
+                iteration = RequestChannel(i.ToString(), DynamicStack, Source2DDynamic);
+                iteration.transform.SetParent(staticObject.transform);
+                Dynamic2DQueue.Enqueue(iteration);
+                SoundStack.Add(iteration);
+            }
+            for (int i = 0; i < SoundChannels; i++)
+            {
                 iteration = RequestChannel(i.ToString(), DynamicStack, Source3DDynamic);
-                SoundQueue.Enqueue(iteration);
+                iteration.transform.SetParent(staticObject.transform);
+                Dynamic3DQueue.Enqueue(iteration);
                 SoundStack.Add(iteration);
             }
         }

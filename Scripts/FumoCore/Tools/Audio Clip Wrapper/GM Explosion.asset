@@ -20,7 +20,7 @@ MonoBehaviour:
     PitchOrigin: 1
     Volume: 0.775
     Muted: 0
-  <soundMode>k__BackingField: 0
+  <soundMode>k__BackingField: 31
   <singleRepeatLockoutTime>k__BackingField: 0.008333334
   <Is3D>k__BackingField: 1
   IsNetworked: 0

@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace rinCore
 {
-    public class QuakeDude : MonoBehaviour
+    public class QuakeDude : MonoBehaviour, IVelocity
     {
         [System.Serializable]
         public class QGrounded : IGroundCheck
@@ -26,6 +26,7 @@ namespace rinCore
         [SerializeField] Rigidbody rb;
         [SerializeField] Transform cameraPivot;
         [SerializeField] QGrounded ground = new QGrounded();
+        public Ray CameraRay => new(cameraPivot.position, cameraPivot.forward);
 
         public float sensitivity = 100f;
         public float Sensitivity
@@ -36,11 +37,26 @@ namespace rinCore
             }
         }
 
+        public Vector3 CurrentVelocity => rb.linearVelocity;
+        Vector2 storedPortrait;
+        public Vector2 PortraitRotation
+        {
+            get
+            {
+                return storedPortrait;
+            }
+        }
+
         float yaw;
         float pitch;
 
         [SerializeField] InputActionReference jumpAction;
         float lastJumpTime;
+        private void Start()
+        {
+            ALHandler.CreateOrUpdate(cameraPivot);
+            IVelocity.Player = this;
+        }
         void Update()
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -52,7 +68,7 @@ namespace rinCore
                 return;
             }
             Vector2 look = GenericInput.MouseDeltaXY;
-
+            storedPortrait = look.magnitude > 10f ? look.Sign() : Vector2.zero;
             yaw += look.x * Sensitivity;
             pitch -= look.y * Sensitivity;
 
@@ -69,7 +85,7 @@ namespace rinCore
             }
             if (!ground.IsGrounded && lastJumpTime + 0.05f < Time.time)
             {
-                float y = rb.linearVelocity.y + (-22f * Time.deltaTime);
+                float y = rb.linearVelocity.y + (-24f * Time.deltaTime);
                 y = y.Clamp(-30, 100f);
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
             }

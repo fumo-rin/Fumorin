@@ -5,7 +5,8 @@ using UnityEngine.AI;
 
 namespace rinCore
 {
-    public class FumoNav : MonoBehaviour
+    [System.Serializable]
+    public class FumoNav
     {
         #region AB Pathing
         private static float CalculateLength(NavMeshPath path)
@@ -104,42 +105,52 @@ namespace rinCore
                 return length;
             }
         }
-        private void Awake()
+        public void Reinitialize()
         {
             activePath = new NavMeshPath();
             queryPath = new NavMeshPath();
         }
+
         public bool SetDestination(Vector3 origin, Vector3 target, float projectionDistance = 5f)
         {
             if (!TryProjectToNavmesh(origin, out Vector3 projectedStart, projectionDistance))
+            {
+                hasDestination = false;
                 return false;
+            }
 
             if (!TryProjectToNavmesh(target, out Vector3 projectedEnd, projectionDistance))
-                return false;
-
-            activePath.ClearCorners();
-            if (!NavMesh.CalculatePath(projectedStart, projectedEnd, NavMesh.AllAreas, activePath))
             {
                 hasDestination = false;
                 return false;
             }
 
-            if (activePath.status == NavMeshPathStatus.PathInvalid)
+            NavMeshPath newPath = new();
+
+            if (!NavMesh.CalculatePath(projectedStart, projectedEnd, NavMesh.AllAreas, newPath))
             {
                 hasDestination = false;
                 return false;
             }
 
+            if (newPath.status != NavMeshPathStatus.PathComplete)
+            {
+                hasDestination = false;
+                return false;
+            }
+
+            activePath = newPath;
             destination = projectedEnd;
             currentCornerIndex = activePath.corners.Length > 1 ? 1 : 0;
             hasDestination = true;
+
             return true;
         }
-
         public void StopPath()
         {
             hasDestination = false;
             currentCornerIndex = 0;
+            activePath = new NavMeshPath();
         }
         public void UpdateCornerProgress(Vector3 currentPosition)
         {

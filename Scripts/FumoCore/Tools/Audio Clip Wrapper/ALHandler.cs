@@ -45,6 +45,7 @@ namespace rinCore
             if (instance != null && trackedTarget != null)
             {
                 instance.transform.position = trackedTarget.position + new Vector3(0f, 0f, 0f);
+                instance.transform.rotation = trackedTarget.rotation;
             }
             else
             {
