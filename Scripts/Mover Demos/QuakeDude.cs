@@ -25,9 +25,13 @@ namespace rinCore
         [SerializeField] BoxCollider stairClimber;
         [SerializeField] QuakeMotor m;
         [SerializeField] Rigidbody rb;
-        [SerializeField] Transform cameraPivot;
+        [SerializeField] Transform cameraPivot, projectilePivot, cameraRoll;
         [SerializeField] QGrounded ground = new QGrounded();
+        [SerializeField] ACWrapper jumpHUUH;
+        float roll = 0f;
         public Ray CameraRay => new(cameraPivot.position, cameraPivot.forward);
+        public Transform LookTransform => cameraPivot;
+        public Ray ProjectileShootRay => new(projectilePivot.position, projectilePivot.forward);
 
         public float sensitivity = 100f;
         public float Sensitivity
@@ -39,12 +43,21 @@ namespace rinCore
         }
 
         public Vector3 CurrentVelocity => rb.linearVelocity;
+        public Vector3 CurrentPosition => transform.position;
         Vector2 storedPortrait;
         public Vector2 PortraitRotation
         {
             get
             {
                 return storedPortrait;
+            }
+        }
+        Vector2 storedPlanar;
+        public Vector2 RelativePlanarMovementXY
+        {
+            get
+            {
+                return storedPlanar;
             }
         }
 
@@ -60,6 +73,23 @@ namespace rinCore
         }
         void Update()
         {
+            void Vertical()
+            {
+                if (jumpAction.IsPressed() && ground.IsGrounded && !jumpAction.PressedLongerThan(0.4f) && lastJumpTime < Time.time + 0.15f)
+                {
+                    rb.linearVelocity = new(rb.linearVelocity.x, 7f, rb.linearVelocity.z);
+                    lastJumpTime = Time.time;
+                    jumpHUUH.Play(CurrentPosition);
+                    return;
+                }
+                if (!ground.IsGrounded && lastJumpTime + 0.05f < Time.time)
+                {
+                    float y = rb.linearVelocity.y + (-24f * Time.deltaTime);
+                    y = y.Clamp(-30, 100f);
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
+                }
+                stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
+            }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             if (GeneralManager.IsPaused || Time.timeScale == 0f)
@@ -77,21 +107,18 @@ namespace rinCore
 
             cameraPivot.localRotation = Quaternion.Euler(pitch, yaw, 0f);
 
+            Vector2 input = GenericInput.Move;
+            m.MoveOther(rb, input, ground.IsGrounded, out storedPlanar);
 
-            m.MoveOther(rb, GenericInput.Move, ground.IsGrounded);
-            if (jumpAction.IsPressed() && ground.IsGrounded && !jumpAction.PressedLongerThan(0.4f) && lastJumpTime < Time.time + 0.15f)
+            Vertical();
+
+            if (cameraRoll)
             {
-                rb.linearVelocity = new(rb.linearVelocity.x, 7f, rb.linearVelocity.z);
-                lastJumpTime = Time.time;
-                return;
+                float target = ground.IsGrounded ? input.x.Sign().Multiply(-5f).Clamp(-2.5f, 2.5f) : 0f;
+                roll = roll.LerpTowards(target, ground.IsGrounded ? Time.deltaTime * 10f : Time.deltaTime * 10f);
+                Quaternion r = cameraRoll.rotation;
+                cameraRoll.rotation = Quaternion.Euler(r.eulerAngles.x, r.eulerAngles.y, roll);
             }
-            if (!ground.IsGrounded && lastJumpTime + 0.05f < Time.time)
-            {
-                float y = rb.linearVelocity.y + (-24f * Time.deltaTime);
-                y = y.Clamp(-30, 100f);
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
-            }
-            stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
         }
     }
 }

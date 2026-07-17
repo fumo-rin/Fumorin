@@ -51,6 +51,7 @@ namespace rinCore
             yield return initHandle;
             if (startingScene != null)
             {
+                yield return null;
                 LoadScenePair(startingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
             }
         }
@@ -133,7 +134,7 @@ namespace rinCore
 
             WhenStartLoadingAdditives?.Invoke();
 
-            string currentBootSceneName = SceneManager.GetActiveScene().name;
+            Scene bootScene = SceneManager.GetActiveScene();
 
             bool skipMainReload = _currentScenePair != null && pair.MainScene != null &&
                                  _currentScenePair.MainScene.GetSceneName() == pair.MainScene.GetSceneName();
@@ -181,14 +182,9 @@ namespace rinCore
                 }
             }
 
-            if (_currentScenePair == null)
+            if (_currentScenePair == null && bootScene.IsValid() && bootScene.isLoaded)
             {
-                Scene fallback = SceneManager.GetSceneByName(currentBootSceneName);
-                if (fallback.IsValid() && fallback.isLoaded && SceneManager.sceneCount > 1)
-                {
-                    var nativeOp = SceneManager.UnloadSceneAsync(fallback);
-                    while (nativeOp != null && !nativeOp.isDone) yield return null;
-                }
+                yield return SceneManager.UnloadSceneAsync(bootScene);
             }
             UpdateLoadingText(1f);
             yield return null;

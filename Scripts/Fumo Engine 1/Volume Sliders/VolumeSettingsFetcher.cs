@@ -4,12 +4,5 @@ using UnityEngine.Audio;
 
 namespace rinCore
 {
-    public class VolumeSettingsFetcher : MonoBehaviour
-    {
-        [SerializeField] List<AudioMixer> musicMixers = new(), effectsMixers = new(), dialogueMixers = new();
-        private void Start()
-        {
-            VolumeSliders.FetchAndApplySettings(effectsMixers.ToArray(), musicMixers.ToArray(), dialogueMixers.ToArray());
-        }
-    }
+
 }

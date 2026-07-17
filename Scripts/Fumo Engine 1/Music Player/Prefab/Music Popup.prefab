@@ -82,7 +82,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: music text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 03257285d91a15644bbde245679893a5, type: 2}
   m_sharedMaterial: {fileID: -8885995462406905172, guid: 078860d05e5f0494da2095df30196ac9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

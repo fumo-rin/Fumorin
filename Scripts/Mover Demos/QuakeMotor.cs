@@ -20,13 +20,13 @@ namespace rinCore
             public float MaxOverspeed = 16f;
         }
 
-        public void MoveOther(Rigidbody rb, Vector2 input, bool grounded)
+        public void MoveOther(Rigidbody rb, Vector2 input, bool grounded, out Vector2 relativePlanarXY)
         {
             float dt = Time.deltaTime;
 
             Vector3 velocity = rb.linearVelocity;
-            Vector3 forward = viewSocket.transform.forward;
-            Vector3 right = viewSocket.transform.right;
+            Vector3 forward = viewSocket.transform.forward.Y(0f);
+            Vector3 right = viewSocket.transform.right.Y(0f);
 
             forward.y = 0f;
             right.y = 0f;
@@ -47,6 +47,11 @@ namespace rinCore
             ClampHorizontalSpeed(ref velocity);
 
             rb.linearVelocity = velocity;
+
+            float relativeX = Vector3.Dot(velocity, right);
+            float relativeY = Vector3.Dot(velocity, forward);
+
+            relativePlanarXY = new Vector2(relativeX, relativeY);
         }
 
         private void ApplyFriction(ref Vector3 velocity, float dt)

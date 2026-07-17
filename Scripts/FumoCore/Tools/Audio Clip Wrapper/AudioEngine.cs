@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace rinCore
@@ -156,6 +158,103 @@ namespace rinCore
     }
 
     #endregion
+    #region Volume Settings
+    public partial class AudioEngine
+    {
+        [Header("Audio Mixers")]
+        [SerializeField] private AudioMixer[] effectsMixers;
+        [SerializeField] private AudioMixer[] musicMixers;
+        [SerializeField] private AudioMixer[] dialogueMixers;
+        public static AudioEngine MixerInstance => instance;
+        private const string EffectsKey = "EffectsSFX";
+        private const string MusicKey = "MusicSFX";
+        private const string DialogueKey = "DialogueSFX";
+        public static float EffectsVolume { get; private set; } = 0.5f;
+        public static float MusicVolume { get; private set; } = 0.5f;
+        public static float DialogueVolume { get; private set; } = 0.5f;
+        private void LoadVolumeSettings()
+        {
+            Debug.Log("Loading Volume");
+            if (!PersistentJSON.TryLoad(out float sfx, EffectsKey))
+                sfx = 0.5f;
+            EffectsVolume = sfx;
+
+
+            if (!PersistentJSON.TryLoad(out float msc, MusicKey))
+                msc = 0.5f;
+            MusicVolume = msc;
+
+            if (!PersistentJSON.TryLoad(out float dlg, DialogueKey))
+                dlg = 0.5f;
+            DialogueVolume = dlg;
+
+            ApplyEffectsVolume();
+            ApplyMusicVolume();
+            ApplyDialogueVolume();
+        }
+        public void SetEffectsVolume(float value)
+        {
+            EffectsVolume = Mathf.Clamp01(value);
+            PersistentJSON.TrySave(EffectsVolume, EffectsKey);
+            ApplyEffectsVolume();
+        }
+        public void SetMusicVolume(float value)
+        {
+            MusicVolume = Mathf.Clamp01(value);
+            PersistentJSON.TrySave(MusicVolume, MusicKey);
+            ApplyMusicVolume();
+        }
+        public void SetDialogueVolume(float value)
+        {
+            DialogueVolume = Mathf.Clamp01(value);
+            PersistentJSON.TrySave(DialogueVolume, DialogueKey);
+            ApplyDialogueVolume();
+        }
+        private void ApplyEffectsVolume()
+        {
+            ApplyMixers(effectsMixers, EffectsVolume);
+        }
+
+        private void ApplyMusicVolume()
+        {
+            ApplyMixers(musicMixers, MusicVolume);
+        }
+
+        private void ApplyDialogueVolume()
+        {
+            ApplyMixers(dialogueMixers, DialogueVolume);
+        }
+        private static void ApplyMixers(AudioMixer[] mixers, float value)
+        {
+            if (mixers == null)
+            {
+                Debug.LogError("ApplyMixers: mixer array is NULL");
+                return;
+            }
+
+            float db = value <= 0f
+                ? -80f
+                : Mathf.Log10(Mathf.Pow(value, 1.8f)) * 20f;
+
+            foreach (var mixer in mixers)
+            {
+                if (mixer == null)
+                {
+                    Debug.LogError("ApplyMixers: mixer is NULL");
+                    continue;
+                }
+
+                bool success = mixer.SetFloat("Vol", db);
+                mixer.GetFloat("Vol", out float current);
+
+                Debug.Log(
+                    $"Setting {mixer.name} ({mixer.GetInstanceID()}) " +
+                    $"to {db:0.##} dB | Set={success} | ReadBack={current:0.##} dB");
+            }
+        }
+    }
+
+    #endregion
     [DefaultExecutionOrder(5)]
     public partial class AudioEngine : MonoBehaviour
     {
@@ -184,7 +283,7 @@ namespace rinCore
         {
             get
             {
-                if (cachedDynamicStack == null)
+                if (cachedDynamicStack == null || cachedDynamicStack.gameObject == null || !cachedDynamicStack.gameObject.activeInHierarchy)
                 {
                     cachedDynamicStack = new GameObject("Audio Dynamic Stack").transform;
                     Object.DontDestroyOnLoad(cachedDynamicStack.gameObject);
@@ -196,44 +295,56 @@ namespace rinCore
         static void ReinitializeACW()
         {
             instance = null;
+            cachedRoot = null;
+            cachedDynamicStack = null;
+            SoundIteration = null;
         }
         private void Awake()
         {
             if (instance == null)
             {
                 instance = this;
-                DontDestroyOnLoad(gameObject);
-                Initialize();
+                if (transform.root == transform)
+                    DontDestroyOnLoad(gameObject);
+
                 return;
             }
             Destroy(gameObject);
         }
+        private void Start()
+        {
+            if (instance == this)
+            {
+                Initialize();
+            }
+        }
         Queue<AudioSource> Dynamic2DQueue = new();
         Queue<AudioSource> Dynamic3DQueue = new();
         List<AudioSource> SoundStack = new();
-        static AudioSource SoundIteration = new();
+        static AudioSource SoundIteration;
         private AudioSource RequestChannel(string name, Transform parent, AudioSource m)
         {
-            GameObject g = new GameObject("Channel " + name);
-            g.transform.SetParent(parent, false);
+            AudioSource source = Instantiate(m, parent);
+            source.name = $"Channel {name}";
 
-            var source = g.AddComponent<AudioSource>();
-            source.CopySettingsFrom(m);
-            source.outputAudioMixerGroup = m.outputAudioMixerGroup;
+            source.transform.SetParent(parent, false);
+
+            //source.CopySettingsFrom(m);
             source.playOnAwake = false;
             source.loop = false;
-
-
 
             return source;
         }
         public void Initialize()
         {
+            LoadVolumeSettings();
+
             GameObject staticObject = new("Dynamic ACPlayer");
             DontDestroyOnLoad(staticObject);
             AudioSource iteration;
             for (int i = 0; i < SoundChannels; i++)
             {
+
                 iteration = RequestChannel(i.ToString(), DynamicStack, Source2DDynamic);
                 iteration.transform.SetParent(staticObject.transform);
                 Dynamic2DQueue.Enqueue(iteration);

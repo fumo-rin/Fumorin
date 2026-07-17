@@ -18,6 +18,8 @@ namespace rinCore
         [SerializeField] private float repathRateLimit = 0.25f;
 
         private Vector3 lastPathOrigin;
+        public Vector3 LastFrameMoveVelocity { get; private set; }
+        public bool HasPath => nav.HasDestination;
         private float repathCooldownTimer;
 
         public FumoNav Nav => nav;
@@ -61,6 +63,7 @@ namespace rinCore
             }
             Vector3 targetVelocity = moveDir * moveSpeed;
             rb.linearVelocity = rb.VelocityTowardsXZ(targetVelocity, stopBrakingSpeed);
+            LastFrameMoveVelocity = rb.linearVelocity.Y(0f);
         }
 
         public bool SetNewTarget(Vector3 targetPosition)

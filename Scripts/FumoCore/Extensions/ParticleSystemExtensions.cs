@@ -413,6 +413,43 @@ namespace rinCore
             }
             ps.SetParticles(particleArray, count);
         }
+        public static void RenderAnimatedPoints_3D(this ParticleSystem ps, List<Vector3> positions, float animationLoopsPerSecond, bool staggerPhase = true)
+        {
+            if (ps == null || positions == null)
+                return;
+
+            var tsa = ps.textureSheetAnimation;
+            int totalFrames = tsa.numTilesX * tsa.numTilesY;
+            float animationDuration = animationLoopsPerSecond <= 0.01f ? 1f : totalFrames / animationLoopsPerSecond;
+            int count = positions.Count;
+
+            if (!particleArrayCache.TryGetValue(ps, out var particleArray) || particleArray.Length < count)
+            {
+                particleArray = new ParticleSystem.Particle[Mathf.Max(count, 128)];
+                particleArrayCache[ps] = particleArray;
+            }
+
+            var main = ps.main;
+            float startSize = main.startSize.constant;
+            Color startColor = main.startColor.color;
+
+            for (int i = 0; i < count; i++)
+            {
+                float animationOffsetSeconds = staggerPhase ? (animationDuration * i / count) : 0f;
+                float animationElapsed = Time.time - animationOffsetSeconds;
+                animationElapsed %= animationDuration;
+
+                particleArray[i] = new ParticleSystem.Particle
+                {
+                    position = new Vector3(positions[i].x, positions[i].y, positions[i].z),
+                    startLifetime = animationDuration,
+                    remainingLifetime = animationDuration - animationElapsed,
+                    startColor = startColor,
+                    startSize = startSize
+                };
+            }
+            ps.SetParticles(particleArray, count);
+        }
         public static Color32 GetInitialColor32(this ParticleSystem ps)
         {
             var main = ps.main;

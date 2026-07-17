@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1761446447908660984
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3332031023622981352}
+  - component: {fileID: 6125899595544166499}
+  m_Layer: 0
+  m_Name: Audio Engine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3332031023622981352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761446447908660984}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6125899595544166499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761446447908660984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210b2b9d9248b03429b22eb1e9e33dd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rinCore::rinCore.AudioEngine
+  Source3DSingle: {fileID: 2707331351230717137, guid: e1787a26b06333746acf6553e0951b83, type: 3}
+  Source2DSingle: {fileID: 7689140691597973428, guid: 491c02fd0a232b94b9a58b8c9e0ba4a3, type: 3}
+  Source2DSingleNondirectional: {fileID: 687227093119103367, guid: 72b8cf98497183f4d9ce025ac33909e1, type: 3}
+  Source3DDynamic: {fileID: 8030397826172231872, guid: 91998f7b51d109546b5796f08f7f1c65, type: 3}
+  Source2DDynamic: {fileID: 1897852517327990178, guid: 7869c2f2b2a1d1449906d65ee9cb8e86, type: 3}

@@ -357,16 +357,6 @@ namespace rinCore
     #endregion
     public static class AudioExtensions
     {
-        /*public static bool TryPlayClip(this AudioSource a, AudioClip clip)
-        {
-            ACWrapper.editorTestPlayers = null;
-            if (clip == null)
-                return false;
-
-            a.clip = clip;
-            a.Play();
-            return true;
-        }*/
         public static void PlayWrapper(this AudioSource a, ACWrapper sound, int index)
         {
             if (sound is ACWrapper audio && audio.soundClips != null)

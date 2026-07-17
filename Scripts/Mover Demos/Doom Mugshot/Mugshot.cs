@@ -60,7 +60,11 @@ namespace rinCore
         }
         void MoodLoop()
         {
-            moodEntries.RemoveAll(x => x.remainingDuration <= 0);
+            if (moodEntries == null)
+            {
+                moodEntries = new();
+            }
+            moodEntries.RemoveAll(x => x == null || x.remainingDuration <= 0);
             foreach (var entry in moodEntries.OrderBy(x => x.priority))
             {
                 entry.remainingDuration -= Time.deltaTime;
@@ -92,9 +96,13 @@ namespace rinCore
         }
         public spriteTing playerImagesUI;
         [SerializeField] Image PlayerFaceDrawer;
-        List<MoodEntry> moodEntries = new();
-        public void SetMood(MoodEntry m)
+        static List<MoodEntry> moodEntries;
+        public static void SetMood(MoodEntry m)
         {
+            if (moodEntries == null)
+            {
+                moodEntries = new();
+            }
             moodEntries.Add(m);
         }
     }

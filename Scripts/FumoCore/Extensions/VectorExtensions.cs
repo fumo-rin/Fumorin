@@ -219,6 +219,14 @@ namespace rinCore
         {
             return a + (b - a) * lerp;
         }
+        public static Vector3 SlerpUnclamped(this Vector3 a, Vector3 b, float lerp)
+        {
+            return Vector3.Slerp(a, b, lerp);
+        }
+        public static Vector3 LerpUnclamped(this Vector3 a, Vector3 b, float lerp)
+        {
+            return a + (b - a) * lerp;
+        }
         public static Vector2 LerpEaseInOut01(this Vector2 a, Vector2 b, float lerp) => a.LerpUnclamped(b, lerp.AsEaseInOut01());
         public static Vector3 X(this Vector3 v, float x)
         {
@@ -360,6 +368,11 @@ namespace rinCore
         public static Vector2 ScaleToMagnitude(this Vector2 v, float magnitude)
         {
             Vector2 direction = v.normalized * magnitude;
+            return direction;
+        }
+        public static Vector3 ScaleToMagnitude(this Vector3 v, float magnitude)
+        {
+            Vector3 direction = v.normalized * magnitude;
             return direction;
         }
         public static Vector2 RandomWithin(this Bounds b, Vector2 center)

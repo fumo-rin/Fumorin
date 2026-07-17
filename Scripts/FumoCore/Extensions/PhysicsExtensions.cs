@@ -1,7 +1,89 @@
+using System;
 using UnityEngine;
 
 namespace rinCore
 {
+    #region Raycast Helper
+    public static partial class RinHelper
+    {
+        public static Ray RayLerp(Ray a, Ray b, float lerp01)
+        {
+            lerp01 = lerp01.Clamp(0f, 1f);
+            Vector3 origin = a.origin.LerpUnclamped(b.origin, lerp01);
+            Vector3 direction = a.direction.SlerpUnclamped(b.direction, lerp01).normalized;
+            return new Ray(origin, direction);
+        }
+        public static Ray RayDot(Ray r, float rngDot)
+        {
+            Ray result = r;
+            Vector3 forward = r.direction.normalized;
+            float dot = 1f - RNG.FloatRange(0f, 1f) * rngDot;
+            Vector3 rng = RNG.SeededRandomInsideUnitSphere;
+            Vector3 tangent = Vector3.ProjectOnPlane(rng, forward);
+
+            if (tangent.sqrMagnitude < 0.000001f)
+                tangent = Vector3.Cross(forward, Vector3.up);
+
+            tangent.Normalize();
+            float tangentScale = Mathf.Sqrt(1f - dot * dot);
+            result.direction = (forward * dot + tangent * tangentScale).ScaleToMagnitude(r.direction.magnitude);
+
+            return result;
+        }
+    }
+    [System.Serializable]
+    public struct RinRaycast
+    {
+        public Ray ray;
+        public LayerMask mask;
+        [field: SerializeField] public float distance { get; private set; }
+        public QueryTriggerInteraction TI;
+        private Action<RinRaycast, RaycastHit, float> _onHit;
+        public RinRaycast(Ray r, LayerMask mask, float distance, QueryTriggerInteraction TI)
+        {
+            ray = r;
+            this.mask = mask;
+            this.distance = distance;
+            this.TI = TI;
+            _onHit = null;
+        }
+        public RinRaycast With(Action<RinRaycast, RaycastHit, float> callback)
+        {
+            _onHit += callback;
+            return this;
+        }
+        public bool Cast(float damage)
+        {
+            if (Physics.Raycast(ray, out RaycastHit hit, distance, mask, TI))
+            {
+                _onHit?.Invoke(this, hit, damage);
+                return true;
+            }
+
+            return false;
+        }
+        public bool Cast<T>(out RaycastHit hit, out T item, float damage, bool withTransformRoot = false)
+        {
+            item = default;
+
+            if (Physics.Raycast(ray, out hit, distance, mask, TI))
+            {
+                _onHit?.Invoke(this, hit, damage);
+
+                if (hit.transform.TryGetComponent(out item) ||
+                    (withTransformRoot && hit.transform.root.TryGetComponent(out item)))
+                {
+                    return item != null;
+                }
+            }
+            return false;
+        }
+    }
+    public static partial class Physics3DExtensions
+    {
+
+    }
+    #endregion
     #region Hitscan Impact
     #region Impact Struct
     public readonly struct Impact

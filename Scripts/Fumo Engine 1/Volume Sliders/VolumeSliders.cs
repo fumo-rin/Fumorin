@@ -7,104 +7,39 @@ namespace rinCore
 {
     public class VolumeSliders : MonoBehaviour
     {
-        [ContextMenu("Reset Player Prefs for music")]
-        public void ResetPrefs()
-        {
-            PlayerPrefs.DeleteKey("EffectsSFX");
-            PlayerPrefs.DeleteKey("MusicSFX");
-            PlayerPrefs.DeleteKey("DialogueSFX");
-            StartSliders();
-        }
         [SerializeField] Slider effectsSlider, musicSlider, dialogueSlider;
-        [SerializeField] AudioMixer[] effectsMixers, musicMixers, dialogueMixers;
-        static float StoredVolume = -7f;
-        public static void FetchAndApplySettings(AudioMixer[] effects, AudioMixer[] music, AudioMixer[] dialogue)
-        {
-            VolumeSliders v = new GameObject("Volume Fetcher").AddComponent<VolumeSliders>();
-            v.TryGetSavedValue("EffectsSFX", out float effectsVolume);
-            v.TryGetSavedValue("MusicSFX", out float musicVolume);
-            v.TryGetSavedValue("DialogueSFX", out float dialogueVolume);
-            v.SetMixers(music, musicVolume);
-            v.SetMixers(effects, effectsVolume);
-            v.SetMixers(dialogue, dialogueVolume);
-            Destroy(v.gameObject);
-        }
-        private void StoreValue(string key, float value)
-        {
-            StoredVolume = value;
-            PersistentJSON.TrySave(value, key);
-            //PlayerPrefs.SetFloat(key, value);
-        }
-        private bool TryGetSavedValue(string key, out float value)
+        private static bool TryGetSavedValue(string key, out float value)
         {
             if (!PersistentJSON.TryLoad(out value, key))
             {
-                value = -7f;
+                value = 0.5f;
             }
             return true;
         }
         private void OnEnable()
         {
-            if (effectsSlider) effectsSlider.onValueChanged.AddListener(delegate { ReadEffectsSlider(); });
-            if (musicSlider) musicSlider.onValueChanged.AddListener(delegate { ReadMusicSlider(); });
-            if (dialogueSlider) dialogueSlider.onValueChanged.AddListener(delegate { ReadDialogueSlider(); });
-        }
-        private void Awake()
-        {
-            StartSliders();
-        }
-        private void StartSliders()
-        {
-            TryGetSavedValue("EffectsSFX", out float effectsVolume);
+            effectsSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.onValueChanged.RemoveAllListeners();
+            dialogueSlider.onValueChanged.RemoveAllListeners();
 
-            if (effectsSlider) effectsSlider.SetValues(effectsVolume * 0.25f, 0f, -40f * 0.25f);
-            if (effectsMixers != null) SetMixers(effectsMixers, effectsVolume);
+            effectsSlider.SetValueWithoutNotify(AudioEngine.EffectsVolume * 10f);
+            musicSlider.SetValueWithoutNotify(AudioEngine.MusicVolume * 10f);
+            dialogueSlider.SetValueWithoutNotify(AudioEngine.DialogueVolume * 10f);
 
-            TryGetSavedValue("MusicSFX", out float musicVolume);
+            effectsSlider.onValueChanged.AddListener(v =>
+                AudioEngine.MixerInstance.SetEffectsVolume(v / 10f));
 
-            if (musicSlider) musicSlider.SetValues(musicVolume * 0.25f, 0f, -40f * 0.25f);
-            if (musicMixers != null) SetMixers(musicMixers, musicVolume);
+            musicSlider.onValueChanged.AddListener(v =>
+                AudioEngine.MixerInstance.SetMusicVolume(v / 10f));
 
-            TryGetSavedValue("DialogueSFX", out float dialogueVolume);
-
-            if (dialogueSlider) dialogueSlider.SetValues(dialogueVolume * 0.25f, 0f, -40f * 0.25f);
-            if (dialogueMixers != null) SetMixers(dialogueMixers, dialogueVolume);
+            dialogueSlider.onValueChanged.AddListener(v =>
+                AudioEngine.MixerInstance.SetDialogueVolume(v / 10f));
         }
         private void OnDisable()
         {
-            if (effectsSlider) effectsSlider.onValueChanged.RemoveListener(delegate { ReadEffectsSlider(); });
-            if (musicSlider) musicSlider.onValueChanged.RemoveListener(delegate { ReadMusicSlider(); });
-            if (dialogueSlider) dialogueSlider.onValueChanged.RemoveListener(delegate { ReadDialogueSlider(); });
-        }
-        private void SetMixers(AudioMixer[] mixers, float value)
-        {
-            if (value < -39.5f)
-            {
-                value = -80f;
-            }
-            value = (value - 5f).Clamp(-80f, 30f);
-            foreach (var item in mixers)
-            {
-                item.SetFloat("Volume", value);
-            }
-        }
-        public void ReadEffectsSlider()
-        {
-            float value = effectsSlider.value * 4f;
-            StoreValue("EffectsSFX", value);
-            SetMixers(effectsMixers, value);
-        }
-        public void ReadDialogueSlider()
-        {
-            float value = dialogueSlider.value * 4f;
-            StoreValue("DialogueSFX", value);
-            SetMixers(dialogueMixers, value);
-        }
-        public void ReadMusicSlider()
-        {
-            float value = musicSlider.value * 4f;
-            StoreValue("MusicSFX", value);
-            SetMixers(musicMixers, value);
+            effectsSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.onValueChanged.RemoveAllListeners();
+            dialogueSlider.onValueChanged.RemoveAllListeners();
         }
     }
 }
