@@ -8,14 +8,6 @@ namespace rinCore
     public class VolumeSliders : MonoBehaviour
     {
         [SerializeField] Slider effectsSlider, musicSlider, dialogueSlider;
-        private static bool TryGetSavedValue(string key, out float value)
-        {
-            if (!PersistentJSON.TryLoad(out value, key))
-            {
-                value = 0.5f;
-            }
-            return true;
-        }
         private void OnEnable()
         {
             effectsSlider.onValueChanged.RemoveAllListeners();
