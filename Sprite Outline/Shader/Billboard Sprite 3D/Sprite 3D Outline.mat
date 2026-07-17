@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Sprite Outline
+  m_Name: Sprite 3D Outline
   m_Shader: {fileID: -6465566751694194690, guid: f1f708c43db714644800df6bf2811af7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -63,5 +63,6 @@ Material:
     - _Smoothness: 0
     m_Colors:
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
