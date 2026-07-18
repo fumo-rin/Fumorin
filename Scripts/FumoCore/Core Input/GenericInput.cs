@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace rinCore
 {
@@ -28,14 +27,14 @@ namespace rinCore
             return GenericInput.GetTracker(reference)?.ReleasedLongerThan(seconds) ?? false;
         }
     }
+
     [DefaultExecutionOrder(-123)]
     public static class InputActionRawExtensions
     {
         /// <summary>
-        /// Reads the direct hardware state of all controls bound to this action.
-        /// Bypasses the Action's internal state-machine/buffer.
+        /// Reads direct hardware values for physical movement states. 
         /// </summary>
-        public static Vector2 ReadRawVector2(this InputActionReference reference)
+        public static Vector2 ReadRawVector2(this InputActionReference reference, bool clamp)
         {
             if (reference == null || reference.action == null) return Vector2.zero;
 
@@ -54,22 +53,13 @@ namespace rinCore
                 }
             }
 
-            return Vector2.ClampMagnitude(combined, 1f);
+            if (clamp)
+            {
+                return Vector2.ClampMagnitude(combined, 1f);
+            }
+            return combined;
         }
 
-        /// <summary>
-        /// Specifically for Mouse Delta which requires unprocessed state to feel 1:1.
-        /// </summary>
-        public static Vector2 ReadRawMouseDelta(this InputActionReference reference)
-        {
-            if (reference == null || reference.action == null) return Vector2.zero;
-            if (Mouse.current != null) return Mouse.current.delta.ReadValue();
-            return ReadRawVector2(reference);
-        }
-
-        /// <summary>
-        /// Checks if any physical control bound to this action is actuated.
-        /// </summary>
         public static bool IsPressedRaw(this InputActionReference reference, float threshold = 0.5f)
         {
             if (reference == null || reference.action == null) return false;
@@ -82,58 +72,47 @@ namespace rinCore
             return false;
         }
     }
+
     #region Sticks & Deadzone
     public partial class GenericInput
     {
         static float cachedDeadZone;
         static float stickDeadZone
         {
-            get
-            {
-                return cachedDeadZone;
-            }
+            get => cachedDeadZone;
             set
             {
                 cachedDeadZone = value;
                 Debug.Log("Set Deadzone: " + cachedDeadZone);
             }
         }
+
         [SerializeField] InputActionReference moveInput, lookInput;
-        static Vector2 cachedMove, cachedLook, cachedMouseDelta;
-        public static Vector2 MouseDeltaXY
-        {
-            get
-            {
-                if (instance == null)
-                    return Vector2.zero;
+        static Vector2 cachedMove, cachedLook;
 
-                return cachedMouseDelta;
-            }
-        }
-        public static Vector2 Look
-        {
-            get
-            {
-                if (instance == null)
-                    return Vector2.zero;
+        // This is your pure raw look vector. No processing, no normalization filters.
+        public static Vector2 Look => instance != null ? cachedLook : Vector2.zero;
 
-                ProcessWithDeadzone(cachedLook, out var result);
-
-                return result;
-            }
-        }
         public static Vector2 Move
         {
             get
             {
-                if (instance == null)
-                    return Vector2.zero;
-
+                if (instance == null) return Vector2.zero;
                 ProcessWithDeadzone(cachedMove, out var result);
-
                 return result;
             }
         }
+
+        public static bool IsLookUsingMouse
+        {
+            get
+            {
+                if (instance == null || instance.lookInput == null) return false;
+                var active = instance.lookInput.action?.activeControl;
+                return active != null && active.device is Pointer;
+            }
+        }
+
         public static float FetchDeadzone()
         {
             if (PersistentJSON.TryLoad(out float value, "Stick Deadzone"))
@@ -150,6 +129,7 @@ namespace rinCore
             Debug.Log("Updated stick deadzone :" + value.ToString("F2"));
             return stickDeadZone;
         }
+
         public static bool ProcessWithDeadzone(in Vector2 input, out Vector2 result)
         {
             result.x = Mathf.Abs(input.x) >= stickDeadZone ? input.x : 0f;
@@ -194,13 +174,17 @@ namespace rinCore
                 return;
             }
             instance = this;
-            if (moveInput != null) moveInput.action.Enable();
-            if (lookInput != null) lookInput.action.Enable();
+
+            if (moveInput != null && moveInput.action != null) moveInput.action.Enable();
+            if (lookInput != null && lookInput.action != null) lookInput.action.Enable();
+
+            transform.SetParent(null);
             if (transform.parent == null)
             {
                 DontDestroyOnLoad(gameObject);
             }
         }
+
         private void Start()
         {
             UpdateDeadzone(FetchDeadzone());
@@ -208,16 +192,15 @@ namespace rinCore
 
         private void Update()
         {
-            cachedMove = moveInput.ReadRawVector2();
-            cachedLook = lookInput.ReadRawVector2();
+            cachedMove = moveInput != null ? moveInput.ReadRawVector2(true) : Vector2.zero;
 
-            if (Mouse.current != null && lookInput.action.activeControl?.device == Mouse.current)
+            if (lookInput != null && lookInput.action != null)
             {
-                cachedMouseDelta = lookInput.ReadRawMouseDelta();
+                cachedLook = lookInput.ReadRawVector2(false);
             }
             else
             {
-                cachedMouseDelta = Vector2.zero;
+                cachedLook = Vector2.zero;
             }
 
             foreach (var kvp in trackers)
@@ -234,7 +217,7 @@ namespace rinCore
             {
                 tracker = new ButtonStateTracker();
                 instance.trackers[reference] = tracker;
-                reference.action.Enable();
+                if (reference.action != null) reference.action.Enable();
             }
             return tracker;
         }

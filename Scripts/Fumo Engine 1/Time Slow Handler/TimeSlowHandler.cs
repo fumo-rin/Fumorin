@@ -218,7 +218,7 @@ namespace rinCore
                 final *= kvp.Value;
 
             final *= GeneralManager.IsPaused.AsFloat(0f, 1f);
-            final *= SceneLoader.IsLoading.AsFloat(0f, 1f);
+            //final *= SceneLoader.IsLoading.AsFloat(0f, 1f);
 
             return Mathf.Max(0f, final);
         }

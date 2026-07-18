@@ -38,7 +38,7 @@ namespace rinCore
         {
             get
             {
-                return sensitivity * 0.0001f;
+                return sensitivity;
             }
         }
 
@@ -132,13 +132,14 @@ namespace rinCore
             RecoilFrame(out Quaternion recoil);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            if (GeneralManager.IsPaused || Time.timeScale == 0f)
+            if (GeneralManager.IsPaused)
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 return;
             }
-            Vector2 look = GenericInput.MouseDeltaXY;
+
+            Vector2 look = GenericInput.Look;
             storedPortrait = look.magnitude > 10f ? look.Sign() : Vector2.zero;
             yaw += look.x * Sensitivity;
             pitch -= look.y * Sensitivity;

@@ -19,17 +19,20 @@ namespace rinCore
         }
         private void PressStart()
         {
-            if (EndSession)
-            {
-                GameSession.EndSession(new()
-                {
-                    SubmitScore = true
-                });
-            }
             if (sceneToLoad != null)
                 SceneLoader.LoadScenePair(sceneToLoad, new()
                 {
-                    Delay = 0.1f
+                    Delay = 0.1f,
+                    Payload = () =>
+                    {
+                        if (EndSession)
+                        {
+                            GameSession.EndSession(new()
+                            {
+                                SubmitScore = true
+                            });
+                        }
+                    }
                 });
         }
     }

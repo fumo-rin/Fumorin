@@ -72,7 +72,11 @@ namespace rinCore
             public Action Payload, PostUnloadPayload;
             public float Delay;
         }
-
+        public static void MainMenu()
+        {
+            if (Instance.startingScene is ScenePairSO p)
+                LoadScenePair(p);
+        }
         public static void LoadScenePair(ScenePairSO pair, SceneLoadSettings? settings = null)
         {
             SceneLoadSettings finalSettings = settings ?? new SceneLoadSettings();
@@ -92,10 +96,11 @@ namespace rinCore
         #endregion
 
         #region Core Coroutine
+
         private IEnumerator CO_LoadScenePair(ScenePairSO pair, SceneLoadSettings settings)
         {
             if (pair == null || IsLoading) yield break;
-            IsLoading = true;
+            IsLoading = true; // Still marks as loading immediately
 
             Application.backgroundLoadingPriority = ThreadPriority.High;
 
@@ -105,9 +110,6 @@ namespace rinCore
                 cachedEventSystem = e;
                 cachedEventSystem.enabled = false;
             }
-
-            if (loadingScreen != null) loadingScreen.SetActive(true);
-            UpdateLoadingText(0f);
 
             Image loadBackground = fadingImage;
             if (settings.Delay > 0f)
@@ -132,13 +134,15 @@ namespace rinCore
             }
             if (loadBackground != null) loadBackground.color = loadBackground.color.Opacity(255);
 
+            if (loadingScreen != null) loadingScreen.SetActive(true);
+            UpdateLoadingText(0f);
+
             WhenStartLoadingAdditives?.Invoke();
 
             Scene bootScene = SceneManager.GetActiveScene();
 
             bool skipMainReload = _currentScenePair != null && pair.MainScene != null &&
                                  _currentScenePair.MainScene.GetSceneName() == pair.MainScene.GetSceneName();
-
 
             foreach (var oldGuid in _loadedAddressableAdditives.Keys.ToList())
             {
@@ -200,7 +204,6 @@ namespace rinCore
             Application.backgroundLoadingPriority = ThreadPriority.BelowNormal;
             if (cachedEventSystem != null) cachedEventSystem.enabled = true;
         }
-
         private void UpdateLoadingText(float progress)
         {
             if (loadingScreenText != null)

@@ -18,6 +18,7 @@ namespace rinCore
             if (instance == null)
             {
                 instance = this;
+                transform.SetParent(null);
                 if (gameObject.GetComponent<AudioListener>())
                 {
                     return;

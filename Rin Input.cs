@@ -104,7 +104,7 @@ namespace rinCore
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Right Stick"",
+                    ""name"": ""Look"",
                     ""type"": ""Value"",
                     ""id"": ""b3a84277-c3d4-40f8-90d9-108359f0bb30"",
                     ""expectedControlType"": ""Vector2"",
@@ -375,68 +375,13 @@ namespace rinCore
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""2D Vector"",
-                    ""id"": ""64f8cf79-1abb-4617-88ef-f0a245a5271e"",
-                    ""path"": ""2DVector(mode=2)"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Right Stick"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""4ced3c76-20f0-437f-9512-b7becba9b60f"",
-                    ""path"": ""<Gamepad>/rightStick/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""Right Stick"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""9da87254-c54e-4aa0-80a7-fbf30c253d1c"",
-                    ""path"": ""<Gamepad>/rightStick/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""Right Stick"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""d103297d-0d85-4c7e-9740-a1576f4dae9f"",
-                    ""path"": ""<Gamepad>/rightStick/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""Right Stick"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""80b791af-3242-40f1-9789-c2840e87230f"",
-                    ""path"": ""<Gamepad>/rightStick/right"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse;Gamepad"",
-                    ""action"": ""Right Stick"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": """",
                     ""id"": ""013a4ba0-935a-4745-9210-212d1b814755"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Right Stick"",
+                    ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1853,7 +1798,7 @@ namespace rinCore
             // Fumo
             m_Fumo = asset.FindActionMap("Fumo", throwIfNotFound: true);
             m_Fumo_Movement = m_Fumo.FindAction("Movement", throwIfNotFound: true);
-            m_Fumo_RightStick = m_Fumo.FindAction("Right Stick", throwIfNotFound: true);
+            m_Fumo_Look = m_Fumo.FindAction("Look", throwIfNotFound: true);
             m_Fumo_ClickLeft = m_Fumo.FindAction("ClickLeft", throwIfNotFound: true);
             m_Fumo_ClickRight = m_Fumo.FindAction("ClickRight", throwIfNotFound: true);
             // UI
@@ -1989,7 +1934,7 @@ namespace rinCore
         private readonly InputActionMap m_Fumo;
         private List<IFumoActions> m_FumoActionsCallbackInterfaces = new List<IFumoActions>();
         private readonly InputAction m_Fumo_Movement;
-        private readonly InputAction m_Fumo_RightStick;
+        private readonly InputAction m_Fumo_Look;
         private readonly InputAction m_Fumo_ClickLeft;
         private readonly InputAction m_Fumo_ClickRight;
         /// <summary>
@@ -2008,9 +1953,9 @@ namespace rinCore
             /// </summary>
             public InputAction @Movement => m_Wrapper.m_Fumo_Movement;
             /// <summary>
-            /// Provides access to the underlying input action "Fumo/RightStick".
+            /// Provides access to the underlying input action "Fumo/Look".
             /// </summary>
-            public InputAction @RightStick => m_Wrapper.m_Fumo_RightStick;
+            public InputAction @Look => m_Wrapper.m_Fumo_Look;
             /// <summary>
             /// Provides access to the underlying input action "Fumo/ClickLeft".
             /// </summary>
@@ -2048,9 +1993,9 @@ namespace rinCore
                 @Movement.started += instance.OnMovement;
                 @Movement.performed += instance.OnMovement;
                 @Movement.canceled += instance.OnMovement;
-                @RightStick.started += instance.OnRightStick;
-                @RightStick.performed += instance.OnRightStick;
-                @RightStick.canceled += instance.OnRightStick;
+                @Look.started += instance.OnLook;
+                @Look.performed += instance.OnLook;
+                @Look.canceled += instance.OnLook;
                 @ClickLeft.started += instance.OnClickLeft;
                 @ClickLeft.performed += instance.OnClickLeft;
                 @ClickLeft.canceled += instance.OnClickLeft;
@@ -2071,9 +2016,9 @@ namespace rinCore
                 @Movement.started -= instance.OnMovement;
                 @Movement.performed -= instance.OnMovement;
                 @Movement.canceled -= instance.OnMovement;
-                @RightStick.started -= instance.OnRightStick;
-                @RightStick.performed -= instance.OnRightStick;
-                @RightStick.canceled -= instance.OnRightStick;
+                @Look.started -= instance.OnLook;
+                @Look.performed -= instance.OnLook;
+                @Look.canceled -= instance.OnLook;
                 @ClickLeft.started -= instance.OnClickLeft;
                 @ClickLeft.performed -= instance.OnClickLeft;
                 @ClickLeft.canceled -= instance.OnClickLeft;
@@ -3077,12 +3022,12 @@ namespace rinCore
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMovement(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Right Stick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Look" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnRightStick(InputAction.CallbackContext context);
+            void OnLook(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "ClickLeft" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
