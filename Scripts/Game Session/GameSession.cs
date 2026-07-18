@@ -134,6 +134,12 @@ namespace rinCore
     #endregion
     public abstract partial class GameSession
     {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            currentSession = null;
+            WhenInvalidationCheck = null;
+        }
         [System.Serializable]
         public class scoringSession
         {

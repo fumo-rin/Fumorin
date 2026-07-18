@@ -12,16 +12,16 @@ namespace rinCore
         {
             public float fadeIn = 0.5f;
             public float fadeOut = 0.5f;
-            public float duration;
-            public Color32 color;
+            public float duration = 2f;
+            public Color32 color = ColorHelper.White;
 
-            public Vector2 a01;
-            public Vector2 b01;
+            public Vector2 a01 = new(0.3f, 0.5f);
+            public Vector2 b01 = new(0.7f, 0.7f);
 
-            public float fontSize;
+            public float fontSize = 28f;
 
-            public HorizontalAlignmentOptions horizontalAlignment;
-            public VerticalAlignmentOptions verticalAlignment;
+            public HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Center;
+            public VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Bottom;
             public textPacket()
             {
                 this.fadeIn = 0.5f;

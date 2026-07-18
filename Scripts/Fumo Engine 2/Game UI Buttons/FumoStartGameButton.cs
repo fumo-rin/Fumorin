@@ -7,15 +7,19 @@ namespace rinCore
     [RequireComponent(typeof(Button))]
     public abstract class FumoStartGameButton : MonoBehaviour
     {
-        Button b;
+        protected Button button;
         protected abstract string LeaderboardKey { get; }
         private void Awake()
         {
-            b = GetComponent<Button>();
+            button = GetComponent<Button>();
         }
         private void Start()
         {
-            b.BindSingleEventAction(PressStart);
+            button.BindSingleEventAction(PressStart);
+        }
+        protected virtual void WhenAwake()
+        {
+
         }
         private void PressStart()
         {
