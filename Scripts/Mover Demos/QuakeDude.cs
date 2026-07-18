@@ -75,7 +75,11 @@ namespace rinCore
             ALHandler.CreateOrUpdate(cameraPivot);
             IVelocity.Player = this;
         }
-
+        private void OnDestroy()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
 
         #region Recoil
         float currentRecoil;
