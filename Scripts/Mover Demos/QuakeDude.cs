@@ -42,6 +42,10 @@ namespace rinCore
             }
         }
 
+        public void ResetVelocity()
+        {
+            rb.linearVelocity = Vector3.zero;
+        }
         public Vector3 CurrentVelocity => rb.linearVelocity;
         public Vector3 CurrentPosition => transform.position;
         Vector2 storedPortrait;
@@ -93,6 +97,15 @@ namespace rinCore
             recoilOffset = Quaternion.Slerp(Quaternion.Euler(0f, 0f, 0f), currentRecoilTarget, currentRecoil.MapTo01(0f, 90f));
         }
         #endregion
+        public void MatchLook(Transform t)
+        {
+            Vector3 euler = t.rotation.eulerAngles;
+            yaw = euler.y + 180f;
+            pitch = euler.x;
+            if (pitch > 180f) pitch -= 360f;
+
+            pitch = Mathf.Clamp(pitch, -89f, 89f);
+        }
         void Update()
         {
             void Vertical()

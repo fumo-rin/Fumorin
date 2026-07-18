@@ -24,5 +24,7 @@ namespace rinCore
                 return result;
             }
         }
+        public void SnapTo(Vector3 v, Vector3? offset = null);
+        public void SnapTo(Transform t);
     }
 }

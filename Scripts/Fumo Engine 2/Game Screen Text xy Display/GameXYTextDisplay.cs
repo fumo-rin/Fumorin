@@ -46,7 +46,7 @@ namespace rinCore
             if (!RinHelper.ValidGameObjects(instance))
                 return;
 
-            CO_Text(text, packet).RunRoutine();
+            instance.StartCoroutine(CO_Text(text, packet));
 
             IEnumerator CO_Text(string text, textPacket packet)
             {
