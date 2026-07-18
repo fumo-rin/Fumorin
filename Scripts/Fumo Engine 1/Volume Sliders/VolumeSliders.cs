@@ -8,7 +8,7 @@ namespace rinCore
     public class VolumeSliders : MonoBehaviour
     {
         [SerializeField] Slider effectsSlider, musicSlider, dialogueSlider;
-        private void OnEnable()
+        private void Start()
         {
             effectsSlider.onValueChanged.RemoveAllListeners();
             musicSlider.onValueChanged.RemoveAllListeners();
@@ -27,7 +27,7 @@ namespace rinCore
             dialogueSlider.onValueChanged.AddListener(v =>
                 AudioEngine.MixerInstance.SetDialogueVolume(v / 10f));
         }
-        private void OnDisable()
+        private void OnDestroy()
         {
             effectsSlider.onValueChanged.RemoveAllListeners();
             musicSlider.onValueChanged.RemoveAllListeners();

@@ -291,7 +291,7 @@ namespace rinCore
                 return cachedDynamicStack;
             }
         }
-        [Initialize(-9999999)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void ReinitializeACW()
         {
             instance = null;
