@@ -71,6 +71,28 @@ namespace rinCore
             ALHandler.CreateOrUpdate(cameraPivot);
             IVelocity.Player = this;
         }
+
+
+        #region Recoil
+        float currentRecoil;
+        Quaternion currentRecoilTarget;
+        public void AddRecoil(float r, float max)
+        {
+            currentRecoil += r;
+            currentRecoil = currentRecoil.Clamp(0f, max);
+
+            float recoilPhase = RNG.FloatRange(0.4f, 1.2f);
+            float yaw = Mathf.Sin(recoilPhase) * 12f;
+            float pitch = -40f + Mathf.Sin(recoilPhase * 1.7f) * 12f;
+
+            currentRecoilTarget = Quaternion.Euler(pitch, yaw, 0f);
+        }
+        void RecoilFrame(out Quaternion recoilOffset)
+        {
+            currentRecoil = currentRecoil.LerpTowards(0f, 2.8f * Time.deltaTime);
+            recoilOffset = Quaternion.Slerp(Quaternion.Euler(0f, 0f, 0f), currentRecoilTarget, currentRecoil.MapTo01(0f, 90f));
+        }
+        #endregion
         void Update()
         {
             void Vertical()
@@ -90,6 +112,7 @@ namespace rinCore
                 }
                 stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
             }
+            RecoilFrame(out Quaternion recoil);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             if (GeneralManager.IsPaused || Time.timeScale == 0f)
@@ -105,7 +128,7 @@ namespace rinCore
 
             pitch = Mathf.Clamp(pitch, -89f, 89f);
 
-            cameraPivot.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+            cameraPivot.localRotation = Quaternion.Euler((recoil.x * 360f) + pitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
 
             Vector2 input = GenericInput.Move;
             m.MoveOther(rb, input, ground.IsGrounded, out storedPlanar);
