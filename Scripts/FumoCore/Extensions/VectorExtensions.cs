@@ -486,5 +486,20 @@ namespace rinCore
             r.SetPositions(vectors);
             return r;
         }
+        public static Vector3 RotateRelative(this Vector3 direction, float pitch, float yaw, float roll = 0f)
+        {
+            Quaternion rotation = Quaternion.LookRotation(direction);
+
+            rotation *= Quaternion.Euler(pitch, yaw, roll);
+
+            return rotation * Vector3.forward;
+        }
+        public static Ray RotateRelative(this Ray ray, float pitch, float yaw, float roll = 0f)
+        {
+            return new Ray(
+                ray.origin,
+                ray.direction.RotateRelative(pitch, yaw, roll)
+            );
+        }
     }
 }

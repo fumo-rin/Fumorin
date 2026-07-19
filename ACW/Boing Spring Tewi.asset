@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Boing Spring Tewi
   m_EditorClassIdentifier: 
   SoundName: Boing
-  soundVolume: 0.839
+  soundVolume: 0.793
   <soundClips>k__BackingField:
   - clip: {fileID: 8300000, guid: 63f4bde1ffd8c9b4fbfb26ef7e667aaa, type: 3}
     PitchVariancePercent: 11.6
     PitchOrigin: 0.95
-    Volume: 0.85
+    Volume: 0.579
     Muted: 0
   <soundMode>k__BackingField: 31
   <singleRepeatLockoutTime>k__BackingField: 0.008333334
