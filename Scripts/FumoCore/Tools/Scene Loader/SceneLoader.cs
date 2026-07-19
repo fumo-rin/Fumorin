@@ -52,7 +52,11 @@ namespace rinCore
             if (startingScene != null)
             {
                 yield return null;
+#if UNITY_EDITOR
                 LoadScenePair(startingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
+#else
+                LoadScenePair(startingScene, new SceneLoadSettings { Payload = null, Delay = 3f });
+#endif
             }
         }
 
