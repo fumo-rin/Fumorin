@@ -19,7 +19,7 @@ namespace rinCore
         }
         private void PressStart()
         {
-            if (sceneToLoad != null)
+            if (sceneToLoad != null && !SceneLoader.IsLoading)
                 SceneLoader.LoadScenePair(sceneToLoad, new()
                 {
                     Delay = 0.1f,

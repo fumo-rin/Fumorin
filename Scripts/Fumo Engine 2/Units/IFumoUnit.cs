@@ -5,6 +5,7 @@ namespace rinCore
     public interface IFumoUnit
     {
         public GameObject unitGameObject { get; }
+        public Rigidbody UnitRB { get; }
         public static IFumoUnit Player;
         public bool IsPlayer => Player == this;
         public struct playerPosition

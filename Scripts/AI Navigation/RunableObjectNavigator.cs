@@ -19,7 +19,7 @@ namespace rinCore
 
         private Vector3 lastPathOrigin;
         public Vector3 LastFrameMoveVelocity { get; private set; }
-        public bool HasPath => nav.HasDestination;
+        public bool HasPath => nav != null && nav.HasDestination;
         private float repathCooldownTimer;
 
         public FumoNav Nav => nav;
@@ -27,7 +27,7 @@ namespace rinCore
         private void OnEnable()
         {
             DynamicNavMeshProvider.OnNavMeshUpdated += HandleNavMeshUpdated;
-            nav.Reinitialize();
+            if (nav != null) nav.Reinitialize();
         }
 
         private void OnDisable()
@@ -37,6 +37,9 @@ namespace rinCore
 
         private void LateUpdate()
         {
+            if (nav == null || !nav.enabled)
+                return;
+
             if (repathCooldownTimer > 0f)
                 repathCooldownTimer -= Time.deltaTime;
 
@@ -68,7 +71,7 @@ namespace rinCore
 
         public bool SetNewTarget(Vector3 targetPosition)
         {
-            if (nav == null) return false;
+            if (nav == null || !nav.enabled) return false;
 
             if (nav.SetDestination(transform.position, targetPosition))
             {
@@ -88,7 +91,7 @@ namespace rinCore
 
         private void HandleRepathTracking(bool isMeshUpdating)
         {
-            if (!autoRepath || !nav.HasDestination || repathCooldownTimer > 0f || isMeshUpdating)
+            if (nav == null || !nav.enabled || !autoRepath || !nav.HasDestination || repathCooldownTimer > 0f || isMeshUpdating)
                 return;
 
             float sqrDistanceMoved = (transform.position - lastPathOrigin).sqrMagnitude;
@@ -104,7 +107,7 @@ namespace rinCore
 
         private void HandleNavMeshUpdated()
         {
-            if (nav != null && nav.HasDestination)
+            if (nav != null && nav.enabled && nav.HasDestination)
             {
                 nav.SetDestination(transform.position, nav.Destination);
             }

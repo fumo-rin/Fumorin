@@ -34,6 +34,8 @@ namespace rinCore
         }
         public Coroutine StartABPath(MonoBehaviour runner, Transform transform, Vector3 target, float maxSpeed, float minimumDuration, Action endAction, AnimationCurve pathInterpolation = null)
         {
+            if (!isEnabled) return null; // Prevent starting if disabled
+
             IEnumerator MoveRoutine()
             {
                 var path = new NavMeshPath();
@@ -50,6 +52,8 @@ namespace rinCore
 
                 while (elapsed < duration)
                 {
+                    if (!isEnabled) yield break; // Kill routine mid-flight if component is disabled
+
                     elapsed += Time.deltaTime;
                     float t = Mathf.Clamp01(elapsed / duration);
                     if (pathInterpolation != null)
@@ -65,12 +69,15 @@ namespace rinCore
         }
         #endregion
 
+        [Header("Activation State")]
+        [SerializeField] private bool isEnabled = true;
+
         [Header("Path Settings")]
         [SerializeField] private float waypointTolerance = 0.8f;
         [SerializeField] private float destinationTolerance = 1.0f;
 
         [Header("Stuck Recovery Settings")]
-        [SerializeField] private float stuckThresholdDuration = 0.75f; // Seconds spent on one corner before recovery kicks in
+        [SerializeField] private float stuckThresholdDuration = 0.75f;
 
         private NavMeshPath activePath;
         private NavMeshPath queryPath;
@@ -79,22 +86,35 @@ namespace rinCore
         private bool hasDestination;
         private Vector3 destination;
 
-        // Tracks progress to detect corner friction locks
         private int lastTrackedCornerIndex = -1;
         private float cornerTimeCounter = 0f;
         private Vector3 lastPosition;
 
-        public bool HasDestination => hasDestination;
+        public bool enabled
+        {
+            get => isEnabled;
+            set
+            {
+                if (isEnabled == value) return;
+                isEnabled = value;
+                if (!isEnabled)
+                {
+                    StopPath();
+                }
+            }
+        }
+
+        public bool HasDestination => isEnabled && hasDestination;
         public Vector3 Destination => destination;
         public int CurrentCornerIndex => currentCornerIndex;
-        public Vector3[] PathCorners => (activePath != null && activePath.status != NavMeshPathStatus.PathInvalid) ? activePath.corners : System.Array.Empty<Vector3>();
+        public Vector3[] PathCorners => (isEnabled && activePath != null && activePath.status != NavMeshPathStatus.PathInvalid) ? activePath.corners : System.Array.Empty<Vector3>();
 
         public float PathLength
         {
             get
             {
+                if (!isEnabled || activePath == null || activePath.corners == null) return 0f;
                 float length = 0f;
-                if (activePath == null || activePath.corners == null) return 0f;
                 for (int i = 1; i < activePath.corners.Length; i++)
                     length += Vector3.Distance(activePath.corners[i - 1], activePath.corners[i]);
                 return length;
@@ -115,6 +135,8 @@ namespace rinCore
         }
         public bool SetDestination(Vector3 origin, Vector3 target, float projectionDistance = 5f)
         {
+            if (!isEnabled) return false; // Fail early if disabled
+
             if (!TryProjectToNavmesh(origin, out Vector3 projectedStart, projectionDistance))
             {
                 if (!TryProjectToNavmesh(origin, out projectedStart, 10f))
@@ -169,15 +191,13 @@ namespace rinCore
 
         public void UpdateCornerProgress(Vector3 currentPosition)
         {
-            if (!hasDestination || activePath.corners == null || activePath.corners.Length == 0)
+            if (!isEnabled || !hasDestination || activePath.corners == null || activePath.corners.Length == 0)
                 return;
 
             Vector3 posFlat = new Vector3(currentPosition.x, 0f, currentPosition.z);
 
-            // Dynamic stuck checks
             if (currentCornerIndex == lastTrackedCornerIndex)
             {
-                // If we aren't moving fast and are trying to reach the same corner, tick the stuck timer
                 if (Vector3.SqrMagnitude(currentPosition - lastPosition) < 0.05f * Time.deltaTime)
                 {
                     cornerTimeCounter += Time.deltaTime;
@@ -196,7 +216,6 @@ namespace rinCore
                 Vector3 cornerFlat = new Vector3(targetCorner.x, 0f, targetCorner.z);
                 float distance = Vector3.Distance(posFlat, cornerFlat);
 
-                // 1. Standard distance check
                 if (distance <= waypointTolerance)
                 {
                     currentCornerIndex++;
@@ -204,14 +223,12 @@ namespace rinCore
                     continue;
                 }
 
-                // 2. Dot Product skip check: If we have physically bypassed/passed the corner line, skip it 
                 if (currentCornerIndex > 0)
                 {
                     Vector3 prevCorner = activePath.corners[currentCornerIndex - 1];
                     Vector3 toCurrent = (targetCorner - prevCorner).normalized;
                     Vector3 playerToCurrent = (targetCorner - currentPosition).normalized;
 
-                    // If dot product is negative, the agent has overshot/passed the waypoint line
                     if (Vector3.Dot(toCurrent, playerToCurrent) < -0.1f)
                     {
                         currentCornerIndex++;
@@ -226,7 +243,7 @@ namespace rinCore
 
         public bool HasReachedDestination(Vector3 currentPosition)
         {
-            if (!hasDestination)
+            if (!isEnabled || !hasDestination)
                 return true;
 
             Vector3 posFlat = new Vector3(currentPosition.x, 0f, currentPosition.z);
@@ -238,7 +255,7 @@ namespace rinCore
         {
             direction = Vector3.zero;
 
-            if (!hasDestination || activePath.corners == null || activePath.corners.Length == 0)
+            if (!isEnabled || !hasDestination || activePath.corners == null || activePath.corners.Length == 0)
                 return false;
 
             if (currentCornerIndex >= activePath.corners.Length)
@@ -255,7 +272,7 @@ namespace rinCore
             Vector3 rawDirection = rawDelta.normalized;
             if (NavMesh.Raycast(currentPosition, targetCorner, out NavMeshHit hit, NavMesh.AllAreas))
             {
-                Vector3 edgeNormal = hit.normal;
+                var edgeNormal = hit.normal;
                 edgeNormal.y = 0f;
                 edgeNormal.Normalize();
 
@@ -272,9 +289,10 @@ namespace rinCore
         }
 
         #region NavMesh Queries
-        public bool CanReach(Vector3 origin, Vector3 target)
+        public bool CanReach(Vector3 origin, Vector3 target, float navigationGap = 5f)
         {
-            if (!TryProjectToNavmesh(origin, out Vector3 start, 5f) || !TryProjectToNavmesh(target, out Vector3 end, 5f))
+            if (!isEnabled) return false;
+            if (!TryProjectToNavmesh(origin, out Vector3 start, navigationGap) || !TryProjectToNavmesh(target, out Vector3 end, navigationGap))
                 return false;
 
             queryPath.ClearCorners();
@@ -284,6 +302,7 @@ namespace rinCore
         public bool TryProjectToNavmesh(Vector3 position, out Vector3 navmeshPosition, float maxSearchDistance = 5f)
         {
             navmeshPosition = position;
+            if (!isEnabled) return false;
             if (!NavMesh.SamplePosition(position, out NavMeshHit hit, maxSearchDistance, NavMesh.AllAreas))
                 return false;
 
@@ -295,7 +314,7 @@ namespace rinCore
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (activePath == null || activePath.corners == null || activePath.corners.Length < 2)
+            if (!isEnabled || activePath == null || activePath.corners == null || activePath.corners.Length < 2)
                 return;
 
             Gizmos.color = Color.cyan;

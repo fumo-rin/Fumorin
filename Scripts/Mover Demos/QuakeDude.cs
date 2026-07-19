@@ -24,7 +24,7 @@ namespace rinCore
     {
         [SerializeField] BoxCollider stairClimber;
         [SerializeField] QuakeMotor m;
-        [SerializeField] Rigidbody rb;
+        [SerializeField] public Rigidbody rb;
         [SerializeField] Transform cameraPivot, projectilePivot, cameraRoll;
         [SerializeField] QGrounded ground = new QGrounded();
         [SerializeField] ACWrapper jumpHUUH;
