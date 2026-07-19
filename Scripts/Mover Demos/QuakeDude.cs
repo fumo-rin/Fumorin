@@ -5,30 +5,13 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
-    [System.Serializable]
-    public class QGrounded : IGroundCheck
-    {
-        [SerializeField] BoxCollider box;
-        [SerializeField] LayerMask groundMask;
-        public bool IsGrounded => box != null && groundedFrame(box);
-        bool groundedFrame(BoxCollider box)
-        {
-            bool grounded = false;
-            Bounds b = box.bounds;
-            if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out _, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
-            {
-                grounded = true;
-            }
-            return grounded;
-        }
-    }
     public class QuakeDude : MonoBehaviour, IVelocity
     {
+        [field: SerializeField] public QGrounded ground { get; private set; } = new QGrounded();
         [SerializeField] BoxCollider stairClimber;
         [SerializeField] QuakeMotor m;
         [SerializeField] public Rigidbody rb;
         [SerializeField] Transform cameraPivot, projectilePivot, cameraRoll;
-        [SerializeField] QGrounded ground = new QGrounded();
         [SerializeField] ACWrapper jumpHUUH;
         float roll = 0f;
         public Ray CameraRay => new(cameraPivot.position, cameraPivot.forward);
@@ -174,7 +157,7 @@ namespace rinCore
             cameraPivot.localRotation = Quaternion.Euler((recoil.x * 360f) + pitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
 
             Vector2 input = GenericInput.Move;
-            m.MoveOther(rb, input, ground.IsGrounded, out storedPlanar);
+            m.MoveOther(rb, input, ground, out storedPlanar);
 
             Vertical();
 

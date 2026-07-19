@@ -4,13 +4,14 @@ namespace rinCore
 {
     public class RunnableObjectNavigator : MonoBehaviour
     {
+        IGroundCheck grounded;
         [SerializeField] public Rigidbody rb;
         [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private FumoNav nav;
 
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
-        [SerializeField] private float stopBrakingSpeed = 40f;
+        [SerializeField] private float Acceleration = 40f;
 
         [Header("Internal Repathing Settings")]
         [SerializeField] private bool autoRepath = true;
@@ -28,6 +29,7 @@ namespace rinCore
         {
             DynamicNavMeshProvider.OnNavMeshUpdated += HandleNavMeshUpdated;
             if (nav != null) nav.Reinitialize();
+            grounded = GetComponentInChildren<IGroundCheck>();
         }
 
         private void OnDisable()
@@ -65,7 +67,12 @@ namespace rinCore
                 boxCollider.HandleStepClimbing(rb, moveDir, 0.45f);
             }
             Vector3 targetVelocity = moveDir * moveSpeed;
-            rb.linearVelocity = rb.VelocityTowardsXZ(targetVelocity, stopBrakingSpeed);
+            float acceleration = Acceleration;
+            if (grounded != null && grounded is QGrounded q && q.IsOnIce)
+            {
+                acceleration *= 0.1f;
+            }
+            rb.linearVelocity = rb.VelocityTowardsXZ(targetVelocity, acceleration);
             LastFrameMoveVelocity = rb.linearVelocity.Y(0f);
         }
 
@@ -85,7 +92,7 @@ namespace rinCore
         {
             if (rb != null)
             {
-                rb.linearVelocity = rb.VelocityTowardsXZ(Vector3.zero, stopBrakingSpeed);
+                rb.linearVelocity = rb.VelocityTowardsXZ(Vector3.zero, Acceleration);
             }
         }
 

@@ -3,6 +3,32 @@ using UnityEngine;
 namespace rinCore
 {
     [System.Serializable]
+    public class QGrounded : IGroundCheck
+    {
+        [SerializeField] BoxCollider box;
+        [SerializeField] LayerMask groundMask;
+        [SerializeField] string iceTag = "Ice";
+        bool isOnIce;
+        public float ForcedIcePhysicsEndTime;
+        public bool IsOnIce => isOnIce || Time.time < ForcedIcePhysicsEndTime;
+        public bool IsGrounded => box != null && groundedFrame(box);
+        bool groundedFrame(BoxCollider box)
+        {
+            isOnIce = false;
+            bool grounded = false;
+            Bounds b = box.bounds;
+            if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out RaycastHit hit, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.transform.CompareTag(string.Intern(iceTag)))
+                {
+                    isOnIce = true;
+                }
+                grounded = true;
+            }
+            return grounded;
+        }
+    }
+    [System.Serializable]
     public class QuakeMotor
     {
         [SerializeField] private Transform viewSocket;
@@ -20,7 +46,7 @@ namespace rinCore
             public float MaxOverspeed = 16f;
         }
 
-        public void MoveOther(Rigidbody rb, Vector2 input, bool grounded, out Vector2 relativePlanarXY)
+        public void MoveOther(Rigidbody rb, Vector2 input, IGroundCheck grounded, out Vector2 relativePlanarXY)
         {
             float dt = Time.deltaTime;
 
@@ -39,10 +65,15 @@ namespace rinCore
             if (wishDir.sqrMagnitude > 0.0001f)
                 wishDir.Normalize();
 
-            if (grounded)
-                ApplyFriction(ref velocity, dt);
+            if (grounded.IsGrounded)
+                ApplyFriction(ref velocity, dt, grounded);
 
-            Accelerate(ref velocity, wishDir, wishSpeed, grounded ? settings.Acceleration : settings.AirAcceleration, dt);
+            float acceleration = grounded.IsGrounded ? settings.Acceleration : settings.AirAcceleration;
+            if (grounded is QGrounded q && q.IsOnIce)
+            {
+                acceleration *= 0.125f;
+            }
+            Accelerate(ref velocity, wishDir, wishSpeed, acceleration, dt);
 
             ClampHorizontalSpeed(ref velocity);
 
@@ -54,7 +85,7 @@ namespace rinCore
             relativePlanarXY = new Vector2(relativeX, relativeY);
         }
 
-        private void ApplyFriction(ref Vector3 velocity, float dt)
+        private void ApplyFriction(ref Vector3 velocity, float dt, IGroundCheck grounded)
         {
             Vector3 lateral = new Vector3(velocity.x, 0f, velocity.z);
 
@@ -64,7 +95,12 @@ namespace rinCore
                 return;
 
             float control = Mathf.Max(speed, settings.StopSpeed);
-            float drop = control * settings.Friction * dt;
+            float friction = settings.Friction;
+            if (grounded is QGrounded q && q.IsOnIce)
+            {
+                friction *= 0.125f;
+            }
+            float drop = control * friction * dt;
 
             float newSpeed = Mathf.Max(speed - drop, 0f);
 
