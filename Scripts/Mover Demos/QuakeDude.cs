@@ -1,5 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace rinCore
 {
@@ -34,6 +36,9 @@ namespace rinCore
         public Ray ProjectileShootRay => new(projectilePivot.position, projectilePivot.forward);
 
         public float sensitivity = 100f;
+        public Slider sensitivtySlider;
+        public TMP_Text sensText;
+        string oldSensString;
         public float Sensitivity
         {
             get
@@ -74,11 +79,28 @@ namespace rinCore
         {
             ALHandler.CreateOrUpdate(cameraPivot);
             IVelocity.Player = this;
+            sensitivtySlider.onValueChanged.AddListener((float v) =>
+            {
+                sensitivity = v;
+                sensText.text = oldSensString + ": " + v.Multiply(10000f).ReverseQuantize(10f).ToString("F0");
+                PersistentJSON.TrySave(sensitivity, "Player Sens");
+            });
+            string oldText = sensText.text.RemoveAfter(":");
+            oldSensString = oldText;
+            if (PersistentJSON.TryLoad(out float f, "Player Sens"))
+            {
+                sensitivtySlider.SetValues(f, 1f, 0.002f, true);
+            }
+            else
+            {
+                sensitivtySlider.SetValues(0.1f, 1f, 0.002f, true);
+            }
         }
         private void OnDestroy()
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            sensitivtySlider.onValueChanged.RemoveAllListeners();
         }
 
         #region Recoil
