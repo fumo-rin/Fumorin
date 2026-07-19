@@ -110,6 +110,10 @@ namespace rinCore
 
             pitch = Mathf.Clamp(pitch, -89f, 89f);
         }
+        void FixedUpdate()
+        {
+            stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
+        }
         void Update()
         {
             void Vertical()
@@ -127,7 +131,6 @@ namespace rinCore
                     y = y.Clamp(-30, 100f);
                     rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
                 }
-                stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
             }
             RecoilFrame(out Quaternion recoil);
             Cursor.lockState = CursorLockMode.Locked;
