@@ -118,6 +118,10 @@ namespace rinCore
 
             float speed = rb.linearVelocity.magnitude;
             float scale = 1f;
+            if (rb.mass < 1f)
+            {
+                scale /= rb.mass.Clamp(0.33f, 1f);
+            }
             if (speed > SoftVelocityLimit)
             {
                 scale = Mathf.Sqrt(SoftVelocityLimit / speed);
