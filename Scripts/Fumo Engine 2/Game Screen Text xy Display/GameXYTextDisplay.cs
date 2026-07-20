@@ -14,6 +14,7 @@ namespace rinCore
             public float fadeIn = 0.5f;
             public float fadeOut = 0.5f;
             public float duration = 2f;
+            public float DurationWithFade => duration + fadeIn + fadeOut;
             public Color32 color = ColorHelper.White;
 
             public Vector2 a01 = new(0.3f, 0.5f);

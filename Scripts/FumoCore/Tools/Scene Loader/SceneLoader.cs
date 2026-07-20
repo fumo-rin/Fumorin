@@ -14,7 +14,8 @@ namespace rinCore
 {
     public class SceneLoader : MonoBehaviour
     {
-        [SerializeField] private ScenePairSO startingScene;
+        [SerializeField] private ScenePairSO editorStartingScene, buildStartingScene;
+        [SerializeField] private bool LoadStartingSceneInBuild;
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private Image fadingImage;
         [SerializeField] private TMP_Text loadingScreenText;
@@ -49,13 +50,14 @@ namespace rinCore
         {
             var initHandle = Addressables.InitializeAsync();
             yield return initHandle;
-            if (startingScene != null)
+            if (editorStartingScene != null)
             {
                 yield return null;
 #if UNITY_EDITOR
-                LoadScenePair(startingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
+                LoadScenePair(editorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
 #else
-                LoadScenePair(startingScene, new SceneLoadSettings { Payload = null, Delay = 3f });
+                if (LoadStartingSceneInBuild)
+                    LoadScenePair(buildStartingScene, new SceneLoadSettings { Payload = null, Delay = 3f });
 #endif
             }
         }
@@ -75,15 +77,21 @@ namespace rinCore
         {
             public Action Payload, PostUnloadPayload;
             public float Delay;
+            public float FadeIn, FadeOut;
         }
         public static void MainMenu()
         {
-            if (Instance.startingScene is ScenePairSO p)
+            if (Instance.editorStartingScene is ScenePairSO p)
                 LoadScenePair(p);
         }
         public static void LoadScenePair(ScenePairSO pair, SceneLoadSettings? settings = null)
         {
-            SceneLoadSettings finalSettings = settings ?? new SceneLoadSettings();
+            SceneLoadSettings finalSettings = settings ?? new SceneLoadSettings()
+            {
+                Delay = 0f,
+                FadeIn = 0.1f,
+                FadeOut = 0.1f
+            };
             if (Instance != null && !IsLoading)
             {
                 if (pair == _currentScenePair)
@@ -100,11 +108,10 @@ namespace rinCore
         #endregion
 
         #region Core Coroutine
-
         private IEnumerator CO_LoadScenePair(ScenePairSO pair, SceneLoadSettings settings)
         {
             if (pair == null || IsLoading) yield break;
-            IsLoading = true; // Still marks as loading immediately
+            IsLoading = true;
 
             Application.backgroundLoadingPriority = ThreadPriority.High;
 
@@ -115,31 +122,25 @@ namespace rinCore
                 cachedEventSystem.enabled = false;
             }
 
-            Image loadBackground = fadingImage;
             if (settings.Delay > 0f)
             {
-                float remainingDelay = settings.Delay;
-                if (loadBackground == null)
-                {
-                    yield return new WaitForSecondsRealtime(settings.Delay);
-                }
-                else
-                {
-                    loadBackground.color = loadBackground.color.Opacity(0);
-                    while (remainingDelay > 0f && loadBackground != null)
-                    {
-                        float lerp01 = Mathf.Clamp01(1f - (remainingDelay / Mathf.Max(settings.Delay, 0.0001f)));
-                        byte opacity = (byte)Mathf.FloorToInt(lerp01 * 255f);
-                        loadBackground.color = loadBackground.color.Opacity(opacity);
-                        remainingDelay -= Time.unscaledDeltaTime;
-                        yield return null;
-                    }
-                }
+                yield return new WaitForSecondsRealtime(settings.Delay);
             }
-            if (loadBackground != null) loadBackground.color = loadBackground.color.Opacity(255);
+
+            if (fadingImage != null)
+            {
+                Color c = fadingImage.color;
+                c.a = (settings.FadeIn > 0f) ? 0f : 1f;
+                fadingImage.color = c;
+            }
 
             if (loadingScreen != null) loadingScreen.SetActive(true);
             UpdateLoadingText(0f);
+
+            if (settings.FadeIn > 0f && fadingImage != null)
+            {
+                yield return CO_FadeImage(fadingImage, 0f, 1f, settings.FadeIn);
+            }
 
             WhenStartLoadingAdditives?.Invoke();
 
@@ -160,6 +161,7 @@ namespace rinCore
                     _loadedAddressableAdditives.Remove(oldGuid);
                 }
             }
+
             settings.PostUnloadPayload?.Invoke();
 
             if (!skipMainReload && _hasActiveMainSceneInstance)
@@ -170,6 +172,7 @@ namespace rinCore
                 }
                 _hasActiveMainSceneInstance = false;
             }
+
             if (!skipMainReload && pair.MainScene != null)
             {
                 var loadHandle = Addressables.LoadSceneAsync(pair.MainScene.AddressableReference, LoadSceneMode.Additive);
@@ -194,6 +197,7 @@ namespace rinCore
             {
                 yield return SceneManager.UnloadSceneAsync(bootScene);
             }
+
             UpdateLoadingText(1f);
             yield return null;
 
@@ -203,11 +207,34 @@ namespace rinCore
 
             settings.Payload?.Invoke();
 
+            if (settings.FadeOut > 0f && fadingImage != null)
+            {
+                yield return CO_FadeImage(fadingImage, 1f, 0f, settings.FadeOut);
+            }
+
             if (loadingScreen != null) loadingScreen.SetActive(false);
             if (EventSystem.current != null) EventSystem.current.enabled = true;
             Application.backgroundLoadingPriority = ThreadPriority.BelowNormal;
             if (cachedEventSystem != null) cachedEventSystem.enabled = true;
         }
+
+        private IEnumerator CO_FadeImage(Image image, float startAlpha, float targetAlpha, float duration)
+        {
+            float elapsed = 0f;
+            Color col = image.color;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                col.a = Mathf.Lerp(startAlpha, targetAlpha, elapsed / duration);
+                image.color = col;
+                yield return null;
+            }
+
+            col.a = targetAlpha;
+            image.color = col;
+        }
+
         private void UpdateLoadingText(float progress)
         {
             if (loadingScreenText != null)
