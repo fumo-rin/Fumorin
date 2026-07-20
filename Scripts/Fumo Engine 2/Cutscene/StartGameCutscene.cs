@@ -11,7 +11,7 @@ namespace rinCore
         public class CutsceneItem
         {
             public Sprite cutsceneImage;
-            public string name => cutsceneImage.name;
+            public string name => cutsceneImage != null ? cutsceneImage.name : "Black Screen";
             public string textDisplay;
             public GameXYTextDisplay.textPacket textPacket = new()
             {
@@ -26,6 +26,7 @@ namespace rinCore
                 verticalAlignment = TMPro.VerticalAlignmentOptions.Top,
             };
         }
+
         [SerializeField] MusicWrapper cutsceneMusic;
         [SerializeField] Image cutsceneViewer;
         [SerializeField] List<CutsceneItem> items = new();
@@ -33,40 +34,61 @@ namespace rinCore
         [SerializeField] Button skipButton;
         bool skipped;
         [SerializeField] float initialDelay = 3f;
+
         private void Awake()
         {
-            cutsceneViewer.sprite = null;
+            SetBlackScreen();
             skipped = false;
             skipButton.onClick.RemoveAllListeners();
             skipButton.onClick.AddListener(() => skipped = true);
         }
+
         private void OnDestroy()
         {
             skipButton.onClick.RemoveAllListeners();
         }
+
         private void Start()
         {
             IEnumerator CO_Run()
             {
                 bool first = true;
-                yield return initialDelay;
+                yield return new WaitForSeconds(initialDelay);
                 cutsceneMusic.Play();
+
                 foreach (var item in items)
                 {
                     skipped = false;
                     bool wasFirst = first;
                     first = false;
-                    cutsceneViewer.sprite = item.cutsceneImage;
-                    GameXYTextDisplay.CreateText(item.textDisplay, item.textPacket);
+
+                    if (item.cutsceneImage != null)
+                    {
+                        cutsceneViewer.sprite = item.cutsceneImage;
+                        cutsceneViewer.color = ColorHelper.White.Opacity(255);
+                    }
+                    else
+                    {
+                        SetBlackScreen();
+                    }
+
+                    GameXYTextDisplay.CreateText(item.textDisplay.ReplaceLineBreaks("##"), item.textPacket, "Cutscene");
 
                     float endTime = Time.time + item.textPacket.DurationWithFade;
 
-                    yield return new WaitUntil(() =>
-                    skipped || Time.time >= endTime);
+                    yield return new WaitUntil(() => skipped || Time.time >= endTime);
                 }
+
                 SceneLoader.LoadScenePair(nextScene);
             }
+
             StartCoroutine(CO_Run());
+        }
+
+        private void SetBlackScreen()
+        {
+            cutsceneViewer.sprite = null;
+            cutsceneViewer.color = ColorHelper.White.Opacity(0);
         }
     }
 }
