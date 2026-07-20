@@ -48,6 +48,8 @@ namespace rinCore
         }
         private IEnumerator Start()
         {
+            if (instance != this)
+                yield break;
             var initHandle = Addressables.InitializeAsync();
             yield return initHandle;
             if (editorStartingScene != null)
