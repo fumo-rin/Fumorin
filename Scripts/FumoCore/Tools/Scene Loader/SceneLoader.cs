@@ -57,7 +57,7 @@ namespace rinCore
                 LoadScenePair(editorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
 #else
                 if (LoadStartingSceneInBuild)
-                    LoadScenePair(buildStartingScene, new SceneLoadSettings { Payload = null, Delay = 3f });
+                    LoadScenePair(buildStartingScene, new SceneLoadSettings { Payload = null, Delay = 5f });
 #endif
             }
         }
