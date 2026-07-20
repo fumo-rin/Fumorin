@@ -12,16 +12,15 @@ namespace rinCore
 
         [Header("Scenes that are loaded additively with the main scene")]
         [SerializeField] private List<SceneReference> additiveScenes = new();
-
         public List<SceneReference> Scenes
         {
             get
             {
                 var list = new List<SceneReference>();
-                if (mainScene != null)
+                if (mainScene != null && mainScene.IsValid)
                     list.Add(mainScene);
 
-                list.AddRange(additiveScenes.Where(s => s != null));
+                list.AddRange(additiveScenes.Where(s => s != null && s.IsValid));
                 return list;
             }
         }

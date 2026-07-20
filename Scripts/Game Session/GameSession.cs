@@ -199,7 +199,26 @@ namespace rinCore
             result = null;
             return false;
         }
+        private int? backingID;
+        public int ID => backingID ??= Random.Range(0, 999999999);
+        public int NewID
+        {
+            get
+            {
+                backingID = null;
+                return ID;
+            }
+        }
         static GameSession currentSession;
+        static GameSession CurrentSession
+        {
+            get => currentSession;
+            set
+            {
+                Debug.Log("Assigning New Session : " + value + " With ID:" + value.ID.ToString());
+                currentSession = value;
+            }
+        }
         public static void StartSession(GameSession s)
         {
             if (currentSession != null)

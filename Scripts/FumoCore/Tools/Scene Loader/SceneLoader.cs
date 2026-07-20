@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -23,10 +21,8 @@ namespace rinCore
         internal static SceneLoader Instance { get; private set; }
 
         private static ScenePairSO _currentScenePair;
-
-        private static Dictionary<string, SceneInstance> _loadedAddressableAdditives = new();
-        private static SceneInstance _currentMainSceneInstance;
-        private static bool _hasActiveMainSceneInstance = false;
+        private static HashSet<string> _loadedAdditiveSceneNames = new();
+        private static string _currentMainSceneName = string.Empty;
 
         public static bool IsLoading { get; private set; }
 
@@ -46,19 +42,19 @@ namespace rinCore
                 Destroy(gameObject);
             }
         }
+
         private IEnumerator Start()
         {
-            if (instance != this)
+            if (Instance != this)
                 yield break;
-            var initHandle = Addressables.InitializeAsync();
-            yield return initHandle;
+
             if (editorStartingScene != null)
             {
                 yield return null;
 #if UNITY_EDITOR
                 LoadScenePair(editorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
 #else
-                if (LoadStartingSceneInBuild)
+                if (LoadStartingSceneInBuild && buildStartingScene != null)
                     LoadScenePair(buildStartingScene, new SceneLoadSettings { Payload = null, Delay = 5f });
 #endif
             }
@@ -69,8 +65,8 @@ namespace rinCore
         {
             Instance = null;
             _currentScenePair = null;
-            _loadedAddressableAdditives = new Dictionary<string, SceneInstance>();
-            _hasActiveMainSceneInstance = false;
+            _loadedAdditiveSceneNames = new HashSet<string>();
+            _currentMainSceneName = string.Empty;
             IsLoading = false;
         }
 
@@ -81,11 +77,13 @@ namespace rinCore
             public float Delay;
             public float FadeIn, FadeOut;
         }
+
         public static void MainMenu()
         {
-            if (Instance.editorStartingScene is ScenePairSO p)
+            if (Instance != null && Instance.editorStartingScene is ScenePairSO p)
                 LoadScenePair(p);
         }
+
         public static void LoadScenePair(ScenePairSO pair, SceneLoadSettings? settings = null)
         {
             SceneLoadSettings finalSettings = settings ?? new SceneLoadSettings()
@@ -94,6 +92,7 @@ namespace rinCore
                 FadeIn = 0.1f,
                 FadeOut = 0.1f
             };
+
             if (Instance != null && !IsLoading)
             {
                 if (pair == _currentScenePair)
@@ -148,56 +147,86 @@ namespace rinCore
 
             Scene bootScene = SceneManager.GetActiveScene();
 
-            bool skipMainReload = _currentScenePair != null && pair.MainScene != null &&
-                                 _currentScenePair.MainScene.GetSceneName() == pair.MainScene.GetSceneName();
+            string newMainSceneName = pair.MainScene != null ? pair.MainScene.GetSceneName() : string.Empty;
+            bool skipMainReload = !string.IsNullOrEmpty(_currentMainSceneName) && _currentMainSceneName == newMainSceneName;
 
-            foreach (var oldGuid in _loadedAddressableAdditives.Keys.ToList())
+            List<string> oldAdditives = _loadedAdditiveSceneNames.ToList();
+            foreach (var oldName in oldAdditives)
             {
-                if (!pair.AdditiveScenes.Any(scene => scene.GetSceneName() == oldGuid))
+                bool keptInNew = pair.AdditiveScenes.Any(s => s.GetSceneName() == oldName);
+                if (!keptInNew)
                 {
-                    SceneInstance instance = _loadedAddressableAdditives[oldGuid];
-                    if (instance.Scene.IsValid() && instance.Scene.isLoaded)
+                    Scene sc = SceneManager.GetSceneByName(oldName);
+                    if (sc.IsValid() && sc.isLoaded)
                     {
-                        yield return Addressables.UnloadSceneAsync(instance);
+                        AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(sc);
+                        if (unloadOp != null) yield return unloadOp;
                     }
-                    _loadedAddressableAdditives.Remove(oldGuid);
+                    _loadedAdditiveSceneNames.Remove(oldName);
                 }
             }
 
             settings.PostUnloadPayload?.Invoke();
 
-            if (!skipMainReload && _hasActiveMainSceneInstance)
+            if (!skipMainReload && !string.IsNullOrEmpty(_currentMainSceneName))
             {
-                if (_currentMainSceneInstance.Scene.IsValid() && _currentMainSceneInstance.Scene.isLoaded)
+                Scene oldMain = SceneManager.GetSceneByName(_currentMainSceneName);
+                if (oldMain.IsValid() && oldMain.isLoaded)
                 {
-                    yield return Addressables.UnloadSceneAsync(_currentMainSceneInstance);
+                    AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(oldMain);
+                    if (unloadOp != null) yield return unloadOp;
                 }
-                _hasActiveMainSceneInstance = false;
+                _currentMainSceneName = string.Empty;
             }
 
-            if (!skipMainReload && pair.MainScene != null)
+            if (!skipMainReload && pair.MainScene != null && pair.MainScene.IsValid)
             {
-                var loadHandle = Addressables.LoadSceneAsync(pair.MainScene.AddressableReference, LoadSceneMode.Additive);
-                yield return loadHandle;
-                _currentMainSceneInstance = loadHandle.Result;
-                _hasActiveMainSceneInstance = true;
-                SceneManager.SetActiveScene(_currentMainSceneInstance.Scene);
+                string sceneToLoad = pair.MainScene.ScenePath;
+                AsyncOperation loadOp = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+
+                while (!loadOp.isDone)
+                {
+                    UpdateLoadingText(loadOp.progress * 0.5f);
+                    yield return null;
+                }
+
+                _currentMainSceneName = pair.MainScene.GetSceneName();
+                Scene newMain = SceneManager.GetSceneByName(_currentMainSceneName);
+                if (newMain.IsValid())
+                {
+                    SceneManager.SetActiveScene(newMain);
+                }
             }
+
+            int totalAdditives = pair.AdditiveScenes.Count;
+            int loadedCount = 0;
 
             foreach (var additive in pair.AdditiveScenes)
             {
-                string guidKey = additive.GetSceneName();
-                if (!_loadedAddressableAdditives.ContainsKey(guidKey))
+                if (additive != null && additive.IsValid)
                 {
-                    var loadHandle = Addressables.LoadSceneAsync(additive.AddressableReference, LoadSceneMode.Additive);
-                    yield return loadHandle;
-                    _loadedAddressableAdditives[guidKey] = loadHandle.Result;
+                    string addName = additive.GetSceneName();
+                    if (!_loadedAdditiveSceneNames.Contains(addName))
+                    {
+                        AsyncOperation addOp = SceneManager.LoadSceneAsync(additive.ScenePath, LoadSceneMode.Additive);
+                        while (!addOp.isDone)
+                        {
+                            float baseProg = 0.5f;
+                            float addProg = ((float)loadedCount / Mathf.Max(1, totalAdditives)) * 0.5f;
+                            UpdateLoadingText(baseProg + addProg);
+                            yield return null;
+                        }
+                        _loadedAdditiveSceneNames.Add(addName);
+                    }
                 }
+                loadedCount++;
             }
 
-            if (_currentScenePair == null && bootScene.IsValid() && bootScene.isLoaded)
+            // 5. Unload boot/starter scene if present
+            if (_currentScenePair == null && bootScene.IsValid() && bootScene.isLoaded && bootScene.name != _currentMainSceneName)
             {
-                yield return SceneManager.UnloadSceneAsync(bootScene);
+                AsyncOperation bootUnload = SceneManager.UnloadSceneAsync(bootScene);
+                if (bootUnload != null) yield return bootUnload;
             }
 
             UpdateLoadingText(1f);
