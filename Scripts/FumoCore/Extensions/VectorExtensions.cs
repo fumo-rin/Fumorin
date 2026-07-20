@@ -9,7 +9,28 @@ namespace rinCore
     #region Helper
     public static partial class RinHelper
     {
-
+        public static class RayChop
+        {
+            public static IEnumerable<Vector3> Chop(Ray ray, float step, float maxDistance)
+            {
+                if (step <= 0f || maxDistance <= 0f)
+                {
+                    yield return ray.origin;
+                    yield break;
+                }
+                float currentDistance = 0f;
+                while (currentDistance <= maxDistance)
+                {
+                    yield return ray.GetPoint(currentDistance);
+                    currentDistance += step;
+                }
+                Vector3 finalPoint = ray.GetPoint(maxDistance);
+                if (currentDistance - step < maxDistance)
+                {
+                    yield return finalPoint;
+                }
+            }
+        }
     }
     #endregion
     #region Position collection cast
