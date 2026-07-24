@@ -140,33 +140,60 @@ namespace rinCore
     #region Staircase Stepsize
     public static partial class Physics3DExtensions
     {
-        public static void HandleStepClimbing(this BoxCollider box, Rigidbody rb, Vector3 moveDir, float maxStepHeight, float maxSlopeAngle = 45f)
+        /// <summary>
+        /// Attempts to climb steps ahead.
+        /// </summary>
+        /// <returns>True if a step was successfully climbed this frame, false otherwise.</returns>
+        public static bool HandleStepClimbing(this BoxCollider box, Rigidbody rb, Vector3 moveDir, float maxStepHeight, Vector3 groundNormal, float maxSlopeAngle = 45f)
         {
-            if (moveDir.sqrMagnitude < 0.001f) return;
+            Vector3 xzVel = new Vector3(moveDir.x, 0f, moveDir.z);
+            if (xzVel.sqrMagnitude < 0.001f) return false;
+
+            float speed = xzVel.magnitude;
+            Vector3 direction = xzVel.normalized;
 
             Vector3 worldCenter = box.transform.TransformPoint(box.center);
             float extentsY = (box.size.y * 0.5f) * box.transform.lossyScale.y;
-            Vector3 bottomPoint = worldCenter - new Vector3(0, extentsY, 0);
-            float speed = moveDir.ToXZ().magnitude;
-            Vector3 direction = new Vector3(moveDir.x, 0, moveDir.z).normalized;
-            if (Physics.BoxCast(worldCenter + Vector3.up * 0.02f, box.size / 2, direction, out RaycastHit hitLower, rb.rotation, Mathf.Max(speed * Time.fixedDeltaTime, 0.1f)))
+            Vector3 bottomPoint = worldCenter - new Vector3(0f, extentsY, 0f);
+
+            float checkDistance = Mathf.Max(speed * Time.fixedDeltaTime, 0.22f);
+
+            // Detect foot level obstacle
+            if (Physics.BoxCast(worldCenter + Vector3.up * 0.02f, box.size * 0.48f, direction, out RaycastHit hitLower, rb.rotation, checkDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
-                if (!Physics.BoxCast(worldCenter + Vector3.up * maxStepHeight, box.size / 2, direction, rb.rotation, hitLower.distance + 0.01f))
+                // Ignore perfectly flat ground (< 1 degree)
+                float lowerHitAngle = Vector3.Angle(Vector3.up, hitLower.normal);
+                if (lowerHitAngle < 1.0f) return false;
+
+                // Check for headroom above the step
+                Vector3 upperBoxCenter = worldCenter + Vector3.up * (maxStepHeight + 0.05f);
+                if (!Physics.BoxCast(upperBoxCenter, box.size * 0.48f, direction, rb.rotation, checkDistance + 0.05f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
                 {
-                    Vector3 downwardRayOrigin = new Vector3(hitLower.point.x, bottomPoint.y, hitLower.point.z) + Vector3.up * maxStepHeight + direction * 0.01f;
-                    if (Physics.Raycast(downwardRayOrigin, Vector3.down, out RaycastHit hitStepTop, maxStepHeight))
+                    Vector3 stepCheckOrigin = hitLower.point + direction * 0.05f + Vector3.up * (maxStepHeight + 0.05f);
+                    if (Physics.Raycast(stepCheckOrigin, Vector3.down, out RaycastHit hitStepTop, maxStepHeight + 0.1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
                     {
-                        float actualStepHeight = maxStepHeight - hitStepTop.distance;
-                        float topSurfaceAngle = Mathf.Min(Vector3.Angle(Vector3.up, hitStepTop.normal), Vector3.Angle(Vector3.down, hitStepTop.normal));
-                        if (topSurfaceAngle > maxSlopeAngle) return;
-                        if (actualStepHeight > 0.02f)
+                        // Step top must be flat enough to stand on (<= 45 deg)
+                        float topSurfaceAngle = Vector3.Angle(Vector3.up, hitStepTop.normal);
+                        if (topSurfaceAngle > maxSlopeAngle) return false;
+                        // Calculate the step height relative to the player's feet
+                        float stepTopY = hitStepTop.point.y;
+                        float actualStepHeight = stepTopY - bottomPoint.y;
+
+                        if (actualStepHeight > 0.01f && actualStepHeight <= maxStepHeight)
                         {
-                            rb.position += Vector3.up * (actualStepHeight + 0.02f) + direction * hitLower.distance;
-                            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0.1f, rb.linearVelocity.z);
+                            rb.position = new Vector3(rb.position.x, stepTopY + 0.01f, rb.position.z) + direction * 0.03f;
+                            if (rb.linearVelocity.y < 0.1f)
+                            {
+                                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0.1f, rb.linearVelocity.z);
+                            }
+
+                            return true;
                         }
                     }
                 }
             }
+
+            return false;
         }
     }
     #endregion

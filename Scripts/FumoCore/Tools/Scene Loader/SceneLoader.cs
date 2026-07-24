@@ -12,8 +12,7 @@ namespace rinCore
 {
     public class SceneLoader : MonoBehaviour
     {
-        [SerializeField] private ScenePairSO editorStartingScene, buildStartingScene;
-        [SerializeField] private bool LoadStartingSceneInBuild;
+        [SerializeField] private ScenePackSO scenePack;
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private Image fadingImage;
         [SerializeField] private TMP_Text loadingScreenText;
@@ -45,17 +44,19 @@ namespace rinCore
 
         private IEnumerator Start()
         {
-            if (Instance != this)
+            if (Instance != this || scenePack == null)
                 yield break;
 
-            if (editorStartingScene != null)
+            yield return StartCoroutine(CO_EnsureUnloadPreventionSceneLoaded());
+
+            if (scenePack.EditorStartingScene != null)
             {
                 yield return null;
 #if UNITY_EDITOR
-                LoadScenePair(editorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
+                LoadScenePair(scenePack.EditorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
 #else
-                if (LoadStartingSceneInBuild && buildStartingScene != null)
-                    LoadScenePair(buildStartingScene, new SceneLoadSettings { Payload = null, Delay = 5f });
+                if (scenePack.LoadStartingSceneInBuild && scenePack.BuildStartingScene != null)
+                    LoadScenePair(scenePack.BuildStartingScene, new SceneLoadSettings { Payload = null, Delay = 5f });
 #endif
             }
         }
@@ -70,18 +71,37 @@ namespace rinCore
             IsLoading = false;
         }
 
+        private IEnumerator CO_EnsureUnloadPreventionSceneLoaded()
+        {
+            if (scenePack == null || scenePack.UnloadPreventionScene == null || !scenePack.UnloadPreventionScene.IsValid)
+                yield break;
+
+            string sceneName = scenePack.UnloadPreventionScene.GetSceneName();
+            Scene sc = SceneManager.GetSceneByName(sceneName);
+
+            if (!sc.IsValid() || !sc.isLoaded)
+            {
+                AsyncOperation loadOp = SceneManager.LoadSceneAsync(scenePack.UnloadPreventionScene.ScenePath, LoadSceneMode.Additive);
+                if (loadOp != null)
+                {
+                    yield return loadOp;
+                }
+            }
+        }
+
         #region Public Wrapper
         public struct SceneLoadSettings
         {
             public Action Payload, PostUnloadPayload;
             public float Delay;
             public float FadeIn, FadeOut;
+            public bool ForceReload;
         }
 
-        public static void MainMenu()
+        public static void MainMenu(SceneLoader.SceneLoadSettings? settings = null)
         {
-            if (Instance != null && Instance.editorStartingScene is ScenePairSO p)
-                LoadScenePair(p);
+            if (Instance != null && Instance.scenePack != null && Instance.scenePack.EditorStartingScene is ScenePairSO p)
+                LoadScenePair(p, settings);
         }
 
         public static void LoadScenePair(ScenePairSO pair, SceneLoadSettings? settings = null)
@@ -90,19 +110,38 @@ namespace rinCore
             {
                 Delay = 0f,
                 FadeIn = 0.1f,
-                FadeOut = 0.1f
+                FadeOut = 0.1f,
+                ForceReload = false
             };
 
             if (Instance != null && !IsLoading)
             {
-                if (pair == _currentScenePair)
+                if (pair == _currentScenePair && !finalSettings.ForceReload)
                 {
-                    WhenStartLoadingAdditives?.Invoke();
-                    WhenFinishedLoadingAdditives?.Invoke();
-                    finalSettings.Payload?.Invoke();
+                    if (finalSettings.Delay <= 0f)
+                    {
+                        WhenStartLoadingAdditives?.Invoke();
+                        WhenFinishedLoadingAdditives?.Invoke();
+                        finalSettings.Payload?.Invoke();
+                    }
+                    else
+                    {
+                        IEnumerator CO_RunPayloads(float delay)
+                        {
+                            yield return new WaitForSeconds(delay);
+                            WhenStartLoadingAdditives?.Invoke();
+                            WhenFinishedLoadingAdditives?.Invoke();
+                            finalSettings.Payload?.Invoke();
+                        }
+                        if (Instance is SceneLoader s)
+                        {
+                            s.StartCoroutine(CO_RunPayloads(finalSettings.Delay));
+                        }
+                    }
                     if (Instance.loadingScreen != null) Instance.loadingScreen.SetActive(false);
                     return;
                 }
+
                 Instance.StartCoroutine(Instance.CO_LoadScenePair(pair, finalSettings));
             }
         }
@@ -143,17 +182,31 @@ namespace rinCore
                 yield return CO_FadeImage(fadingImage, 0f, 1f, settings.FadeIn);
             }
 
+            yield return CO_EnsureUnloadPreventionSceneLoaded();
+
             WhenStartLoadingAdditives?.Invoke();
 
             Scene bootScene = SceneManager.GetActiveScene();
+            string persistentName = (scenePack != null && scenePack.UnloadPreventionScene != null && scenePack.UnloadPreventionScene.IsValid)
+                ? scenePack.UnloadPreventionScene.GetSceneName()
+                : string.Empty;
 
             string newMainSceneName = pair.MainScene != null ? pair.MainScene.GetSceneName() : string.Empty;
-            bool skipMainReload = !string.IsNullOrEmpty(_currentMainSceneName) && _currentMainSceneName == newMainSceneName;
+            if (string.IsNullOrEmpty(_currentMainSceneName) && bootScene.IsValid())
+            {
+                _currentMainSceneName = bootScene.name;
+            }
+            bool skipMainReload = !settings.ForceReload
+                && !string.IsNullOrEmpty(_currentMainSceneName)
+                && _currentMainSceneName == newMainSceneName;
 
             List<string> oldAdditives = _loadedAdditiveSceneNames.ToList();
             foreach (var oldName in oldAdditives)
             {
-                bool keptInNew = pair.AdditiveScenes.Any(s => s.GetSceneName() == oldName);
+                if (!string.IsNullOrEmpty(persistentName) && oldName == persistentName)
+                    continue;
+
+                bool keptInNew = !settings.ForceReload && pair.AdditiveScenes.Any(s => s.GetSceneName() == oldName);
                 if (!keptInNew)
                 {
                     Scene sc = SceneManager.GetSceneByName(oldName);
@@ -170,11 +223,14 @@ namespace rinCore
 
             if (!skipMainReload && !string.IsNullOrEmpty(_currentMainSceneName))
             {
-                Scene oldMain = SceneManager.GetSceneByName(_currentMainSceneName);
-                if (oldMain.IsValid() && oldMain.isLoaded)
+                if (string.IsNullOrEmpty(persistentName) || _currentMainSceneName != persistentName)
                 {
-                    AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(oldMain);
-                    if (unloadOp != null) yield return unloadOp;
+                    Scene oldMain = SceneManager.GetSceneByName(_currentMainSceneName);
+                    if (oldMain.IsValid() && oldMain.isLoaded)
+                    {
+                        AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(oldMain);
+                        if (unloadOp != null) yield return unloadOp;
+                    }
                 }
                 _currentMainSceneName = string.Empty;
             }
@@ -222,8 +278,8 @@ namespace rinCore
                 loadedCount++;
             }
 
-            // 5. Unload boot/starter scene if present
-            if (_currentScenePair == null && bootScene.IsValid() && bootScene.isLoaded && bootScene.name != _currentMainSceneName)
+            if (_currentScenePair == null && bootScene.IsValid() && bootScene.isLoaded &&
+                bootScene.name != _currentMainSceneName && bootScene.name != persistentName)
             {
                 AsyncOperation bootUnload = SceneManager.UnloadSceneAsync(bootScene);
                 if (bootUnload != null) yield return bootUnload;

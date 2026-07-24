@@ -115,15 +115,16 @@ namespace rinCore
 
             pitch = Mathf.Clamp(pitch, -89f, 89f);
         }
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f);
+            stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f, ground.LastGroundNormal, 45f);
         }
+        float nextStepTime;
         void Update()
         {
             void Vertical()
             {
-                if (jumpAction.IsPressed() && ground.IsGrounded && !jumpAction.PressedLongerThan(0.4f) && lastJumpTime < Time.time + 0.15f)
+                if (jumpAction.IsPressed() && ground.IsGrounded && !jumpAction.PressedLongerThan(0.4f) && Time.time > lastJumpTime + 0.15f)
                 {
                     rb.linearVelocity = new(rb.linearVelocity.x, 7f, rb.linearVelocity.z);
                     lastJumpTime = Time.time;
@@ -157,6 +158,12 @@ namespace rinCore
             cameraPivot.localRotation = Quaternion.Euler((recoil.x * 360f) + pitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
 
             Vector2 input = GenericInput.Move;
+
+            if (Time.time > nextStepTime && stairClimber.HandleStepClimbing(rb, rb.linearVelocity, 0.25f, ground.LastGroundNormal, 45f))
+            {
+                nextStepTime = Time.time + 0.04f;
+                ground.ForcedGroundedEndTime = Time.time + 0.04f;
+            }
             m.MoveOther(rb, input, ground, out storedPlanar);
 
             Vertical();

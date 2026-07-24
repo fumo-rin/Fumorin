@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -12,16 +11,28 @@ namespace rinCore
     [CreateAssetMenu(menuName = "Fumocore/Scene Pack")]
     public class ScenePackSO : ScriptableObject
     {
-        [Header("Initial Scene")]
+        [Header("System Scenes")]
         [Tooltip("The bootstrapper/loader scene that will always be placed at Index 0 in Build Settings.")]
         [SerializeField] private SceneReference bootstrapperScene;
+
+        [Tooltip("The persistent EventSystem/UI scene that stays permanently loaded across scene loads.")]
+        [SerializeField] private SceneReference unloadPreventionScene;
+
+        [Header("Starting Scenes")]
+        [SerializeField] private ScenePairSO editorStartingScene;
+        [SerializeField] private ScenePairSO buildStartingScene;
+        [SerializeField] private bool loadStartingSceneInBuild;
+
+        public SceneReference BootstrapperScene => bootstrapperScene;
+        public SceneReference UnloadPreventionScene => unloadPreventionScene;
+        public ScenePairSO EditorStartingScene => editorStartingScene;
+        public ScenePairSO BuildStartingScene => buildStartingScene;
+        public bool LoadStartingSceneInBuild => loadStartingSceneInBuild;
 
 #if UNITY_EDITOR
         [Header("Scene Folders")]
         [Tooltip("Folders containing ScenePairSO assets to scan and sync.")]
         public List<DefaultAsset> scenePairSOFolders = new();
-
-        public SceneReference BootstrapperScene => bootstrapperScene;
 
         public void AutoPopulateSceneLists()
         {
@@ -35,22 +46,42 @@ namespace rinCore
             var buildScenes = new List<EditorBuildSettingsScene>();
             var addedPaths = new HashSet<string>();
 
-            // 1. Add Bootstrapper Scene first (Index 0)
+            void AddSceneToBuild(SceneReference sr)
+            {
+                if (sr != null && sr.IsValid)
+                {
+                    string path = sr.ScenePath;
+                    if (!string.IsNullOrEmpty(path) && !addedPaths.Contains(path))
+                    {
+                        buildScenes.Add(new EditorBuildSettingsScene(path, true));
+                        addedPaths.Add(path);
+                    }
+                }
+            }
+
+            void AddPairToBuild(ScenePairSO pair)
+            {
+                if (pair == null) return;
+                AddSceneToBuild(pair.MainScene);
+                if (pair.AdditiveScenes != null)
+                {
+                    foreach (var add in pair.AdditiveScenes)
+                        AddSceneToBuild(add);
+                }
+            }
+
             if (bootstrapperScene != null && bootstrapperScene.IsValid)
             {
-                string bootPath = bootstrapperScene.ScenePath;
-                if (!string.IsNullOrEmpty(bootPath))
-                {
-                    buildScenes.Add(new EditorBuildSettingsScene(bootPath, true));
-                    addedPaths.Add(bootPath);
-                }
+                AddSceneToBuild(bootstrapperScene);
             }
             else
             {
-                Debug.LogWarning("[ScenePackSO] No Bootstrapper Scene assigned! Index 0 will be the first scene found in folders.");
+                Debug.LogWarning("[ScenePackSO] No Bootstrapper Scene assigned! Index 0 will be the first scene found.");
             }
 
-            // 2. Scan folders for ScenePairSO assets and add unique scenes
+            AddSceneToBuild(unloadPreventionScene);
+            AddPairToBuild(editorStartingScene);
+            AddPairToBuild(buildStartingScene);
             foreach (var folder in scenePairSOFolders)
             {
                 if (folder == null) continue;
@@ -61,18 +92,7 @@ namespace rinCore
                 foreach (var guid in guids)
                 {
                     var so = AssetDatabase.LoadAssetAtPath<ScenePairSO>(AssetDatabase.GUIDToAssetPath(guid));
-                    if (so == null || so.Scenes == null) continue;
-
-                    foreach (var sceneRef in so.Scenes)
-                    {
-                        if (sceneRef == null || !sceneRef.IsValid) continue;
-
-                        string path = sceneRef.ScenePath;
-                        if (string.IsNullOrEmpty(path) || addedPaths.Contains(path)) continue;
-
-                        buildScenes.Add(new EditorBuildSettingsScene(path, true));
-                        addedPaths.Add(path);
-                    }
+                    AddPairToBuild(so);
                 }
             }
 
@@ -99,7 +119,6 @@ namespace rinCore
         {
             serializedObject.Update();
 
-            // ONLY refresh during Layout event to prevent IMGUI control count mismatches
             if (Event.current.type == EventType.Layout && EditorApplication.timeSinceStartup - _lastScanTime > ScanInterval)
             {
                 RefreshSceneList();
@@ -136,17 +155,25 @@ namespace rinCore
 
             HashSet<string> seenScenePaths = new();
 
-            // Include Bootstrapper scene in preview if valid
-            if (pack.BootstrapperScene != null && pack.BootstrapperScene.IsValid)
+            void AddSingleScene(SceneReference sr, string label)
             {
-                string path = pack.BootstrapperScene.ScenePath;
-                var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-                if (asset != null)
+                if (sr != null && sr.IsValid)
                 {
-                    seenScenePaths.Add(path);
-                    _cachedScenes.Add((pack.BootstrapperScene.GetSceneName(), "BOOTSTRAPPER", asset, path));
+                    string path = sr.ScenePath;
+                    if (!seenScenePaths.Contains(path))
+                    {
+                        var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+                        if (asset != null)
+                        {
+                            seenScenePaths.Add(path);
+                            _cachedScenes.Add((sr.GetSceneName(), label, asset, path));
+                        }
+                    }
                 }
             }
+
+            AddSingleScene(pack.BootstrapperScene, "BOOTSTRAPPER");
+            AddSingleScene(pack.UnloadPreventionScene, "PERSISTENT");
 
             if (pack.scenePairSOFolders == null) return;
 
@@ -193,7 +220,7 @@ namespace rinCore
 
             GUIStyle linkStyle = new(EditorStyles.linkLabel) { richText = true };
 
-            foreach (var entry in _cachedScenes.OrderBy(e => e.packName == "BOOTSTRAPPER" ? "" : e.sceneName))
+            foreach (var entry in _cachedScenes.OrderBy(e => GetPriority(e.packName)).ThenBy(e => e.sceneName))
             {
                 EditorGUILayout.BeginHorizontal();
 
@@ -202,9 +229,12 @@ namespace rinCore
                     EditorGUIUtility.PingObject(entry.asset);
                 }
 
-                string tagText = entry.packName == "BOOTSTRAPPER"
-                    ? "<color=#FFD700>(BOOTSTRAPPER)</color>"
-                    : $"<color=#7F7F7F>(from {entry.packName})</color>";
+                string tagText = entry.packName switch
+                {
+                    "BOOTSTRAPPER" => "<color=#FFD700>(BOOTSTRAPPER)</color>",
+                    "PERSISTENT" => "<color=#00FFFF>(PERSISTENT)</color>",
+                    _ => $"<color=#7F7F7F>(from {entry.packName})</color>"
+                };
 
                 string labelText = $"• {entry.sceneName} {tagText}";
 
@@ -219,6 +249,13 @@ namespace rinCore
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(2);
             }
+        }
+
+        private int GetPriority(string packName)
+        {
+            if (packName == "BOOTSTRAPPER") return 0;
+            if (packName == "PERSISTENT") return 1;
+            return 2;
         }
     }
 #endif

@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands.Changelist;
 using UnityEngine;
 
 namespace rinCore
@@ -62,9 +63,10 @@ namespace rinCore
                 return;
             }
 
+            bool climbing = false;
             if (boxCollider != null)
             {
-                boxCollider.HandleStepClimbing(rb, moveDir, 0.45f);
+                boxCollider.HandleStepClimbing(rb, moveDir, 0.45f, grounded is QGrounded qg ? qg.LastGroundNormal : Vector3.up);
             }
             Vector3 targetVelocity = moveDir * moveSpeed;
             float acceleration = Acceleration;

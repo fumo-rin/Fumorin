@@ -6,25 +6,36 @@ namespace rinCore
     public class QGrounded : IGroundCheck
     {
         [SerializeField] BoxCollider box;
+        public BoxCollider GroundedBox => box;
         [SerializeField] LayerMask groundMask;
         [SerializeField] string iceTag = "Ice";
         bool isOnIce;
         public float ForcedIcePhysicsEndTime;
         public bool IsOnIce => isOnIce || Time.time < ForcedIcePhysicsEndTime;
-        public bool IsGrounded => box != null && groundedFrame(box);
+        public Vector3 LastGroundNormal { get; private set; } = Vector3.up;
+        public float ForcedGroundedEndTime;
+        public bool IsGrounded => Time.time < ForcedGroundedEndTime || (box != null && groundedFrame(box));
         bool groundedFrame(BoxCollider box)
         {
             isOnIce = false;
             bool grounded = false;
             Bounds b = box.bounds;
+
             if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out RaycastHit hit, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
             {
                 if (hit.transform.CompareTag(string.Intern(iceTag)))
                 {
                     isOnIce = true;
                 }
+
+                LastGroundNormal = hit.normal;
                 grounded = true;
             }
+            else
+            {
+                LastGroundNormal = Vector3.up;
+            }
+
             return grounded;
         }
     }

@@ -15,6 +15,7 @@ namespace rinCore
         }
         public bool IsAlive { get; set; }
         public Vector3 CurrentPosition { get; }
+        public Vector3 Center { get; }
         public static playerPosition PlayerPosition
         {
             get
