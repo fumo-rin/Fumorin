@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1448112631434084646}
   - component: {fileID: 9136616433333806910}
   - component: {fileID: 3497082712041680668}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: fakken tree mate innit
   m_TagString: Untagged
   m_Icon: {fileID: 0}

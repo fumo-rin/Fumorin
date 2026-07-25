@@ -304,6 +304,7 @@ namespace rinCore
             if (instance == null)
             {
                 instance = this;
+                LoadVolumeSettings();
                 if (transform.root == transform)
                     DontDestroyOnLoad(gameObject);
 
