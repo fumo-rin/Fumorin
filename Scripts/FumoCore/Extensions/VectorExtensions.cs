@@ -453,7 +453,9 @@ namespace rinCore
         }
         public static void DrawRect(this Rect r)
         {
+#if UNITY_EDITOR
             Debug.DrawLine(r.min, r.max, new Color(1f, 1f, 1f, 1f), 1f);
+#endif
         }
         public static float LowestOfXOrYAbs(this Vector2 v)
         {

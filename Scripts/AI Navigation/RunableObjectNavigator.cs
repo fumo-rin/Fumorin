@@ -63,7 +63,6 @@ namespace rinCore
                 return;
             }
 
-            bool climbing = false;
             if (boxCollider != null)
             {
                 boxCollider.HandleStepClimbing(rb, moveDir, 0.45f, grounded is QGrounded qg ? qg.LastGroundNormal : Vector3.up);
