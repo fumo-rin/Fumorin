@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
 namespace rinCore
 {
     public class QuakeDude : MonoBehaviour, IVelocity
@@ -155,7 +154,9 @@ namespace rinCore
 
             pitch = Mathf.Clamp(pitch, -89f, 89f);
 
-            cameraPivot.localRotation = Quaternion.Euler((recoil.x * 360f) + pitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
+            float finalPitch = Mathf.Clamp((recoil.x * 360f) + pitch, -89.9f, 89.9f);
+
+            cameraPivot.localRotation = Quaternion.Euler(finalPitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
 
             Vector2 input = GenericInput.Move;
 

@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 #endif
 
@@ -30,6 +33,8 @@ namespace rinCore
         public bool LoadStartingSceneInBuild => loadStartingSceneInBuild;
 
 #if UNITY_EDITOR
+        private const string ActivePackPrefsKey = "ScenePackSO_LastSyncedGUID";
+
         [Header("Scene Folders")]
         [Tooltip("Folders containing ScenePairSO assets to scan and sync.")]
         public List<DefaultAsset> scenePairSOFolders = new();
@@ -40,8 +45,32 @@ namespace rinCore
             EditorUtility.SetDirty(this);
             Debug.Log("[ScenePackSO] Scene lists refreshed from selected folders.");
         }
+        public void SetAsActiveAndSync(bool isActualBuildProcess = false)
+        {
+            if (!isActualBuildProcess)
+            {
+                string myGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
+                if (!string.IsNullOrEmpty(myGuid))
+                {
+                    EditorPrefs.SetString(ActivePackPrefsKey, myGuid);
+                }
+            }
 
-        public void SyncScenesToBuildSettings()
+            SyncScenesToBuildSettings(isActualBuildProcess);
+        }
+
+        public static ScenePackSO GetLastSyncedPack()
+        {
+            string savedGuid = EditorPrefs.GetString(ActivePackPrefsKey, string.Empty);
+            if (string.IsNullOrEmpty(savedGuid)) return null;
+
+            string path = AssetDatabase.GUIDToAssetPath(savedGuid);
+            if (string.IsNullOrEmpty(path)) return null;
+
+            return AssetDatabase.LoadAssetAtPath<ScenePackSO>(path);
+        }
+
+        public void SyncScenesToBuildSettings(bool isActualBuildProcess = false)
         {
             var buildScenes = new List<EditorBuildSettingsScene>();
             var addedPaths = new HashSet<string>();
@@ -62,6 +91,9 @@ namespace rinCore
             void AddPairToBuild(ScenePairSO pair)
             {
                 if (pair == null) return;
+
+                if (isActualBuildProcess && !pair.IncludeInBuild) return;
+
                 AddSceneToBuild(pair.MainScene);
                 if (pair.AdditiveScenes != null)
                 {
@@ -82,6 +114,7 @@ namespace rinCore
             AddSceneToBuild(unloadPreventionScene);
             AddPairToBuild(editorStartingScene);
             AddPairToBuild(buildStartingScene);
+
             foreach (var folder in scenePairSOFolders)
             {
                 if (folder == null) continue;
@@ -97,16 +130,44 @@ namespace rinCore
             }
 
             EditorBuildSettings.scenes = buildScenes.ToArray();
-            Debug.Log($"[ScenePackSO] Successfully synced {buildScenes.Count} scene(s) to Build Settings.");
+            string modeText = isActualBuildProcess ? "Build Mode (Filtered)" : "Editor Mode (All Scenes)";
+            Debug.Log($"[ScenePackSO] Successfully synced {buildScenes.Count} scene(s) to Build Settings from '{name}' ({modeText}).");
         }
 #endif
     }
 
 #if UNITY_EDITOR
+    public class ScenePackBuildProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    {
+        public int callbackOrder => 0;
+
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            var activePack = ScenePackSO.GetLastSyncedPack();
+            if (activePack != null)
+            {
+                activePack.SyncScenesToBuildSettings(isActualBuildProcess: true);
+            }
+            else
+            {
+                Debug.LogWarning("[ScenePackSO] No active Scene Pack found in EditorPrefs! Building with current Build Settings.");
+            }
+        }
+
+        public void OnPostprocessBuild(BuildReport report)
+        {
+            var activePack = ScenePackSO.GetLastSyncedPack();
+            if (activePack != null)
+            {
+                activePack.SyncScenesToBuildSettings(isActualBuildProcess: false);
+            }
+        }
+    }
+
     [CustomEditor(typeof(ScenePackSO))]
     public class ScenePackEditor : Editor
     {
-        private readonly List<(string sceneName, string packName, SceneAsset asset, string path)> _cachedScenes = new();
+        private readonly List<(string sceneName, string packName, SceneAsset asset, string path, ScenePairSO pairAsset)> _cachedScenes = new();
         private double _lastScanTime = 0;
         private const double ScanInterval = 2.0;
 
@@ -124,17 +185,29 @@ namespace rinCore
                 RefreshSceneList();
             }
 
+            var pack = (ScenePackSO)target;
+            bool isActive = ScenePackSO.GetLastSyncedPack() == pack;
+
+            if (isActive)
+            {
+                EditorGUILayout.HelpBox("This is currently the ACTIVE Scene Pack for Build Settings.", MessageType.Info);
+            }
+
             GUILayout.Space(5);
             if (GUILayout.Button("Auto-Populate Scene Lists from Folders", GUILayout.Height(25)))
             {
-                ((ScenePackSO)target).AutoPopulateSceneLists();
+                pack.AutoPopulateSceneLists();
                 RefreshSceneList();
             }
 
-            if (GUILayout.Button("Sync Build Settings From Scene Lists", GUILayout.Height(25)))
+            GUI.backgroundColor = isActive ? new Color(0.4f, 0.85f, 0.4f) : Color.white;
+            string buttonText = isActive ? "Sync Build Settings (Currently Active)" : "Set Active & Sync Build Settings";
+
+            if (GUILayout.Button(buttonText, GUILayout.Height(28)))
             {
-                ((ScenePackSO)target).SyncScenesToBuildSettings();
+                pack.SetAsActiveAndSync(isActualBuildProcess: false);
             }
+            GUI.backgroundColor = Color.white;
 
             GUILayout.Space(15);
             DrawSceneOverview();
@@ -166,7 +239,7 @@ namespace rinCore
                         if (asset != null)
                         {
                             seenScenePaths.Add(path);
-                            _cachedScenes.Add((sr.GetSceneName(), label, asset, path));
+                            _cachedScenes.Add((sr.GetSceneName(), label, asset, path, null));
                         }
                     }
                 }
@@ -202,7 +275,7 @@ namespace rinCore
                         if (asset == null) continue;
 
                         seenScenePaths.Add(path);
-                        _cachedScenes.Add((sr.GetSceneName(), so.name, asset, path));
+                        _cachedScenes.Add((sr.GetSceneName(), so.name, asset, path, so));
                     }
                 }
             }
@@ -224,7 +297,26 @@ namespace rinCore
             {
                 EditorGUILayout.BeginHorizontal();
 
-                if (GUILayout.Button("Ping", GUILayout.Width(50)))
+                if (entry.pairAsset != null)
+                {
+                    bool included = entry.pairAsset.IncludeInBuild;
+                    GUI.backgroundColor = included ? new Color(0.4f, 0.85f, 0.4f) : new Color(0.85f, 0.4f, 0.4f);
+                    string buttonLabel = included ? "In Build" : "Excluded";
+
+                    if (GUILayout.Button(buttonLabel, GUILayout.Width(65)))
+                    {
+                        Undo.RecordObject(entry.pairAsset, "Toggle Include In Build");
+                        entry.pairAsset.IncludeInBuild = !entry.pairAsset.IncludeInBuild;
+                        EditorUtility.SetDirty(entry.pairAsset);
+                    }
+                    GUI.backgroundColor = Color.white;
+                }
+                else
+                {
+                    GUILayout.Space(69);
+                }
+
+                if (GUILayout.Button("Ping", GUILayout.Width(45)))
                 {
                     EditorGUIUtility.PingObject(entry.asset);
                 }
@@ -236,7 +328,10 @@ namespace rinCore
                     _ => $"<color=#7F7F7F>(from {entry.packName})</color>"
                 };
 
-                string labelText = $"• {entry.sceneName} {tagText}";
+                bool isExcluded = entry.pairAsset != null && !entry.pairAsset.IncludeInBuild;
+                string displayName = isExcluded ? $"<color=#888888><s>{entry.sceneName}</s> [Build Excluded]</color>" : entry.sceneName;
+
+                string labelText = $"• {displayName} {tagText}";
 
                 if (GUILayout.Button(labelText, linkStyle))
                 {

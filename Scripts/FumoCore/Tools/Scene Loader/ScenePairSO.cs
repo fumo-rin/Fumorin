@@ -7,6 +7,7 @@ namespace rinCore
     [CreateAssetMenu(menuName = "Fumorin/Scene Pair")]
     public class ScenePairSO : ScriptableObject
     {
+        public bool IncludeInBuild = true;
         [Header("Main scene that defines this pair")]
         [SerializeField] private SceneReference mainScene;
 
