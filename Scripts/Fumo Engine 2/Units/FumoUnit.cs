@@ -316,9 +316,12 @@ namespace rinCore
         }
     }
     #endregion
+    public interface UnitCenter2
+    {
+        public Vector2 Center { get; }
+    }
     public abstract partial class FumoUnit : MonoBehaviour
     {
-        
         public abstract IEnumerable<Collider2D> Hitboxes { get; }
         public static FumoUnit Player { get; protected set; }
         public static bool PlayerAs<T>(out T player) where T : FumoUnit

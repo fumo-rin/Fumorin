@@ -51,6 +51,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  m_InScenePlaced: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
@@ -381,8 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9106ec666f6da4e4786a93200f4cbcad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingScene: {fileID: 11400000, guid: e9c99deb955ffb447bed46abfe484e4b, type: 2}
-  LoadStartingSceneInBuild: 0
+  scenePack: {fileID: 0}
   loadingScreen: {fileID: 6775066911122835517}
   fadingImage: {fileID: 1378356003629487710}
   loadingScreenText: {fileID: 879523235413287891}
