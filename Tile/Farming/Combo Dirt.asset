@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: rinCore::rinCore.SiblingTile
   m_DefaultSprite: {fileID: -6235390695814835177, guid: b4e86a54864a05b4e9552d7a368e7af9, type: 3}
   m_DefaultGameObject: {fileID: 0}
-  m_DefaultColliderType: 1
+  m_DefaultColliderType: 0
   m_TilingRules:
   - m_Id: 12
     m_Sprites:
