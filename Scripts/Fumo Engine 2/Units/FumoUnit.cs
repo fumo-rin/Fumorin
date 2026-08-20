@@ -318,6 +318,7 @@ namespace rinCore
     #endregion
     public interface UnitCenter2
     {
+        public FumoUnit CenterOwner { get; }
         public Vector2 Center { get; }
     }
     public abstract partial class FumoUnit : MonoBehaviour
