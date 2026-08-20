@@ -11,11 +11,11 @@ namespace rinCore
         {
             public static Action<T> OnEventRaised;
         }
-        public static void Subscribe<T>(Action<T> listener)
+        public static void Bind<T>(Action<T> listener)
         {
             EventHolder<T>.OnEventRaised += listener;
         }
-        public static void Unsubscribe<T>(Action<T> listener)
+        public static void Release<T>(Action<T> listener)
         {
             EventHolder<T>.OnEventRaised -= listener;
         }
