@@ -27,6 +27,7 @@ namespace rinCore
 
             public static implicit operator string(GameVersion v) => $"{v.name} v{v.version}";
         }
+
         public static GameVersion GetCurrentVersion()
         {
             return new GameVersion(Application.productName, Application.version);
@@ -44,8 +45,17 @@ namespace rinCore
 
                 if (string.IsNullOrEmpty(version))
                 {
-                    Debug.LogWarning($"No version found for '{gameName}', defaulting to 1.0.0");
-                    version = "1.0.0";
+                    string playerSettingsVersion = PlayerSettings.bundleVersion;
+                    if (!string.IsNullOrEmpty(playerSettingsVersion))
+                    {
+                        Debug.Log($"[VersionManager] No entry for '{gameName}' in version.txt. Fetching from PlayerSettings ({playerSettingsVersion}).");
+                        version = playerSettingsVersion;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[VersionManager] No version found for '{gameName}' in file or PlayerSettings, defaulting to 1.0.0");
+                        version = "1.0.0";
+                    }
                 }
 
                 string newVersion = IncrementVersion(version);
@@ -54,12 +64,11 @@ namespace rinCore
                 PlayerSettings.bundleVersion = newVersion;
 
 #if UNITY_ANDROID
-            PlayerSettings.Android.bundleVersionCode += 1;
+                PlayerSettings.Android.bundleVersionCode += 1;
 #endif
-
 #if UNITY_IOS
-            if (int.TryParse(PlayerSettings.iOS.buildNumber, out int buildNum))
-                PlayerSettings.iOS.buildNumber = (buildNum + 1).ToString();
+                if (int.TryParse(PlayerSettings.iOS.buildNumber, out int buildNum))
+                    PlayerSettings.iOS.buildNumber = (buildNum + 1).ToString();
 #endif
 
                 Debug.Log($"[VersionManager] Updated version for '{gameName}' to {newVersion}");

@@ -12,6 +12,7 @@ namespace rinCore
         [Range(1, 999), SerializeField] int _stackSize = 250;
         public int MaxStackSize => Stackable ? _stackSize : 1;
     }
+
     public interface IFumoUseItem
     {
         public struct unitUsePacket
@@ -22,6 +23,7 @@ namespace rinCore
         }
         public bool TryUse(unitUsePacket packet);
     }
+
     [System.Serializable]
     public class FumoSlotItem
     {
@@ -34,6 +36,8 @@ namespace rinCore
             }
             return use != null;
         }
+
+        public int SlotNumber;
         public FumoItem containedItem;
         public int Amount;
         public float Power;
@@ -41,6 +45,11 @@ namespace rinCore
         public bool ScheduleClear => ValidItem && Amount <= 0;
 
         public FumoSlotItem() { }
+
+        public FumoSlotItem(int slotNumber)
+        {
+            this.SlotNumber = slotNumber;
+        }
 
         public FumoSlotItem(FumoItem item, int amount = 1, float power = 1.0f)
         {
@@ -62,14 +71,16 @@ namespace rinCore
     {
         public int CurrentSelectedSlot { get; private set; } = -1;
 
-        public void BindEvents()
+        public void Start()
         {
             EventBus.Bind<FInv_AddItem>(AddItem);
+            EventBus.Bind<FInv_External_Select>(ExternalSelectSlot);
         }
 
-        public void ReleaseEvents()
+        public void End()
         {
             EventBus.Release<FInv_AddItem>(AddItem);
+            EventBus.Release<FInv_External_Select>(ExternalSelectSlot);
         }
 
         public void AddItem(FInv_AddItem item)
@@ -97,19 +108,63 @@ namespace rinCore
             CurrentSelectedSlot = slot;
             return true;
         }
+        private void ExternalSelectSlot(FInv_External_Select action)
+        {
+            SelectSlot(action.slot);
+        }
     }
     #endregion
 
     #region Event Bus
+    public record FInv_External_Select(int slot);
     public record FInv_AddItem(FumoSlotItem slotItem);
     public record FInv_SelectSlot(int slot, FumoSlotItem containedItem);
+    public record FInv_SetSlotItem(int slot, FumoSlotItem newItem);
+    public record FInv_SwapSlots(int slot1, int slot2);
     #endregion
 
     [System.Serializable]
     public partial class FumoInventory
     {
+        public IEnumerable<FInv_SetSlotItem> InventorySnapshot
+        {
+            get
+            {
+                EnsureLookupInitialized();
+                for (int i = 0; i < slots.Count; i++)
+                {
+                    var item = slots[i];
+                    item.SlotNumber = i;
+                    if (item.ValidItem)
+                    {
+                        RegisterSlotInLookup(item);
+                    }
+                    yield return new FInv_SetSlotItem(i, item);
+                }
+            }
+        }
+
         public List<FumoSlotItem> slots = new List<FumoSlotItem>();
-        private readonly Dictionary<string, List<FumoSlotItem>> _itemLookup = new Dictionary<string, List<FumoSlotItem>>();
+
+        [System.NonSerialized]
+        private Dictionary<string, List<FumoSlotItem>> _itemLookup;
+
+        private Dictionary<string, List<FumoSlotItem>> ItemLookup
+        {
+            get
+            {
+                EnsureLookupInitialized();
+                return _itemLookup;
+            }
+        }
+
+        private void EnsureLookupInitialized()
+        {
+            if (_itemLookup == null)
+            {
+                _itemLookup = new Dictionary<string, List<FumoSlotItem>>();
+            }
+        }
 
         public record ItemStackQuery(string itemID, bool notFull);
         public record ItemSlotQuery(int slotIndex);
@@ -119,21 +174,26 @@ namespace rinCore
             slots = new List<FumoSlotItem>(maxSlots);
             for (int i = 0; i < maxSlots; i++)
             {
-                slots.Add(new FumoSlotItem());
+                slots.Add(new FumoSlotItem(i));
             }
+            EnsureLookupInitialized();
         }
 
-        public bool TryGetItemStack(ItemStackQuery q, out FumoSlotItem item)
+        public bool TryGetItemStack(ItemStackQuery q, out int slotIndex, out FumoSlotItem item)
         {
-            if (_itemLookup.TryGetValue(q.itemID, out List<FumoSlotItem> itemSlots))
+            if (ItemLookup.TryGetValue(q.itemID, out List<FumoSlotItem> itemSlots))
             {
                 item = itemSlots.FirstOrDefault(s =>
-                    s.ValidItem &&
-                    (!q.notFull || s.Amount < s.containedItem.MaxStackSize)
-                );
-                return item != null;
+                s.ValidItem && (!q.notFull || s.Amount < s.containedItem.MaxStackSize));
+
+                if (item != null)
+                {
+                    slotIndex = slots.IndexOf(item);
+                    return true;
+                }
             }
 
+            slotIndex = -1;
             item = null;
             return false;
         }
@@ -155,19 +215,23 @@ namespace rinCore
 
             if (item.containedItem.Stackable)
             {
-                while (item.Amount > 0 && TryGetItemStack(new ItemStackQuery(item.containedItem.ItemID, true), out FumoSlotItem existingSlot))
+                while (item.Amount > 0 && TryGetItemStack(new ItemStackQuery(item.containedItem.ItemID, true), out int slotIdx, out FumoSlotItem existingSlot))
                 {
                     int space = item.containedItem.MaxStackSize - existingSlot.Amount;
                     int addAmount = Mathf.Min(space, item.Amount);
                     existingSlot.Amount += addAmount;
                     item.Amount -= addAmount;
+
+                    EventBus.Publish(new FInv_SetSlotItem(slotIdx, existingSlot));
                 }
             }
 
             while (item.Amount > 0)
             {
-                FumoSlotItem emptySlot = slots.FirstOrDefault(s => !s.ValidItem);
-                if (emptySlot == null) return false;
+                int emptyIdx = slots.FindIndex(s => !s.ValidItem);
+                if (emptyIdx == -1) return false;
+
+                FumoSlotItem emptySlot = slots[emptyIdx];
 
                 int addAmount = item.containedItem.Stackable ? Mathf.Min(item.containedItem.MaxStackSize, item.Amount) : 1;
                 emptySlot.containedItem = item.containedItem;
@@ -176,6 +240,8 @@ namespace rinCore
                 item.Amount -= addAmount;
 
                 RegisterSlotInLookup(emptySlot);
+
+                EventBus.Publish(new FInv_SetSlotItem(emptyIdx, emptySlot));
             }
 
             return true;
@@ -183,10 +249,15 @@ namespace rinCore
 
         public void CleanEmptySlots()
         {
-            foreach (var slot in slots.Where(x => x.ScheduleClear))
+            for (int i = 0; i < slots.Count; i++)
             {
-                UnregisterSlotFromLookup(slot);
-                slot.Clear();
+                var slot = slots[i];
+                if (slot.ScheduleClear)
+                {
+                    UnregisterSlotFromLookup(slot);
+                    slot.Clear();
+                    EventBus.Publish(new FInv_SetSlotItem(i, slot));
+                }
             }
         }
 
@@ -195,10 +266,10 @@ namespace rinCore
             if (!slot.ValidItem) return;
 
             string id = slot.containedItem.ItemID;
-            if (!_itemLookup.TryGetValue(id, out List<FumoSlotItem> itemSlots))
+            if (!ItemLookup.TryGetValue(id, out List<FumoSlotItem> itemSlots))
             {
                 itemSlots = new List<FumoSlotItem>();
-                _itemLookup[id] = itemSlots;
+                ItemLookup[id] = itemSlots;
             }
 
             if (!itemSlots.Contains(slot))
@@ -212,12 +283,12 @@ namespace rinCore
             if (!slot.ValidItem) return;
 
             string id = slot.containedItem.ItemID;
-            if (_itemLookup.TryGetValue(id, out List<FumoSlotItem> itemSlots))
+            if (ItemLookup.TryGetValue(id, out List<FumoSlotItem> itemSlots))
             {
                 itemSlots.Remove(slot);
                 if (itemSlots.Count == 0)
                 {
-                    _itemLookup.Remove(id);
+                    ItemLookup.Remove(id);
                 }
             }
         }

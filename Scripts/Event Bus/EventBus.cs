@@ -28,6 +28,13 @@ namespace rinCore
             EventHolder<T>.OnEventRaised = null;
         }
     }
+    public static class EventBusTriggerExtension
+    {
+        public static void Publish<T>(this T record) where T : class
+        {
+            EventBus.Publish<T>(record);
+        }
+    }
 }
 public record CropHarvestedEvent(string CropId, int Quantity, string TileId);
 public record DayPassedEvent(int CurrentDay, string Season);
