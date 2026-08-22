@@ -13,7 +13,7 @@ namespace rinCore
         public int MaxStackSize => Stackable ? _stackSize : 1;
     }
 
-    public interface IFumoUseItem
+    public interface IFumoItem_Use
     {
         public struct unitUsePacket
         {
@@ -23,14 +23,18 @@ namespace rinCore
         }
         public bool TryUse(unitUsePacket packet);
     }
+    public interface IFumoItem_TileDisplay
+    {
+        public float Range { get; }
+    }
 
     [System.Serializable]
     public class FumoSlotItem
     {
-        public bool IsUseable(out IFumoUseItem use)
+        public bool IsUseable(out IFumoItem_Use use)
         {
             use = null;
-            if (containedItem != null && containedItem is IFumoUseItem u)
+            if (containedItem != null && containedItem is IFumoItem_Use u)
             {
                 use = u;
             }
