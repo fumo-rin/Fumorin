@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8382330993584a499c6d2c0b6f54d89, type: 3}
   m_Name: Combo Dirt Wet
   m_EditorClassIdentifier: rinCore::rinCore.SiblingTile
-  m_DefaultSprite: {fileID: -6235390695814835177, guid: b4e86a54864a05b4e9552d7a368e7af9, type: 3}
+  m_DefaultSprite: {fileID: 7166606487693166368, guid: 64bfc9dfe9c97894bb248c49fc2320e2, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules:
@@ -290,5 +290,6 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     - {x: -1, y: 0, z: 0}
     m_RuleTransform: 5
+  <Tag>k__BackingField: WET_DIRT
   siblingTiles:
   - {fileID: 11400000, guid: 56622e96e689142429bb52382b858015, type: 2}

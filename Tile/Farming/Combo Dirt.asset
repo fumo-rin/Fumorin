@@ -290,5 +290,6 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     - {x: -1, y: 0, z: 0}
     m_RuleTransform: 5
+  <Tag>k__BackingField: DRY_DIRT
   siblingTiles:
   - {fileID: 11400000, guid: c2abd70001ea8474e9d7e134e8b0bccf, type: 2}

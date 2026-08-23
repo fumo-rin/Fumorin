@@ -1,39 +1,47 @@
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace rinCore
 {
-    [CreateAssetMenu(menuName = "rinCore/Tile/Sibling Ruletile")]
-    public class SiblingTile : RuleTile
+    public interface ITagTile
     {
-        public RuleTile[] siblingTiles;
+        public string Tag { get; }
+        public bool IsOfTag(params string[] other)
+        {
+            foreach (var item in other)
+            {
+                if (string.Intern(item).Equals(Tag))
+                    return true;
+            }
+            return false;
+        }
+    }
+    [CreateAssetMenu(menuName = "rinCore/Tile/Sibling Ruletile")]
+    public class SiblingTile : RuleTile, ITagTile
+    {
+        [field: SerializeField] public string Tag { get; private set; } = "";
+        [SerializeField] RuleTile[] siblingTiles = Array.Empty<RuleTile>();
         public override bool RuleMatch(int neighbor, TileBase other)
         {
-            bool isSibling = false;
-            if (other == this)
+            bool isSibling = IsSibling(other);
+            return neighbor switch
             {
-                isSibling = true;
-            }
-            else if (siblingTiles != null)
+                TilingRuleOutput.Neighbor.This => isSibling,
+                TilingRuleOutput.Neighbor.NotThis => !isSibling,
+                _ => base.RuleMatch(neighbor, other)
+            };
+        }
+        private bool IsSibling(TileBase other)
+        {
+            if (other == this) return true;
+            if (other == null || siblingTiles == null) return false;
+            ReadOnlySpan<RuleTile> siblings = siblingTiles;
+            for (int i = 0; i < siblings.Length; i++)
             {
-                for (int i = 0; i < siblingTiles.Length; i++)
-                {
-                    if (other == siblingTiles[i])
-                    {
-                        isSibling = true;
-                        break;
-                    }
-                }
+                if (siblings[i] == other) return true;
             }
-            switch (neighbor)
-            {
-                case TilingRuleOutput.Neighbor.This:
-                    return isSibling;
-
-                case TilingRuleOutput.Neighbor.NotThis:
-                    return !isSibling;
-            }
-            return base.RuleMatch(neighbor, other);
+            return false;
         }
     }
 }
