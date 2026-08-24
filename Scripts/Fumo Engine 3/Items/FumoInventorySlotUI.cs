@@ -84,7 +84,7 @@ namespace rinCore
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            new FInv_External_Select(slotIndex).Publish();
+            new FInv_External_Select_ItemSlot(slotIndex).Publish();
         }
     }
 }

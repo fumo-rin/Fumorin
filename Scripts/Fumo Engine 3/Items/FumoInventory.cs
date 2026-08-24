@@ -4,15 +4,45 @@ using UnityEngine;
 
 namespace rinCore
 {
+    public partial class ItemTesting
+    {
+        [System.Serializable]
+        public class DebugItemAction : FumoItem.ItemUseAction
+        {
+            public string text;
+            public override void WhenUseSuccess(IFumoItem_Use.unitUsePacket packet)
+            {
+                Debug.Log(text + " : )");
+            }
+        }
+    }
     public abstract class FumoItem : ScriptableObject
     {
+        [System.Serializable]
+        public abstract class ItemUseAction
+        {
+            public abstract void WhenUseSuccess(IFumoItem_Use.unitUsePacket packet);
+        }
+        [SerializeReference, ManagedReferencePicker] public ItemUseAction UseAction;
         public string ItemID => name;
         public Sprite inventoryIcon;
         public bool Stackable;
         [Range(1, 999), SerializeField] int _stackSize = 250;
         public int MaxStackSize => Stackable ? _stackSize : 1;
+        protected void TriggerUseAction(IFumoItem_Use.unitUsePacket packet)
+        {
+            if (UseAction == null)
+                return;
+            UseAction.WhenUseSuccess(packet);
+        }
     }
-
+    public interface IFumoItem_WeaponItemSwing
+    {
+        public bool SwapLock => Time.time < SwapLockEnd;
+        public bool SwingLock => Time.time < SwingLockEnd;
+        public float SwapLockEnd { get; set; }
+        public float SwingLockEnd { get; set; }
+    }
     public interface IFumoItem_Use
     {
         public struct unitUsePacket
@@ -78,13 +108,13 @@ namespace rinCore
         public void Start()
         {
             EventBus.Bind<FInv_AddItem>(AddItem);
-            EventBus.Bind<FInv_External_Select>(ExternalSelectSlot);
+            EventBus.Bind<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
         }
 
         public void End()
         {
             EventBus.Release<FInv_AddItem>(AddItem);
-            EventBus.Release<FInv_External_Select>(ExternalSelectSlot);
+            EventBus.Release<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
         }
 
         public void AddItem(FInv_AddItem item)
@@ -112,7 +142,7 @@ namespace rinCore
             CurrentSelectedSlot = slot;
             return true;
         }
-        private void ExternalSelectSlot(FInv_External_Select action)
+        private void ExternalSelectSlot(FInv_External_Select_ItemSlot action)
         {
             SelectSlot(action.slot);
         }
@@ -120,7 +150,7 @@ namespace rinCore
     #endregion
 
     #region Event Bus
-    public record FInv_External_Select(int slot);
+    public record FInv_External_Select_ItemSlot(int slot);
     public record FInv_AddItem(FumoSlotItem slotItem);
     public record FInv_SelectSlot(int slot, FumoSlotItem containedItem);
     public record FInv_SetSlotItem(int slot, FumoSlotItem newItem);

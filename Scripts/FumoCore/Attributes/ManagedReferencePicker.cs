@@ -1,20 +1,18 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
-
-
-
 #if UNITY_EDITOR
-
 using UnityEditor;
 #endif
+
 namespace rinCore
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class ManagedReferencePickerAttribute : PropertyAttribute
     {
     }
+
     #region Prop Drawer
 #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ManagedReferencePickerAttribute), true)]
@@ -39,6 +37,7 @@ namespace rinCore
 
             return h;
         }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect line = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
@@ -48,11 +47,18 @@ namespace rinCore
                 property.isExpanded,
                 GUIContent.none);
 
-            Rect dropdown = new Rect(line.x + 15, line.y, line.width - 15, line.height);
+            // 1. Dwwaw de pwwopewty wabel (e.g., "Use Action")
+            float labelWidth = EditorGUIUtility.labelWidth - 15;
+            Rect labelRect = new Rect(line.x + 15, line.y, labelWidth, line.height);
+            EditorGUI.LabelField(labelRect, label);
 
+            // 2. Dwwaw de dwopdown button next to de wabel
+            Rect dropdown = new Rect(line.x + 15 + labelWidth, line.y, line.width - (15 + labelWidth), line.height);
+
+            // Formatting de active menu text to show de fuww path (e.g. "ItemTesting/DebugItemAction")
             string current = property.managedReferenceValue == null
                 ? "None"
-                : property.managedReferenceValue.GetType().Name;
+                : GetNestedMenuPath(property.managedReferenceValue.GetType());
 
             if (EditorGUI.DropdownButton(dropdown, new GUIContent(current), FocusType.Passive))
             {
@@ -66,7 +72,19 @@ namespace rinCore
                 });
 
                 Type baseType = fieldInfo.FieldType;
-                foreach (var type in TypeCache.GetTypesDerivedFrom(baseType))
+                if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    baseType = baseType.GetGenericArguments()[0];
+                }
+                else if (baseType.IsArray)
+                {
+                    baseType = baseType.GetElementType();
+                }
+
+                var derivedTypes = TypeCache.GetTypesDerivedFrom(baseType)
+                    .Where(t => !t.IsAbstract && !t.IsInterface && t.GetConstructor(Type.EmptyTypes) != null);
+
+                foreach (var type in derivedTypes)
                 {
                     string path = GetNestedMenuPath(type);
 
@@ -122,7 +140,6 @@ namespace rinCore
             return string.Join("/", path);
         }
     }
-
 #endif
     #endregion
 }

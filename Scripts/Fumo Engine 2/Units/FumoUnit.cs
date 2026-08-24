@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using rinCore.Bullet;
 
 namespace rinCore
 {
@@ -316,12 +317,23 @@ namespace rinCore
         }
     }
     #endregion
+    #region Inventory Swing Lock
+    public partial class FumoUnit : IFumoItem_WeaponItemSwing
+    {
+        public float SwapLockEnd { get; set; }
+        public float SwingLockEnd { get; set; }
+    }
+    #endregion
+    public interface IUnitIframes
+    {
+        public float IFramesRemaining { get; }
+    }
     public interface UnitCenter2
     {
         public FumoUnit CenterOwner { get; }
         public Vector2 Center { get; }
     }
-    public abstract partial class FumoUnit : MonoBehaviour
+    public abstract partial class FumoUnit : MonoBehaviour, Projectile.IProjectileHit
     {
         public abstract IEnumerable<Collider2D> Hitboxes { get; }
         public static FumoUnit Player { get; protected set; }
