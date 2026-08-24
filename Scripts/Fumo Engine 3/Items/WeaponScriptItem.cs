@@ -41,7 +41,7 @@ namespace rinCore
             }
         }
         [SerializeReference, ManagedReferencePicker] WeaponScriptItemAction weaponScript;
-
+        [SerializeField] ACWrapper sound;
         public bool TryUse(IFumoItem_Use.unitUsePacket packet)
         {
             if (weaponScript == null)
@@ -56,6 +56,7 @@ namespace rinCore
             if (!hasSwing || !swing.SwingLock)
             {
                 UseSuccess(packet, swing);
+                sound.Play(RNG.SeededRandomVector2 * 15f + packet.Sender.CurrentPosition);
                 return true;
             }
             return false;
