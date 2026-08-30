@@ -2,7 +2,10 @@
   "name": "com.fumorin.tools",
   "version": "0.0.1",
   "displayName": "Fumo Core Tools",
-  "author": "Fumo Rin",
+  "author": {
+    "name": "Fumo Rin"
+  },
   "unity": "6000.0",
-  "description": "rin core tools."
+  "description": "rin core tools.",
+  "hideInEditor": false
 }

@@ -8,70 +8,90 @@ namespace rinCore
     [DefaultExecutionOrder(-10)]
     public class FumoInventorySlotUI : MonoBehaviour, IPointerDownHandler
     {
-        static FumoInventorySlotUI unwrapper;
-        [SerializeField] int hotbarCount = 9;
-        int slotIndex;
-        FumoSlotItem containedItem;
-        [SerializeField] Image itemImage;
-        [SerializeField] TMP_Text itemCountText;
-        [SerializeField] Image selectionImage;
-        Color32 startingColor;
-        private void LateUpdate()
-        {
-            if (containedItem == null || !containedItem.ValidItem)
-            {
-                itemImage.enabled = false;
-                itemCountText.text = "";
-                return;
-            }
-            itemImage.sprite = containedItem.containedItem.inventoryIcon;
-            itemCountText.text = containedItem.Amount > 1 ? containedItem.Amount.ToShortenedString() : "";
-            itemImage.enabled = true;
-        }
-        static FumoInventorySlotUI()
-        {
-            unwrapper = null;
-        }
+        private static FumoInventorySlotUI unwrapper;
+
+        [SerializeField] private int hotbarCount = 9;
+        public int slotIndex;
+        private FumoSlotItem containedItem;
+        [SerializeField] private Image itemImage;
+        [SerializeField] private TMP_Text itemCountText;
+        [SerializeField] private Image selectionImage;
+        private Color32 startingColor;
+
         private void Awake()
         {
             if (unwrapper != null)
             {
                 return;
             }
+
             unwrapper = this;
             Transform parent = transform.parent;
+
+            gameObject.SetActive(false);
+
             for (int i = 0; i < hotbarCount; i++)
             {
                 var c = Instantiate(this, parent);
                 c.slotIndex = i;
-                c.startingColor = c.selectionImage.color;
+                if (c.selectionImage != null)
+                {
+                    c.startingColor = c.selectionImage.color;
+                }
+                c.gameObject.SetActive(true);
             }
-            unwrapper.gameObject.SetActive(false);
         }
+
         private void OnDestroy()
         {
             if (unwrapper == this)
                 unwrapper = null;
         }
+
         private void OnEnable()
         {
             EventBus.Bind<FInv_SetSlotItem>(SetItem);
             EventBus.Bind<FInv_SelectSlot>(Select);
         }
+
         private void OnDisable()
         {
             EventBus.Release<FInv_SetSlotItem>(SetItem);
             EventBus.Release<FInv_SelectSlot>(Select);
-
         }
+
+        private void LateUpdate()
+        {
+            if (containedItem == null || !containedItem.ValidItem)
+            {
+                if (itemImage != null) itemImage.enabled = false;
+                if (itemCountText != null) itemCountText.text = "";
+                return;
+            }
+
+            if (itemImage != null)
+            {
+                itemImage.sprite = containedItem.containedItem.inventoryIcon;
+                itemImage.enabled = true;
+            }
+
+            if (itemCountText != null)
+            {
+                itemCountText.text = containedItem.containedItem.Stackable ? containedItem.Amount.ToShortenedString() : "";
+            }
+        }
+
         public void SetItem(FInv_SetSlotItem action)
         {
             if (slotIndex != action.slot)
                 return;
             containedItem = action.newItem;
         }
-        void Select(FInv_SelectSlot selection)
+
+        private void Select(FInv_SelectSlot selection)
         {
+            if (selectionImage == null) return;
+
             if (selection.slot == slotIndex)
             {
                 selectionImage.color = ColorHelper.PastelYellow.Opacity(startingColor.a);

@@ -259,6 +259,83 @@ namespace rinCore
         }
     }
     #endregion
+    #region (WIP) Cached Playoneshot
+    public static partial class ParticleSystemExtensions
+    {
+        private static readonly Dictionary<ParticleSystem, ParticleSystem> oneShotBurstCache = new();
+        public static void PlayOneShotCached(this ParticleSystem prefab, Vector3 position, Quaternion? rotation = null, int? overrideBurstCount = null, Color32? colorOverride = null, float sizeMultiplier = 1f)
+        {
+            if (prefab == null)
+            {
+                Debug.LogWarning("Particle System Extensions - " + nameof(PlayOneShotCached) + " called with null prefab.");
+                return;
+            }
+
+            if (!oneShotBurstCache.TryGetValue(prefab, out var cached) || cached == null)
+            {
+                cached = Object.Instantiate(prefab);
+                cached.name = $"[CachedOneShot] {prefab.name}";
+                oneShotBurstCache[prefab] = cached;
+            }
+
+            if (!cached.gameObject.activeInHierarchy)
+                cached.gameObject.SetActive(true);
+
+            var main = prefab.main;
+            var emission = prefab.emission;
+
+            int burstCount = overrideBurstCount ?? GetDefaultBurstCount(emission);
+            if (burstCount <= 0) return;
+
+            Quaternion rot = rotation ?? prefab.transform.rotation;
+            var shape = prefab.shape;
+
+            for (int i = 0; i < burstCount; i++)
+            {
+                Vector3 particleVelocity;
+
+                if (shape.enabled)
+                {
+                    float arcAngle = shape.arc;
+                    float randomAngle = UnityEngine.Random.Range(-arcAngle * 0.5f, arcAngle * 0.5f);
+
+                    Vector3 spreadDir = Quaternion.Euler(0f, 0f, randomAngle) * Vector3.right;
+                    particleVelocity = rot * (spreadDir * main.startSpeed.Evaluate());
+                }
+                else
+                {
+                    particleVelocity = rot * (Vector3.right * main.startSpeed.Evaluate());
+                }
+
+                var emitParams = new ParticleSystem.EmitParams
+                {
+                    position = position,
+                    velocity = particleVelocity,
+                    startColor = colorOverride ?? main.startColor.Evaluate(),
+                    startSize = main.startSize.Evaluate() * sizeMultiplier,
+                    startLifetime = main.startLifetime.Evaluate(),
+                    rotation3D = (rot * Quaternion.Euler(main.startRotationX.Evaluate(), main.startRotationY.Evaluate(), main.startRotationZ.Evaluate())).eulerAngles
+                };
+
+                cached.Emit(emitParams, 1);
+            }
+        }
+
+        private static int GetDefaultBurstCount(ParticleSystem.EmissionModule emission)
+        {
+            if (!emission.enabled) return 1;
+
+            if (emission.burstCount > 0)
+            {
+                ParticleSystem.Burst[] bursts = new ParticleSystem.Burst[emission.burstCount];
+                emission.GetBursts(bursts);
+                return (int)bursts[0].count.Evaluate();
+            }
+
+            return (int)emission.rateOverTime.Evaluate();
+        }
+    }
+    #endregion
     public static partial class ParticleSystemExtensions
     {
         public static void PlayIfNotPlaying(this ParticleSystem ps)
@@ -267,7 +344,7 @@ namespace rinCore
             ps.Play();
         }
         private static readonly Dictionary<ParticleSystem, ParticleSystem> particleCache = new();
-        public static void EmitSingleParticleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color? colorOverride = null, float sizeMultiplier = 1f)
+        public static void EmitSingleParticleCached(this ParticleSystem prefab, Vector3 position, Vector3? velocity = null, float lifetimeSpread = 0f, Color32? colorOverride = null, float sizeMultiplier = 1f)
         {
             if (prefab == null)
             {

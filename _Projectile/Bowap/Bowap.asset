@@ -15,13 +15,16 @@ MonoBehaviour:
   animationSpeed: 3
   animationSpreadPercent: 7
   spin: 0
-  SortingLayer: Front
+  SortingLayer: Projectile
   particleTemplate: {fileID: 5905382930097071747, guid: cb3d2d2be9f5fef4288ef2b272bc4753, type: 3}
   Size: 0.75
+  <ProjectileTint>k__BackingField:
+    serializedVersion: 2
+    rgba: 4294967295
   <LockRotation>k__BackingField: 0
   AddedSortingLayer: 0
   <CollisionRadius>k__BackingField: 0.05
-  <Flare>k__BackingField: 1
+  <Flare>k__BackingField: 0
   <FlareColor>k__BackingField:
     serializedVersion: 2
-    rgba: 4294937852
+    rgba: 4289751551

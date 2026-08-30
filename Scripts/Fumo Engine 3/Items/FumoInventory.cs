@@ -49,7 +49,7 @@ namespace rinCore
         public struct unitUsePacket
         {
             public FumoUnit Sender;
-            public Vector2 Target;
+            public Vector2 SnappedTarget, RawTarget;
             public FumoSlotItem slotItem;
         }
         public bool TryUseHand(unitUsePacket packet);
@@ -76,8 +76,8 @@ namespace rinCore
         public FumoItem containedItem;
         public int Amount;
         public float Power;
-        public bool ValidItem => containedItem != null;
-        public bool ScheduleClear => ValidItem && Amount <= 0;
+        public bool ValidItem => containedItem != null && Amount > 0;
+        public bool ScheduleClear => containedItem != null && Amount <= 0;
 
         public FumoSlotItem() { }
 
@@ -110,12 +110,42 @@ namespace rinCore
         {
             EventBus.Bind<FInv_AddItem>(AddItem);
             EventBus.Bind<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
+            EventBus.Bind<FInv_External_SetAmount>(ChangeAmount);
         }
 
         public void End()
         {
             EventBus.Release<FInv_AddItem>(AddItem);
             EventBus.Release<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
+            EventBus.Release<FInv_External_SetAmount>(ChangeAmount);
+        }
+
+        public void ChangeAmount(FInv_External_SetAmount action)
+        {
+            if (action == null || action.item == null) return;
+
+            int targetSlotIndex = slots.IndexOf(action.item);
+            if (targetSlotIndex == -1 && action.item.SlotNumber >= 0 && action.item.SlotNumber < slots.Count)
+            {
+                targetSlotIndex = action.item.SlotNumber;
+            }
+
+            if (targetSlotIndex >= 0 && targetSlotIndex < slots.Count)
+            {
+                FumoSlotItem slotToUpdate = slots[targetSlotIndex];
+                UnregisterSlotFromLookup(slotToUpdate);
+                slotToUpdate.Amount = action.amount;
+                if (!slotToUpdate.ValidItem)
+                {
+                    slotToUpdate.Clear();
+                }
+                else
+                {
+                    RegisterSlotInLookup(slotToUpdate);
+                }
+
+                EventBus.Publish(new FInv_SetSlotItem(targetSlotIndex, slotToUpdate));
+            }
         }
 
         public void AddItem(FInv_AddItem item)
@@ -125,13 +155,14 @@ namespace rinCore
 
             }
         }
-
         public bool SelectSlot(int slot, bool forceRefresh)
         {
-            if (CurrentSelectedSlot == slot)
+            if (!forceRefresh && CurrentSelectedSlot == slot)
             {
                 return false;
             }
+
+            CurrentSelectedSlot = slot;
 
             FumoSlotItem selectedItem = null;
             if (TryGetItemSlot(new ItemSlotQuery(slot), out FumoSlotItem item))
@@ -140,7 +171,6 @@ namespace rinCore
             }
 
             EventBus.Publish(new FInv_SelectSlot(slot, selectedItem));
-            CurrentSelectedSlot = slot;
             return true;
         }
         private void ExternalSelectSlot(FInv_External_Select_ItemSlot action)
@@ -155,6 +185,7 @@ namespace rinCore
     public record FInv_AddItem(FumoSlotItem slotItem);
     public record FInv_SelectSlot(int slot, FumoSlotItem containedItem);
     public record FInv_SetSlotItem(int slot, FumoSlotItem newItem);
+    public record FInv_External_SetAmount(FumoSlotItem item, int amount);
     public record FInv_SwapSlots(int slot1, int slot2);
     public record FInv_HeldItem_To_UI(FumoSlotItem handItem);
     #endregion
@@ -244,21 +275,31 @@ namespace rinCore
             item = null;
             return false;
         }
-
         public bool TryAddItem(FumoSlotItem item)
         {
             if (item == null || item.containedItem == null || item.Amount <= 0) return false;
 
             if (item.containedItem.Stackable)
             {
-                while (item.Amount > 0 && TryGetItemStack(new ItemStackQuery(item.containedItem.ItemID, true), out int slotIdx, out FumoSlotItem existingSlot))
+                for (int i = 0; i < slots.Count; i++)
                 {
-                    int space = item.containedItem.MaxStackSize - existingSlot.Amount;
-                    int addAmount = Mathf.Min(space, item.Amount);
-                    existingSlot.Amount += addAmount;
-                    item.Amount -= addAmount;
+                    if (item.Amount <= 0) break;
 
-                    EventBus.Publish(new FInv_SetSlotItem(slotIdx, existingSlot));
+                    FumoSlotItem existingSlot = slots[i];
+                    if (ReferenceEquals(existingSlot, item)) continue;
+
+                    if (existingSlot.ValidItem &&
+                        existingSlot.containedItem.ItemID == item.containedItem.ItemID &&
+                        existingSlot.Amount < existingSlot.containedItem.MaxStackSize)
+                    {
+                        int space = existingSlot.containedItem.MaxStackSize - existingSlot.Amount;
+                        int addAmount = Mathf.Min(space, item.Amount);
+
+                        existingSlot.Amount += addAmount;
+                        item.Amount -= addAmount;
+
+                        EventBus.Publish(new FInv_SetSlotItem(i, existingSlot));
+                    }
                 }
             }
 
@@ -269,14 +310,18 @@ namespace rinCore
 
                 FumoSlotItem emptySlot = slots[emptyIdx];
 
-                int addAmount = item.containedItem.Stackable ? Mathf.Min(item.containedItem.MaxStackSize, item.Amount) : 1;
+                if (ReferenceEquals(emptySlot, item)) break;
+
+                int addAmount = item.containedItem.Stackable
+                    ? Mathf.Min(item.containedItem.MaxStackSize, item.Amount)
+                    : 1;
+
                 emptySlot.containedItem = item.containedItem;
                 emptySlot.Amount = addAmount;
                 emptySlot.Power = item.Power;
                 item.Amount -= addAmount;
 
                 RegisterSlotInLookup(emptySlot);
-
                 EventBus.Publish(new FInv_SetSlotItem(emptyIdx, emptySlot));
             }
 
@@ -316,7 +361,7 @@ namespace rinCore
 
         private void UnregisterSlotFromLookup(FumoSlotItem slot)
         {
-            if (!slot.ValidItem) return;
+            if (slot == null || slot.containedItem == null) return;
 
             string id = slot.containedItem.ItemID;
             if (ItemLookup.TryGetValue(id, out List<FumoSlotItem> itemSlots))

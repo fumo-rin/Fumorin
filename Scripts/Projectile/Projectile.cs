@@ -95,17 +95,31 @@ namespace rinCore.Bullet
                     {
                         RaycastHit2D hit = hits[i];
                         Transform hitTrans = hit.transform;
+
                         if (hitTrans == null)
                             continue;
 
                         if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
                         {
                             proj.IsValid = false;
+
+                            ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.25f), hit.normal, new()
+                            {
+                                colorOverride = null,
+                                forceMultiplier = 1f
+                            });
                             continue;
                         }
 
                         if (proj.Sender == (object)ihit || !hitList.Add(ihit))
                             continue;
+
+
+                        ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                        {
+                            colorOverride = null,
+                            forceMultiplier = 1f
+                        });
 
                         proj.IsValid = false;
                         hitAction?.Invoke(ihit);

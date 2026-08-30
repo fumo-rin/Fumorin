@@ -11,6 +11,7 @@ namespace rinCore.Bullet
         [SortingLayer] public string SortingLayer = "Default";
         [SerializeField] private ParticleSystem particleTemplate;
         [SerializeField] public float Size = 0.75f;
+        [field: SerializeField] public Color32 ProjectileTint { get; private set; } = ColorHelper.White.Opacity(255);
         [field: SerializeField] public bool LockRotation { get; private set; }
 
         #region Sorting Layer

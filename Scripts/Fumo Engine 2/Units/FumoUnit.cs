@@ -390,6 +390,10 @@ namespace rinCore
         {
             get
             {
+                if (this is UnitCenter2 c)
+                {
+                    return c.Center;
+                }
                 if (transform == null)
                 {
                     return Vector2.zero;

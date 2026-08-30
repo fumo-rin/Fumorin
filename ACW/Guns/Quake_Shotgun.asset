@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
+  m_Name: Quake_Shotgun
+  m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
+  SoundName: Player Shotgun
+  soundVolume: 0.773
+  <soundClips>k__BackingField:
+  - clip: {fileID: 8300000, guid: e0be3da1f3849dd449a158b5387a82af, type: 3}
+    PitchVariancePercent: 12
+    PitchOrigin: 0.83
+    Volume: 1
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 39ff8f912042a8e469efaebd38b0e768, type: 3}
+    PitchVariancePercent: 12
+    PitchOrigin: 0.66
+    Volume: 1
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 322b6a66a2ec4214682a7c2158dee232, type: 3}
+    PitchVariancePercent: 12
+    PitchOrigin: 0.86
+    Volume: 0.901
+    Muted: 0
+  <soundMode>k__BackingField: 20
+  <singleRepeatLockoutTime>k__BackingField: 0.02
+  <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0

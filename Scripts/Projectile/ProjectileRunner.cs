@@ -35,7 +35,16 @@ namespace rinCore.Bullet
             {
                 float force = setting == null ? defaultSetting.forceMultiplier : setting.Value.forceMultiplier;
                 Color32? color = setting == null ? defaultSetting.colorOverride : setting.Value.colorOverride;
-                instance.hitParticle.EmitSingleParticleCached(position, normal.QuantizeToStepSize(15f).Rotate2D(10f.RandomPositiveNegativeRange()).ScaleToMagnitude(3f.Spread(55f) * force), 25f, color);
+
+                Quaternion rotation = Quaternion.FromToRotation(Vector3.right, normal);
+
+                instance.hitParticle.PlayOneShotCached(
+                    position: position,
+                    rotation: rotation,
+                    overrideBurstCount: 6,
+                    colorOverride: color,
+                    sizeMultiplier: force
+                );
             }
         }
     }
@@ -51,6 +60,27 @@ namespace rinCore.Bullet
             if (instance == null || instance.bulletCancelParticlePrefab == null)
                 return;
             instance.bulletCancelParticlePrefab.EmitSingleParticleCached(position, velocity * velocityMultiplier, 50f);
+        }
+    }
+    #endregion
+
+    #region Bullet Flare
+    public partial class ProjectileRenderer
+    {
+        [SerializeField] private ParticleSystem bulletFlareParticlePrefab;
+
+        public static void BulletFlareParticle(Vector3 position, Color32 color, Vector3? velocity = null, float sizeMultiplier = 1f)
+        {
+            if (instance == null || instance.bulletFlareParticlePrefab == null)
+                return;
+
+            instance.bulletFlareParticlePrefab.EmitSingleParticleCached(
+                position + new Vector3(0, 0, -1),
+                velocity ?? Vector3.zero,
+                0f,
+                color,
+                sizeMultiplier
+            );
         }
     }
     #endregion
@@ -105,7 +135,6 @@ namespace rinCore.Bullet
             if (instance == null || d == null) return;
             instance.CreateParticleSystemForDefine(d);
         }
-
         private void CreateParticleSystemForDefine(ProjectileDefine define)
         {
             int key = define.GetInstanceID();
@@ -118,6 +147,15 @@ namespace rinCore.Bullet
                 psInstance.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 var main = psInstance.main;
                 main.maxParticles = 100000;
+
+                var psRenderer = psInstance.GetComponent<ParticleSystemRenderer>();
+                if (psRenderer != null)
+                {
+                    psRenderer.alignment = ParticleSystemRenderSpace.View;
+                    psRenderer.sortMode = ParticleSystemSortMode.OldestInFront;
+                    psRenderer.sortingLayerName = define.SortingLayer;
+                    psRenderer.sortingOrder = define.sortingLayer;
+                }
 
                 systemDictByID[key] = psInstance;
                 fastDefineLookup[key] = new List<Projectile>(8192);
@@ -184,13 +222,16 @@ namespace rinCore.Bullet
                 int totalFrames = textureSheetAnimation.numTilesX * textureSheetAnimation.numTilesY;
                 float animSpeed = define.animationSpeed <= 0.01f ? 1f : totalFrames / define.animationSpeed;
 
+                Color32 particleColor = define.ProjectileTint;
+
                 for (int j = 0; j < count; j++)
                 {
                     var p = batch[j];
                     float animElapsed = currentTime - (p.spawnTime + p.animationOffsetSeconds);
                     float unmodifiedElapsed = currentTime - p.spawnTime;
                     float addedSpin = animElapsed * define.spin;
-                    animElapsed %= animSpeed;
+
+                    float currentRemaining = Mathf.Max(0.001f, animSpeed - (animElapsed % animSpeed));
 
                     float scaleFactor = 1f;
                     if (unmodifiedElapsed <= growTime)
@@ -198,15 +239,15 @@ namespace rinCore.Bullet
                     else if (unmodifiedElapsed <= growTime + shrinkTime)
                         scaleFactor = Mathf.Lerp(peakScale, 1f, (unmodifiedElapsed - growTime) / shrinkTime);
 
-                    Vector2 vel = p.FinalizedVelocity;
                     float angle = define.LockRotation ? 0f : p.Render_Angle + addedSpin - 90f;
 
                     managedCacheArray[j] = new ParticleSystem.Particle
                     {
-                        position = new Vector3(p.FinalizedPosition.x, p.FinalizedPosition.y, -5f),
+                        position = new Vector3(p.FinalizedPosition.x, p.FinalizedPosition.y, 0f),
                         startSize = define.Size * scaleFactor,
                         startLifetime = animSpeed,
-                        remainingLifetime = animSpeed - animElapsed,
+                        remainingLifetime = currentRemaining,
+                        startColor = particleColor,
                         rotation = angle
                     };
                 }
@@ -264,6 +305,10 @@ namespace rinCore.Bullet
             if (current == null || p == null || p.data == null) return;
             ProjectileRenderer.AddDefine(p.data);
             current.masterProjectileList.Add(p);
+            if (p.data.Flare)
+            {
+                ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, 2.35f);
+            }
         }
 
         private void Awake()
