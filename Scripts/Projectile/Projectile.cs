@@ -16,6 +16,10 @@ namespace rinCore.Bullet
     }
     public class Projectile : IParticleRenderItem
     {
+        public interface IProjectileHitListener
+        {
+
+        }
         [NonSerialized] public FumoUnit Sender;
         [NonSerialized] public ProjectileDefine data;
         [HideInInspector] public float spawnTime;

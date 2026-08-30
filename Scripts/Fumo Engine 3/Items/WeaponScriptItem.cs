@@ -42,7 +42,7 @@ namespace rinCore
         }
         [SerializeReference, ManagedReferencePicker] WeaponScriptItemAction weaponScript;
         [SerializeField] ACWrapper sound;
-        public bool TryUse(IFumoItem_Use.unitUsePacket packet)
+        public bool TryUseHand(IFumoItem_Use.unitUsePacket packet)
         {
             if (weaponScript == null)
                 return false;

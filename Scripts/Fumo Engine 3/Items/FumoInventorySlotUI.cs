@@ -62,7 +62,7 @@ namespace rinCore
         {
             EventBus.Release<FInv_SetSlotItem>(SetItem);
             EventBus.Release<FInv_SelectSlot>(Select);
-            
+
         }
         public void SetItem(FInv_SetSlotItem action)
         {
@@ -84,7 +84,7 @@ namespace rinCore
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            new FInv_External_Select_ItemSlot(slotIndex).Publish();
+            new FInv_External_Select_ItemSlot(slotIndex, false).Publish();
         }
     }
 }

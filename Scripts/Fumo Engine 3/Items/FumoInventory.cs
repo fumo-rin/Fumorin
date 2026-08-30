@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.RenderGraphModule;
 
 namespace rinCore
 {
@@ -51,7 +52,7 @@ namespace rinCore
             public Vector2 Target;
             public FumoSlotItem slotItem;
         }
-        public bool TryUse(unitUsePacket packet);
+        public bool TryUseHand(unitUsePacket packet);
     }
     public interface IFumoItem_TileDisplay
     {
@@ -125,7 +126,7 @@ namespace rinCore
             }
         }
 
-        public bool SelectSlot(int slot)
+        public bool SelectSlot(int slot, bool forceRefresh)
         {
             if (CurrentSelectedSlot == slot)
             {
@@ -144,17 +145,18 @@ namespace rinCore
         }
         private void ExternalSelectSlot(FInv_External_Select_ItemSlot action)
         {
-            SelectSlot(action.slot);
+            SelectSlot(action.slot, false);
         }
     }
     #endregion
 
     #region Event Bus
-    public record FInv_External_Select_ItemSlot(int slot);
+    public record FInv_External_Select_ItemSlot(int slot, bool forceRefresh);
     public record FInv_AddItem(FumoSlotItem slotItem);
     public record FInv_SelectSlot(int slot, FumoSlotItem containedItem);
     public record FInv_SetSlotItem(int slot, FumoSlotItem newItem);
     public record FInv_SwapSlots(int slot1, int slot2);
+    public record FInv_HeldItem_To_UI(FumoSlotItem handItem);
     #endregion
 
     [System.Serializable]
