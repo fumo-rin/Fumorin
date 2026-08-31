@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Search;
 
 namespace rinCore
@@ -27,6 +28,9 @@ namespace rinCore
         private List<Entry> frameEntries = new();
         private Dictionary<(Sprite sprite, int scale), Texture2D> convertedTextureCache = new();
 
+        private Sprite lastAppliedSprite;
+        private int lastAppliedScale = -1;
+
         public record Cursor_Set_Frame(Entry entry);
 
         private void OnEnable()
@@ -45,6 +49,8 @@ namespace rinCore
             EventBus.Release<Cursor_Set_Frame>(OnCursorSetFrame);
             EventBus.Release<Cursor_Set_Size>(SetSize);
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            lastAppliedSprite = null;
+            lastAppliedScale = -1;
         }
 
         public record Cursor_Set_Size(int size);
@@ -67,8 +73,12 @@ namespace rinCore
 
         private void LateUpdate()
         {
-            if (!Application.isFocused)
+            if (!Application.isFocused || IsPointerOffScreen())
+            {
+                frameEntries.Clear();
                 return;
+            }
+
             Entry highestEntry = defaultCursor;
 
             for (int i = 0; i < frameEntries.Count; i++)
@@ -82,15 +92,37 @@ namespace rinCore
             ApplyNativeCursor(highestEntry);
             frameEntries.Clear();
         }
+
+        private bool IsPointerOffScreen()
+        {
+            var mouse = Mouse.current;
+            if (mouse == null)
+                return false;
+
+            Vector2 mousePos = mouse.position.ReadValue();
+            return mousePos.x < 0 || mousePos.x > Screen.width || mousePos.y < 0 || mousePos.y > Screen.height;
+        }
+
         private void ApplyNativeCursor(Entry entry)
         {
+            int currentScale = Mathf.Max(0, SizeModifier);
+
             if (entry.sprite == null)
             {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                if (lastAppliedSprite != null || lastAppliedScale != currentScale)
+                {
+                    Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                    lastAppliedSprite = null;
+                    lastAppliedScale = currentScale;
+                }
                 return;
             }
 
-            int currentScale = Mathf.Max(0, SizeModifier);
+            if (entry.sprite == lastAppliedSprite && currentScale == lastAppliedScale)
+            {
+                return;
+            }
+
             int textureScale = Mathf.Max(1, currentScale);
             Texture2D cursorTex = GetOrCreateCursorTexture(entry.sprite, textureScale);
 
@@ -99,6 +131,9 @@ namespace rinCore
                 Vector2 hotspot = (entry.hotspotOverride ?? GetSpriteHotspot(entry.sprite)) * textureScale;
                 CursorMode mode = (currentScale == 0) ? CursorMode.Auto : CursorMode.ForceSoftware;
                 Cursor.SetCursor(cursorTex, hotspot, mode);
+
+                lastAppliedSprite = entry.sprite;
+                lastAppliedScale = currentScale;
             }
         }
 
@@ -130,7 +165,7 @@ namespace rinCore
             );
 
             Vector2 uvMin = new Vector2(r.x / sourceTex.width, r.y / sourceTex.height);
-            Vector2 uvMax = new Vector2((r.x + r.width) / sourceTex.width, (r.y + r.height) / sourceTex.height);
+            Vector2 uvMax = new Vector2((r.x + r.width) / sourceTex.width, (r.x + r.height) / sourceTex.height);
 
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = rt;
