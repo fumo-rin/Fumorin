@@ -234,10 +234,16 @@ namespace rinCore.Bullet
                     float currentRemaining = Mathf.Max(0.001f, animSpeed - (animElapsed % animSpeed));
 
                     float scaleFactor = 1f;
-                    if (unmodifiedElapsed <= growTime)
-                        scaleFactor = Mathf.SmoothStep(0f, peakScale, unmodifiedElapsed / growTime);
-                    else if (unmodifiedElapsed <= growTime + shrinkTime)
-                        scaleFactor = Mathf.Lerp(peakScale, 1f, (unmodifiedElapsed - growTime) / shrinkTime);
+                    if (define.Flare)
+                    {
+                        if (unmodifiedElapsed <= growTime)
+                            scaleFactor = Mathf.SmoothStep(0f, peakScale, unmodifiedElapsed / growTime);
+                        else if (unmodifiedElapsed <= growTime + shrinkTime)
+                            scaleFactor = Mathf.Lerp(peakScale, 1f, (unmodifiedElapsed - growTime) / shrinkTime);
+                    }
+                    else
+                        if (unmodifiedElapsed <= growTime)
+                            scaleFactor = Mathf.SmoothStep(0f, 1f, unmodifiedElapsed / growTime);
 
                     float angle = define.LockRotation ? 0f : p.Render_Angle + addedSpin - 90f;
 

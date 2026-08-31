@@ -16,6 +16,7 @@ namespace rinCore
         [SerializeField] private Image itemImage;
         [SerializeField] private TMP_Text itemCountText;
         [SerializeField] private Image selectionImage;
+        [SerializeField] Slider chargeSlider;
         private Color32 startingColor;
 
         private void Awake()
@@ -86,6 +87,12 @@ namespace rinCore
             if (slotIndex != action.slot)
                 return;
             containedItem = action.newItem;
+            bool success = false;
+            if (success = action.newItem.containedItem is IFumoItem_WeaponItemSwing)
+            {
+                chargeSlider.SetValuesInt(0, 30, 0, false);
+            }
+            chargeSlider.gameObject.SetActive(success);
         }
 
         private void Select(FInv_SelectSlot selection)

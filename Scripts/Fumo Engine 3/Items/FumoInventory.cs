@@ -175,7 +175,7 @@ namespace rinCore
         }
         private void ExternalSelectSlot(FInv_External_Select_ItemSlot action)
         {
-            SelectSlot(action.slot, false);
+            SelectSlot(action.slot, action.forceRefresh);
         }
     }
     #endregion

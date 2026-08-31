@@ -184,7 +184,7 @@ ScriptedImporter:
     layerType: 0
     blendMode: 0
     cells:
-    - name: Selection Box
+    - name: Selection Tile Box
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:

@@ -63,7 +63,7 @@ namespace rinCore.Bullet
         {
             public Transform HitTransform => (this is Component comp) ? comp.transform : null;
         }
-        static RaycastHit2D[] hits = new RaycastHit2D[10];
+        static RaycastHit2D[] hits = new RaycastHit2D[4];
         static HashSet<IProjectileHit> hitList = new();
         static ContactFilter2D batchContactFilter = new ContactFilter2D()
         {
