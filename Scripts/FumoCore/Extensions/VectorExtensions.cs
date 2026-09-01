@@ -212,9 +212,10 @@ namespace rinCore
         {
             return !SquareDistanceToGreaterThan(v, position, magnitude);
         }
+        [NYI("Default Unity RNG")]
         public static float RandomBetweenXY(this Vector2 v)
         {
-            return Random.Range(v.x, v.y);
+            return UnityEngine.Random.Range(v.x, v.y);
         }
         public static Vector3 Floor(this Vector3 v)
         {
@@ -271,25 +272,29 @@ namespace rinCore
                 return true;
             return false;
         }
+        [NYI("Default Unity RNG")]
         public static Vector2Int GetRandom(this Vector2Int v, Vector2Int min, Vector2Int max)
         {
-            return v = new(Random.Range(min.x, max.x), Random.Range(min.y, max.y));
+            return v = new(UnityEngine.Random.Range(min.x, max.x), UnityEngine.Random.Range(min.y, max.y));
         }
+        [NYI("Default Unity RNG")]
         public static int RandomBetweenXY(this Vector2Int v)
         {
-            return Random.Range(v.x, v.y);
+            return UnityEngine.Random.Range(v.x, v.y);
         }
+        [NYI("Default Unity RNG")]
         public static Vector2 RandomFromZero(this Vector2 v)
         {
-            return new(Random.Range(0f, v.x), Random.Range(0f, v.y));
+            return new(UnityEngine.Random.Range(0f, v.x), UnityEngine.Random.Range(0f, v.y));
         }
         public static Vector2Int GetRandom(this Vector2Int v, Vector3Int min, Vector3Int max)
         {
             return GetRandom(v, (Vector2Int)min, (Vector2Int)max);
         }
+        [NYI("Default Unity RNG")]
         public static Vector2 RandomSign(this Vector2 v)
         {
-            return new(Random.Range(0, 2) * 2 - 1, Random.Range(0, 2) * 2 - 1);
+            return new(UnityEngine.Random.Range(0, 2) * 2 - 1, UnityEngine.Random.Range(0, 2) * 2 - 1);
         }
         public static BoundsInt ToInt(this Bounds b)
         {
@@ -315,16 +320,18 @@ namespace rinCore
             }
             return RandomCircleDirection(v3, new(radius, radiusMax));
         }
+        [NYI("Default Unity RNG")]
         public static Vector2 RandomCircleDirection(this Vector3 v, Vector2 radiusRange)
         {
             Vector2 point = v;
-            point += Random.insideUnitCircle.normalized * radiusRange.RandomBetweenXY();
+            point += UnityEngine.Random.insideUnitCircle.normalized * radiusRange.RandomBetweenXY();
             return point;
         }
+        [NYI("Default Unity RNG")]
         public static Vector2 RandomCircleDirection(this Vector2 v, Vector2 radiusRange)
         {
             Vector2 point = v;
-            point += Random.insideUnitCircle.normalized * radiusRange.RandomBetweenXY();
+            point += UnityEngine.Random.insideUnitCircle.normalized * radiusRange.RandomBetweenXY();
             return point;
         }
         public static Vector2 Rotate2D(this Vector2 v, float angle)
@@ -465,10 +472,11 @@ namespace rinCore
         {
             return v.x.Absolute() < v.y.Absolute() ? v.x.Absolute() : v.y.Absolute();
         }
+        [NYI("Default Unity RNG")]
         public static Vector2 RandomPointInBox(this Vector2 v)
         {
-            float x = Random.Range(-v.x * 0.5f, v.x * 0.5f);
-            float y = Random.Range(-v.y * 0.5f, v.y * 0.5f);
+            float x = UnityEngine.Random.Range(-v.x * 0.5f, v.x * 0.5f);
+            float y = UnityEngine.Random.Range(-v.y * 0.5f, v.y * 0.5f);
             return new Vector2(x, y);
         }
         public static Rect ToRect(this Vector2 a, Vector2 b)

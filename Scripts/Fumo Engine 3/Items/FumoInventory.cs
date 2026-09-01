@@ -1,7 +1,10 @@
+using Codice.CM.Common.Tree;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.UI;
 
 namespace rinCore
 {
@@ -17,7 +20,49 @@ namespace rinCore
             }
         }
     }
-    public abstract class FumoItem : ScriptableObject
+    #region Item Lookup
+    public partial class FumoItem // Item Lookup
+    {
+        public record BuildItemLookup(List<FumoItem> items);
+        private static Dictionary<string, FumoItem> builtCache = new();
+        public static bool TryGetFromID(string id, out FumoItem item)
+        {
+            item = null;
+            if (builtCache == null)
+            {
+                return false;
+            }
+            builtCache.TryGetValue(id, out item);
+            return item != null;
+        }
+        [Initialize(-999)]
+        private static void StartCacheSubscription()
+        {
+            EventBus.Clear<BuildItemLookup>();
+            EventBus.Bind<BuildItemLookup>(BuildCacheFrom);
+        }
+        private static void BuildCacheFrom(BuildItemLookup action)
+        {
+            if (builtCache == null)
+                builtCache = new();
+            builtCache.Clear();
+
+            foreach (var item in action.items)
+            {
+                if (item == null)
+                {
+                    continue;
+                }
+                if (builtCache.ContainsKey(item.ItemID))
+                {
+                    Debug.LogWarning($"Overwriting Cache. Duplicate key for : {item.ItemID}");
+                }
+                builtCache[item.ItemID] = item;
+            }
+        }
+    }
+    #endregion
+    public abstract partial class FumoItem : ScriptableObject
     {
         [System.Serializable]
         public abstract class ItemUseAction
@@ -26,6 +71,7 @@ namespace rinCore
         }
         [SerializeReference, ManagedReferencePicker] public ItemUseAction UseAction;
         public string ItemID => name;
+        public string ItemDisplayName => name.Capitalized().StripUnityNameSuffix().RemoveAfter("#");
         public Sprite inventoryIcon;
         public bool Stackable;
         [Range(1, 999), SerializeField] int _stackSize = 250;
@@ -58,7 +104,45 @@ namespace rinCore
     {
         public float Range { get; }
     }
-
+    [System.Serializable]
+    public class FumoItemPacket
+    {
+        public int Amount, Power;
+        public string ItemID;
+        public bool RealizeSlotItem()
+        {
+            if (Amount <= 0)
+            {
+                return false;
+            }
+            if (!FumoItem.TryGetFromID(ItemID, out FumoItem data))
+            {
+                return false;
+            }
+            new FInv_AddItem(new()
+            {
+                Amount = Amount,
+                Power = Power,
+                containedItem = data,
+            }).Publish();
+            return true;
+        }
+        public bool TryAsData(out FumoItem data)
+        {
+            if (!FumoItem.TryGetFromID(ItemID, out data))
+            {
+                return false;
+            }
+            return true;
+        }
+        public bool TryApplyIcon(in Image i)
+        {
+            if (!TryAsData(out FumoItem data))
+                return false;
+            i.sprite = data.inventoryIcon;
+            return true;
+        }
+    }
     [System.Serializable]
     public class FumoSlotItem
     {

@@ -42,6 +42,36 @@ namespace rinCore
                 }
             }
             [System.Serializable]
+            public class LotsOfShots : WeaponScriptItemAction
+            {
+                public ProjectileDefine projectile;
+                public int count = 50;
+                public override void RunItem(IFumoItem_Use.unitUsePacket packet)
+                {
+                    IEnumerator CO_Run()
+                    {
+                        for (int j = 0; j < count; j++)
+                        {
+                            for (int i = 0; i < 10000; i++)
+                            {
+                                Vector2 a = packet.Sender.CurrentPosition;
+                                Vector2 dir = RNG.SeededRandomVector2 * RNG.FloatRange(6f, 12f);
+                                Projectile.BuildProjectile(new()
+                                {
+                                    Define = projectile,
+                                    Position = packet.Sender.CurrentPosition,
+                                    Sender = packet.Sender,
+                                    VelocityDirection = dir.ScaleToMagnitude(12f)
+                                });
+                            }
+                            const float wait = 1 / 60f;
+                            yield return wait.WaitForSeconds();
+                        }
+                    }
+                    packet.Sender.StartCoroutine(CO_Run());
+                }
+            }
+            [System.Serializable]
             public class BurstShot : WeaponScriptItemAction
             {
                 public ProjectileDefine projectile;

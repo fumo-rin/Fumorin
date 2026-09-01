@@ -6,7 +6,7 @@ namespace rinCore
 #if UNITY_EDITOR
     public static partial class FCEHelper
     {
-        public static void CreateAsset(Object o, string path)
+        public static void CreateAsset(UnityEngine.Object o, string path)
         {
             AssetDatabase.CreateAsset(o, path);
             AssetDatabase.SaveAssets();

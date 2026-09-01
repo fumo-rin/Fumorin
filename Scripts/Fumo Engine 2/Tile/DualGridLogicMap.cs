@@ -85,7 +85,7 @@ namespace rinCore
                     Rect spriteRect = new Rect(cellRect.x + padding, cellRect.y + padding, boxSize - (padding * 2), boxSize - (padding * 2));
 
                     EditorGUI.BeginChangeCheck();
-                    Object newSprite = EditorGUI.ObjectField(spriteRect, elementProp.objectReferenceValue, typeof(Sprite), false);
+                    UnityEngine.Object newSprite = EditorGUI.ObjectField(spriteRect, elementProp.objectReferenceValue, typeof(Sprite), false);
                     if (EditorGUI.EndChangeCheck())
                     {
                         elementProp.objectReferenceValue = newSprite;
