@@ -63,6 +63,24 @@ namespace rinCore
     #endregion
     public static class RectExtensions
     {
+        public static Rect Shrink(this Rect rect, float x, float y)
+        {
+            return new Rect(
+                rect.x + x,
+                rect.y + y,
+                rect.width - (x * 2f),
+                rect.height - (y * 2f)
+            );
+        }
+        public static Rect Shift(this Rect rect, float x, float y)
+        {
+            return new Rect(
+                rect.x + x,
+                rect.y + y,
+                rect.width,
+                rect.height
+            );
+        }
         #region Rect Rip From VFavorites
         public static Rect Core_Resize(this Rect rect, float px) { rect.x += px; rect.y += px; rect.width -= px * 2; rect.height -= px * 2; return rect; }
 

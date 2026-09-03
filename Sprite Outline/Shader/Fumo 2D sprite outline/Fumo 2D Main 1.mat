@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Fumo 2D Main
+  m_Name: Fumo 2D Main 1
   m_Shader: {fileID: -6465566751694194690, guid: 997281fb698064f4fb51b8930cadf25d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -54,10 +54,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _OutlineSize: 0.0095
+    - _OutlineSize: 0.0074
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0, g: 2.3052938, b: 4.9245777, a: 1}
+    - _OutlineColor: {r: 0, g: 0.8156853, b: 4, a: 0.44705883}
     - _Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
