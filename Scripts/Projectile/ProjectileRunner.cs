@@ -243,7 +243,7 @@ namespace rinCore.Bullet
                     }
                     else
                         if (unmodifiedElapsed <= growTime)
-                            scaleFactor = Mathf.SmoothStep(0f, 1f, unmodifiedElapsed / growTime);
+                            scaleFactor = Mathf.SmoothStep(0.35f, 1f, unmodifiedElapsed / growTime);
 
                     float angle = define.LockRotation ? 0f : p.Render_Angle + addedSpin - 90f;
 
