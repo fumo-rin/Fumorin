@@ -172,6 +172,10 @@ namespace rinCore
                 z = Mathf.Abs(v.z)
             };
         }
+        public static Vector2 Half(this Vector2 v)
+        {
+            return v * 0.5f;
+        }
         public static Vector3 Multiply(this Vector3 v, float magnitude)
         {
             return new(v.x * magnitude, v.y * magnitude, v.z * magnitude);

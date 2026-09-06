@@ -36,6 +36,7 @@ namespace rinCore
         }
     }
     public record FEB_Camera_Focus(GameObject focus);
+    public record FEB_Camera_Offset(float x, float y);
     public interface IFocusCamera
     {
         private static GameObject _fallbackFocusObject;

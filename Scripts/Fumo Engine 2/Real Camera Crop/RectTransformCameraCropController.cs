@@ -52,10 +52,11 @@ namespace rinCore
         {
             instance = null;
         }
-        public static void ApplyToCamera(Camera scaleCamera)
+        public static void ApplyToCamera(Camera scaleCamera, bool clearColor)
         {
             scaleCamera.clearFlags = CameraClearFlags.Depth;
-            scaleCamera.backgroundColor = Color.black.Opacity(0);
+            if (clearColor)
+                scaleCamera.backgroundColor = Color.black.Opacity(0);
             scaleCamera.pixelRect = storedRect;
         }
     }

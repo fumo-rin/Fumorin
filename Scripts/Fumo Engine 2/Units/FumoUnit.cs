@@ -328,7 +328,7 @@ namespace rinCore
     {
         public float IFramesRemaining { get; }
     }
-    public interface UnitCenter2
+    public interface IUnitCenter2
     {
         public FumoUnit CenterOwner { get; }
         public Vector2 Center { get; }
@@ -390,7 +390,7 @@ namespace rinCore
         {
             get
             {
-                if (this is UnitCenter2 c)
+                if (this is IUnitCenter2 c)
                 {
                     return c.Center;
                 }

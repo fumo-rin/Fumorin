@@ -197,9 +197,6 @@
         },
         {
             "m_Id": "48c806e2c24345bb9e4364e17157ee91"
-        },
-        {
-            "m_Id": "8736f9b8e94244feb4beabc3dfee7913"
         }
     ],
     "m_GroupDatas": [],
@@ -607,20 +604,6 @@
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "89066e1fd1224aae975e82ee066b86af"
-                },
-                "m_SlotId": 0
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "8736f9b8e94244feb4beabc3dfee7913"
-                },
-                "m_SlotId": 2
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "f03995f662a04f4eb87055fa7cf0d616"
                 },
                 "m_SlotId": 0
             }
@@ -1173,29 +1156,6 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.Smoothness"
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector3MaterialSlot",
-    "m_ObjectId": "03a0270da7ef4d569cf52b94b158d94d",
-    "m_Id": 2,
-    "m_DisplayName": "Out_Vector3",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "OutVector3",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-    },
-    "m_Labels": []
 }
 
 {
@@ -3555,22 +3515,6 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "541b47a354b94c228da2abdb9b43b5d7",
-    "m_Id": -527489353,
-    "m_DisplayName": "Wind",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "_Wind",
-    "m_StageCapability": 3,
-    "m_Value": 0.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": [],
-    "m_LiteralMode": false
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "574c7a99e60740a188a93744dcf79a5c",
     "m_Id": 6,
     "m_DisplayName": "B",
@@ -4522,59 +4466,6 @@
     },
     "m_Labels": [],
     "m_Channel": 0
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "8736f9b8e94244feb4beabc3dfee7913",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Vertex Snap Out",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 2735.000244140625,
-            "y": -1922.0001220703125,
-            "width": 208.0,
-            "height": 303.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "541b47a354b94c228da2abdb9b43b5d7"
-        },
-        {
-            "m_Id": "e58384c14e6a4dc2a97d280a705ead25"
-        },
-        {
-            "m_Id": "df0427ede2604e5690a0be944a0f49b7"
-        },
-        {
-            "m_Id": "03a0270da7ef4d569cf52b94b158d94d"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"e163740d4d19d7b4e8085ca4d4ce2651\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "fc203e8f-9103-4c98-84f4-dda2bf7deaf2",
-        "486701c5-a026-4770-a91e-cc9e3a7d9073"
-    ],
-    "m_PropertyIds": [
-        -527489353,
-        -498351504
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
 }
 
 {
@@ -6563,31 +6454,6 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
-    "m_ObjectId": "df0427ede2604e5690a0be944a0f49b7",
-    "m_Id": 1,
-    "m_DisplayName": "Out_Vector4",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "OutVector4",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "dfb2f3f49b80436ca8dfbb149eb07dba",
     "m_Id": 2,
@@ -6664,22 +6530,6 @@
     "m_CustomColors": {
         "m_SerializableColors": []
     }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "e58384c14e6a4dc2a97d280a705ead25",
-    "m_Id": -498351504,
-    "m_DisplayName": "VSnap",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "_VSnap",
-    "m_StageCapability": 3,
-    "m_Value": 16.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": [],
-    "m_LiteralMode": false
 }
 
 {

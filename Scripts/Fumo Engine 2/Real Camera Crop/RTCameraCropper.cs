@@ -5,9 +5,10 @@ namespace rinCore
     public class RTCameraCropper : MonoBehaviour
     {
         [SerializeField] Camera cropCamera;
+        [SerializeField] bool clearColor = true;
         private void LateUpdate()
         {
-            RectTransformCameraCropController.ApplyToCamera(cropCamera);
+            RectTransformCameraCropController.ApplyToCamera(cropCamera, clearColor);
         }
     }
 }
