@@ -6,7 +6,7 @@ namespace rinCore
 {
     public partial struct BusUI
     {
-        public record Close(BusUI_Queue channel);
+        public record Close(BusUI_Queue channel) : IRinEvent;
     }
 
     [Flags]

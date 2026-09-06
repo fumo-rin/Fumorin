@@ -325,8 +325,21 @@ namespace rinCore.Bullet
 
         public static int BulletCount => current != null ? current.masterProjectileList.Count : 0;
 
-        private void OnEnable() => _renderer.Bind();
-        private void OnDisable() => _renderer.Release();
+        private void OnEnable()
+        {
+            _renderer.Bind();
+            EventBus.Bind<RProj_Global_Clear>(ApplyGlobalClear);
+        }
+        private void OnDisable()
+        {
+            _renderer.Release();
+            EventBus.Release<RProj_Global_Clear>(ApplyGlobalClear);
+        }
+        private void ApplyGlobalClear(RProj_Global_Clear clear)
+        {
+            currentClear = clear;
+        }
+        static RProj_Global_Clear currentClear;
 
         private void Update()
         {
@@ -334,7 +347,11 @@ namespace rinCore.Bullet
             if (count == 0) return;
 
             float dt = Time.deltaTime;
-            Projectile.ProcessBatch(masterProjectileList, dt, CollisionLayer, (Projectile.IProjectileHit hit) =>
+            var runSettings = new Projectile.Settings(CollisionLayer)
+            {
+                GlobalClear = currentClear
+            };
+            Projectile.ProcessBatch(masterProjectileList, dt, runSettings, (Projectile.IProjectileHit hit) =>
             {
                 hit.HitTransform.position += new Vector3(0, -1f, 0f);
             });
@@ -356,6 +373,6 @@ namespace rinCore.Bullet
         }
     }
 
-    public record FEB_Projectile_Count_Frame(int ProjectileCount);
+    public record FEB_Projectile_Count_Frame(int ProjectileCount) : IRinEvent;
     #endregion
 }

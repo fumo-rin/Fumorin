@@ -7,10 +7,10 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
-    public record FFac_Floor_Click(PointerEventData data);
-    public record FFac_Floor_Release(PointerEventData data);
-    public record FFac_SetFactoryPiece(Vector2Int tilePos, FactoryNode item);
-    public record FFac_Item_Out(Vector2 position, FumoSlotItem item);
+    public record FFac_Floor_Click(PointerEventData data) : IRinEvent;
+    public record FFac_Floor_Release(PointerEventData data) : IRinEvent;
+    public record FFac_SetFactoryPiece(Vector2Int tilePos, FactoryNode item) : IRinEvent;
+    public record FFac_Item_Out(Vector2 position, FumoSlotItem item) : IRinEvent;
 
     [System.Serializable]
     public class FactoryNode

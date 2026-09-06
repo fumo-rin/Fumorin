@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace rinCore.Bullet
 {
+    public record RProj_Global_Clear(Rect? clear) : IRinEvent;
     public interface IParticleRenderItem
     {
         public bool SkipRender { get; }
@@ -70,14 +71,34 @@ namespace rinCore.Bullet
             useLayerMask = true,
             useTriggers = false
         };
-        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, LayerMask hitLayers, Action<IProjectileHit> hitAction)
+        public struct Settings
         {
-            batchContactFilter.SetLayerMask(hitLayers);
-
+            public LayerMask hitLayers;
+            public RProj_Global_Clear GlobalClear;
+            public Settings(LayerMask mask)
+            {
+                hitLayers = mask;
+                GlobalClear = null;
+            }
+        }
+        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, Settings settings, Action<IProjectileHit> hitAction)
+        {
+            batchContactFilter.SetLayerMask(settings.hitLayers);
+            Rect? clearRect;
             foreach (var proj in projCollection)
             {
                 if (!proj.IsValid)
                     continue;
+                if (settings.GlobalClear != null && settings.GlobalClear.clear.HasValue)
+                {
+                    clearRect = settings.GlobalClear.clear.Value;
+                    if (!clearRect.Value.Contains(proj.FinalizedPosition))
+                    {
+                        proj.IsValid = false;
+                        ProjectileRenderer.HitParticle(proj.FinalizedPosition, -proj.FinalizedVelocity);
+                        continue;
+                    }
+                }
 
                 Vector2 startPos = proj.FinalizedPosition;
                 proj.PreviousPosition = startPos;

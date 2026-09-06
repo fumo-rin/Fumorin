@@ -23,7 +23,7 @@ namespace rinCore
     #region Item Lookup
     public partial class FumoItem // Item Lookup
     {
-        public record BuildItemLookup(List<FumoItem> items);
+        public record BuildItemLookup(List<FumoItem> items) : IRinEvent;
         private static Dictionary<string, FumoItem> builtCache = new();
         public static bool TryGetFromID(string id, out FumoItem item)
         {
@@ -265,13 +265,13 @@ namespace rinCore
     #endregion
 
     #region Event Bus
-    public record FInv_External_Select_ItemSlot(int slot, bool forceRefresh);
-    public record FInv_AddItem(FumoSlotItem slotItem);
-    public record FInv_SelectSlot(int slot, FumoSlotItem containedItem);
-    public record FInv_SetSlotItem(int slot, FumoSlotItem newItem);
-    public record FInv_External_SetAmount(FumoSlotItem item, int amount);
-    public record FInv_SwapSlots(int slot1, int slot2);
-    public record FInv_HeldItem_To_UI(FumoSlotItem handItem);
+    public record FInv_External_Select_ItemSlot(int slot, bool forceRefresh) : IRinEvent;
+    public record FInv_AddItem(FumoSlotItem slotItem) : IRinEvent;
+    public record FInv_SelectSlot(int slot, FumoSlotItem containedItem) : IRinEvent;
+    public record FInv_SetSlotItem(int slot, FumoSlotItem newItem) : IRinEvent;
+    public record FInv_External_SetAmount(FumoSlotItem item, int amount) : IRinEvent;
+    public record FInv_SwapSlots(int slot1, int slot2) : IRinEvent;
+    public record FInv_HeldItem_To_UI(FumoSlotItem handItem) : IRinEvent;
     #endregion
 
     [System.Serializable]
@@ -317,8 +317,8 @@ namespace rinCore
             }
         }
 
-        public record ItemStackQuery(string itemID, bool notFull);
-        public record ItemSlotQuery(int slotIndex);
+        public record ItemStackQuery(string itemID, bool notFull) : IRinEvent;
+        public record ItemSlotQuery(int slotIndex) : IRinEvent;
 
         public FumoInventory(int maxSlots = 20)
         {

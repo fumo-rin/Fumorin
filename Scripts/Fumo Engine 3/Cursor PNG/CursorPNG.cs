@@ -31,7 +31,7 @@ namespace rinCore
         private Sprite lastAppliedSprite;
         private int lastAppliedScale = -1;
 
-        public record Cursor_Set_Frame(Entry entry);
+        public record Cursor_Set_Frame(Entry entry) : IRinEvent;
 
         private void OnEnable()
         {
@@ -53,7 +53,7 @@ namespace rinCore
             lastAppliedScale = -1;
         }
 
-        public record Cursor_Set_Size(int size);
+        public record Cursor_Set_Size(int size) : IRinEvent;
         const string settingName = "Setting_Cursor_Size";
         [QFSW.QC.Command("-cursor-size")]
         private void SetSize(int newSize)
