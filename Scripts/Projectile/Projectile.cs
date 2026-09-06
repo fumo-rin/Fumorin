@@ -4,9 +4,15 @@ using UnityEngine;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace rinCore.Bullet
 {
+    public static class FactionExtension
+    {
+        public static bool IsFriendlyWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is not FumoUnit.UFaction.None && fac == other;
+        public static bool IsHostileWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is FumoUnit.UFaction.None || fac != other;
+    }
     public record RProj_Global_Clear(Rect? clear) : IRinEvent;
     public interface IParticleRenderItem
     {
@@ -17,12 +23,25 @@ namespace rinCore.Bullet
     }
     public class Projectile : IParticleRenderItem
     {
-        public interface IProjectileHitListener
+        public struct HitPacket
         {
-
+            public FumoUnit Sender;
+            public Vector2 Point;
+            public Vector2 Normal;
+            public float Damage;
+            public HitPacket(float damage, Vector2 position)
+            {
+                this.Sender = null;
+                this.Point = position;
+                this.Damage = damage;
+                this.Normal = Vector2.down;
+            }
         }
+        public float FinalDamage => BaseDamage * (Sender is not null and IDamageMod mod ? mod.DamageMod : 1f);
+        public float BaseDamage = 1f;
         [NonSerialized] public FumoUnit Sender;
         [NonSerialized] public ProjectileDefine data;
+        public FumoUnit.UFaction Faction => Sender.AssignedFaction;
         [HideInInspector] public float spawnTime;
         [HideInInspector] public float animationOffsetSeconds;
         [HideInInspector] public bool IsValid { get; set; }
@@ -62,7 +81,10 @@ namespace rinCore.Bullet
         }
         public interface IProjectileHit
         {
+            public FumoUnit.UFaction PHitFaction => (this is FumoUnit f) ? f.AssignedFaction : FumoUnit.UFaction.None;
             public Transform HitTransform => (this is Component comp) ? comp.transform : null;
+
+            public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
         }
         static RaycastHit2D[] hits = new RaycastHit2D[4];
         static HashSet<IProjectileHit> hitList = new();
@@ -81,7 +103,7 @@ namespace rinCore.Bullet
                 GlobalClear = null;
             }
         }
-        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, Settings settings, Action<IProjectileHit> hitAction)
+        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, Settings settings, Action<IProjectileHit> extraHitAction)
         {
             batchContactFilter.SetLayerMask(settings.hitLayers);
             Rect? clearRect;
@@ -132,6 +154,9 @@ namespace rinCore.Bullet
                             continue;
                         }
 
+                        if (ihit.PHitFaction.IsFriendlyWith(proj.Faction))
+                            continue;
+
                         if (proj.Sender == (object)ihit || !hitList.Add(ihit))
                             continue;
 
@@ -142,8 +167,18 @@ namespace rinCore.Bullet
                             forceMultiplier = 1f
                         });
 
+                        if (ihit.TryProjectileHit(new()
+                        {
+                            Damage = proj.FinalDamage,
+                            Sender = proj.Sender,
+                            Normal = hit.normal,
+                            Point = hit.point
+                        }, out float hitActualDamage))
+                        {
+
+                        }
                         proj.IsValid = false;
-                        hitAction?.Invoke(ihit);
+                        extraHitAction?.Invoke(ihit);
                     }
                 }
             }

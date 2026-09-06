@@ -324,6 +324,82 @@ namespace rinCore
         public float SwingLockEnd { get; set; }
     }
     #endregion
+    #region Unit Faction
+    public partial class FumoUnit
+    {
+        public UFaction AssignedFaction = UFaction.None;
+        public enum UFaction
+        {
+            None = -1,
+            Default = 0,
+            Player = 100,
+            Enemy = 200,
+
+        }
+        public bool IsFriendlyWith(UFaction other) => AssignedFaction.IsFriendlyWith(other);
+        public bool IsHostileWith(UFaction other) => AssignedFaction.IsHostileWith(other);
+    }
+    #endregion
+    #region Projectile Hit
+    public partial class FumoUnit : Projectile.IProjectileHit
+    {
+        public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage)
+        {
+            return WhenProjectileHit(packet, out processedDealtDamage);
+        }
+        public abstract bool WhenProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
+    }
+    #endregion
+    #region MoveLerp
+    public partial class FumoUnit
+    {
+        public Coroutine currentExternalMovement;
+        public ExternalMovement cemData = new()
+        {
+            endTime = null,
+            startTime = -1f
+        };
+        public void Action_CEM_Stop()
+        {
+            if (currentExternalMovement != null)
+            {
+                StopCoroutine(currentExternalMovement);
+            }
+        }
+        public void Action_CEM_Arbitrary(IEnumerator coroutine, float duration)
+        {
+            Action_CEM_Stop();
+            cemData = new()
+            {
+                startTime = Time.time,
+                endTime = Time.time + duration
+            };
+            currentExternalMovement = StartCoroutine(coroutine.Wrap(() => currentExternalMovement = null));
+        }
+        public void Action_CEM_A_to_B(Vector2 a, Vector2 b, float duration, System.Func<float> curve = null)
+        {
+            Action_CEM_Stop();
+            cemData = new()
+            {
+                startTime = Time.time,
+                endTime = Time.time + duration
+            };
+            IEnumerator CO_Run(float duration)
+            {
+                float durationRemain = duration;
+                while (durationRemain > 0f)
+                {
+                    yield return null;
+                }
+            }
+            currentExternalMovement = StartCoroutine(CO_Run(duration).Wrap(() => currentExternalMovement = null));
+        }
+    }
+    #endregion
+    public interface IDamageMod
+    {
+        public float DamageMod { get; }
+    }
     public interface IUnitIframes
     {
         public float IFramesRemaining { get; }
@@ -333,7 +409,7 @@ namespace rinCore
         public FumoUnit CenterOwner { get; }
         public Vector2 Center { get; }
     }
-    public abstract partial class FumoUnit : MonoBehaviour, Projectile.IProjectileHit
+    public abstract partial class FumoUnit : MonoBehaviour
     {
         public abstract IEnumerable<Collider2D> Hitboxes { get; }
         public static FumoUnit Player { get; protected set; }
@@ -448,11 +524,32 @@ namespace rinCore
                     }
                 }
             }
-            WhenUpdate();
+            WhenUpdate(cemData);
+        }
+        private void OnDisable()
+        {
+            cemData = new()
+            {
+                startTime = -1f,
+                endTime = null
+            };
+            WhenDisable();
+        }
+        private void OnEnable()
+        {
+            WhenEnable();
         }
         protected abstract void WhenAwake();
         protected abstract void WhenStart();
         protected abstract void WhenDestroy();
-        protected abstract void WhenUpdate();
+        protected abstract void WhenDisable();
+        protected abstract void WhenEnable();
+        public struct ExternalMovement
+        {
+            public float startTime;
+            public float? endTime;
+        }
+        protected abstract void WhenUpdate(ExternalMovement movement);
+
     }
 }

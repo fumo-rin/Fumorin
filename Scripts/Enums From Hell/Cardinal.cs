@@ -4,6 +4,7 @@ namespace rinCore
 {
     public enum Cardinal
     {
+        None = -1,
         Right = 0, Up = 1, Left = 2, Down = 3
     }
 
@@ -11,6 +12,10 @@ namespace rinCore
     {
         public static Cardinal Rotate(this Cardinal c, int count)
         {
+            if (c == Cardinal.None)
+            {
+                return c;
+            }
             return (Cardinal)(((int)c + count) % 4);
         }
         public static Cardinal Flip(this Cardinal c)

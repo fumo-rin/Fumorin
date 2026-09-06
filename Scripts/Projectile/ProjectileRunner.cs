@@ -353,7 +353,7 @@ namespace rinCore.Bullet
             };
             Projectile.ProcessBatch(masterProjectileList, dt, runSettings, (Projectile.IProjectileHit hit) =>
             {
-                hit.HitTransform.position += new Vector3(0, -1f, 0f);
+
             });
 
             masterProjectileList.RemoveAll(x => x == null || !x.IsValid);

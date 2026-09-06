@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
+  m_Name: Eagle
+  m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
+  SoundName: eagle_balls farming ACWrapper
+  soundVolume: 1
+  <soundClips>k__BackingField:
+  - clip: {fileID: 8300000, guid: b0513f3eae0be6a42932064f1fccc7d5, type: 3}
+    PitchVariancePercent: 3
+    PitchOrigin: 1
+    Volume: 1
+    Muted: 0
+  <soundMode>k__BackingField: 20
+  <singleRepeatLockoutTime>k__BackingField: 0.02
+  <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0
