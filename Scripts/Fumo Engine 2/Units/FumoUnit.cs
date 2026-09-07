@@ -462,6 +462,7 @@ namespace rinCore
         {
             transform.position = worldPosition;
         }
+        public Vector2 CenterOrCurrentPosition => this is IUnitCenter2 c ? c.Center : CurrentPosition;
         public virtual Vector2 CurrentPosition
         {
             get

@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using WebSocketSharp;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -10,10 +12,11 @@ namespace rinCore
     public class TypedComponentAttribute : Attribute
     {
         public string CustomCategory { get; }
-
-        public TypedComponentAttribute(string customCategory = null)
+        public string ExtraCategory { get; }
+        public TypedComponentAttribute(string customCategory = null, string extraCategory = null)
         {
             CustomCategory = customCategory;
+            ExtraCategory = extraCategory ?? "Unsorted";
         }
     }
 }
@@ -55,9 +58,10 @@ namespace rinCore
                     ? type.BaseType.Name
                     : "Direct MonoBehaviours";
 
+                string extra = attr.ExtraCategory;
                 string categoryPath = !string.IsNullOrEmpty(attr.CustomCategory)
                     ? attr.CustomCategory
-                    : $"{assemblyName}/{baseTypeName}";
+                    : $"{assemblyName}/{baseTypeName}" + (extra.IsNullOrEmpty() ? "" : "/" + extra);
 
                 string typeName = type.Name;
                 string itemPath = $"{categoryPath}/{typeName}";

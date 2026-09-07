@@ -22,7 +22,7 @@ namespace rinCore
 
         private static GlobalCoroutineRunner Instance
         {
-            get
+            get 
             {
                 if (_instance == null)
                 {
@@ -72,6 +72,7 @@ namespace rinCore
 
             string trackedKey = ResolveKey(key, persistAcrossScenes);
 
+            Debug.Log(Instance);
             Coroutine c = Instance.StartCoroutine(routine);
 
             if (!trackedCoroutines.TryGetValue(trackedKey, out var list))
