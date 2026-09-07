@@ -88,7 +88,7 @@ namespace rinCore
                 return;
             containedItem = action.newItem;
             bool success = false;
-            if (success = action.newItem.containedItem is IFumoItem_WeaponItemSwing)
+            if (success = action.newItem.containedItem is IWeaponSwingLock)
             {
                 chargeSlider.SetValuesInt(0, 30, 0, false);
             }

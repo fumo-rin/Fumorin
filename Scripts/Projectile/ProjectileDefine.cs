@@ -10,7 +10,7 @@ namespace rinCore.Bullet
         public float spin;
         [SortingLayer] public string SortingLayer = "Default";
         [SerializeField] private ParticleSystem particleTemplate;
-        [SerializeField] public float Size = 0.75f;
+        [SerializeField] public float Size = 0.75f, FlareSizeMod = 1.65f;
         [field: SerializeField] public Color32 ProjectileTint { get; private set; } = ColorHelper.White.Opacity(255);
         [field: SerializeField] public bool LockRotation { get; private set; }
 

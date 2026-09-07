@@ -80,10 +80,10 @@ namespace rinCore
             UseAction.WhenUseSuccess(packet);
         }
     }
-    public interface IFumoItem_WeaponItemSwing
+    public interface IWeaponSwingLock
     {
         public bool SwapLock => Time.time < SwapLockEnd;
-        public bool SwingLock => Time.time < SwingLockEnd;
+        public bool IsSwingLocked => Time.time < SwingLockEnd;
         public float SwapLockEnd { get; set; }
         public float SwingLockEnd { get; set; }
     }

@@ -1,13 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using rinCore;
 
 namespace rinCore.Bullet
@@ -98,9 +93,9 @@ namespace rinCore.Bullet
         private Dictionary<int, List<Projectile>> fastDefineLookup;
         private List<ProjectileDefine> activeDefinesList;
 
-        const float growTime = 0.075f;
-        const float shrinkTime = 0.1f;
-        const float peakScale = 2f;
+        const float growTime = 0.045f;
+        const float shrinkTime = 0.065f;
+        const float peakScale = 1.35f;
 
         public void Bind()
         {
@@ -237,7 +232,7 @@ namespace rinCore.Bullet
                     if (define.Flare)
                     {
                         if (unmodifiedElapsed <= growTime)
-                            scaleFactor = Mathf.SmoothStep(0f, peakScale, unmodifiedElapsed / growTime);
+                            scaleFactor = Mathf.SmoothStep(0.35f, peakScale, unmodifiedElapsed / growTime);
                         else if (unmodifiedElapsed <= growTime + shrinkTime)
                             scaleFactor = Mathf.Lerp(peakScale, 1f, (unmodifiedElapsed - growTime) / shrinkTime);
                     }
@@ -313,7 +308,7 @@ namespace rinCore.Bullet
             current.masterProjectileList.Add(p);
             if (p.data.Flare)
             {
-                ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, 2.35f);
+                ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, p.data.FlareSizeMod);
             }
         }
 

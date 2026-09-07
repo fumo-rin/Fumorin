@@ -13,7 +13,7 @@ namespace rinCore
         {
             [Range(-1f, 10f)] public float SwingCooldownTime = 0.65f;
             [Range(-1f, 10f)] public float SwapLockTime = 0.65f;
-            public void ApplyTo(IFumoItem_WeaponItemSwing swing)
+            public void ApplyTo(IWeaponSwingLock swing)
             {
                 if (swing == null)
                     return;
@@ -147,14 +147,14 @@ namespace rinCore
         {
             if (weaponScript == null)
                 return false;
-            void UseSuccess(IFumoItem_Use.unitUsePacket packet, IFumoItem_WeaponItemSwing swing)
+            void UseSuccess(IFumoItem_Use.unitUsePacket packet, IWeaponSwingLock swing)
             {
                 weaponScript.ApplyTo(swing);
                 weaponScript.RunItem(packet);
             }
-            IFumoItem_WeaponItemSwing swing = packet.Sender.GetComponentInChildren<IFumoItem_WeaponItemSwing>();
+            IWeaponSwingLock swing = packet.Sender.GetComponentInChildren<IWeaponSwingLock>();
             bool hasSwing = swing != null;
-            if (!hasSwing || !swing.SwingLock)
+            if (!hasSwing || !swing.IsSwingLocked)
             {
                 UseSuccess(packet, swing);
                 sound.Play(RNG.SeededRandomVector2 * 15f + packet.Sender.CurrentPosition);

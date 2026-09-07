@@ -318,7 +318,7 @@ namespace rinCore
     }
     #endregion
     #region Inventory Swing Lock
-    public partial class FumoUnit : IFumoItem_WeaponItemSwing
+    public partial class FumoUnit : IWeaponSwingLock
     {
         public float SwapLockEnd { get; set; }
         public float SwingLockEnd { get; set; }
@@ -537,6 +537,8 @@ namespace rinCore
         }
         private void OnEnable()
         {
+            SwingLockEnd = Time.time + 0.75f;
+            SwapLockEnd = Time.time + 0.75f;
             WhenEnable();
         }
         protected abstract void WhenAwake();

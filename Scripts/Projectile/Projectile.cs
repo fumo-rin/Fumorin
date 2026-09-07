@@ -189,11 +189,13 @@ namespace rinCore.Bullet
             public FumoUnit Sender;
             public Vector2 Position;
             public Vector2 VelocityDirection;
+            public float Damage;
         }
         public static Projectile BuildProjectile(BulletPacket b)
         {
             if (CreateProjectile(b.Define, b.Sender, b.Position, b.VelocityDirection, out Projectile newP))
             {
+                newP.BaseDamage = b.Damage;
                 return newP;
             }
             return null;
