@@ -3,11 +3,93 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
-using System.Linq;
-using JetBrains.Annotations;
 
 namespace rinCore.Bullet
 {
+    #region Extended Actions & Utilities
+    public partial class Projectile
+    {
+        public Projectile Action_Bounce(Vector2 normal, float bounce)
+        {
+            float speed = _regularVelocity.magnitude;
+            _regularVelocity = _regularVelocity.Bounce(normal, bounce).ScaleToMagnitude(speed);
+            return this;
+        }
+
+        public Projectile Action_AddRotation(float angle)
+        {
+            _regularVelocity = _regularVelocity.Rotate2D(angle);
+            return this;
+        }
+
+        public Projectile Action_ModifySpeed(float multiplier)
+        {
+            _regularVelocity = _regularVelocity.ScaleToMagnitude(_regularVelocity.magnitude * multiplier);
+            return this;
+        }
+
+        public Projectile Action_ShiftForward(float distance)
+        {
+            Vector2 dist = VelocityNotZero.ScaleToMagnitude(distance);
+            SetNewPosition(_currentPosition + dist, false);
+            return this;
+        }
+
+        public void AddForward(float forward)
+        {
+            if (forward != 0f)
+            {
+                Vector2 diff = VelocityNotZero.ScaleToMagnitude(forward);
+                SetNewPosition(diff + _currentPosition, true);
+            }
+        }
+
+        public Vector2 VelocityNotZero
+        {
+            get
+            {
+                if (_regularVelocity != Vector2.zero)
+                {
+                    return _regularVelocity;
+                }
+                return Vector2.down;
+            }
+        }
+
+        public void SetNewPosition(Vector2 position, bool overrideLastPosition = false)
+        {
+            PreviousPosition = _currentPosition;
+            if (overrideLastPosition)
+            {
+                PreviousPosition = position;
+            }
+            _currentPosition = position;
+        }
+
+        public static void ModifyVelocity(Projectile p, Vector2 newVelocity)
+        {
+            p._regularVelocity = newVelocity;
+        }
+    }
+    #endregion
+    #region Factory Helper
+    public class ProjectileFactory
+    {
+        public static Projectile.ArcSettings Arc(float centerAimAngle, float arcSize, int shotCount, float projectileSpeed)
+        {
+            var result = new Projectile.ArcSettings(
+                centerAimAngle - (arcSize * 0.5f),
+                centerAimAngle + (arcSize * 0.5f),
+                arcSize / Mathf.Clamp(shotCount - 1, 1, 9999),
+                projectileSpeed);
+            return result;
+        }
+        public static Projectile.SingleSettings Single(float addedAngle, float projectileSpeed)
+            => new Projectile.SingleSettings(addedAngle, projectileSpeed);
+        public static Projectile.CircleSettings Circle(float addedAngle, int segments, float projectileSpeed)
+            => new Projectile.CircleSettings(addedAngle, segments, projectileSpeed);
+    }
+    #endregion
     public static class FactionExtension
     {
         public static bool IsFriendlyWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is not FumoUnit.UFaction.None && fac == other;
@@ -21,7 +103,7 @@ namespace rinCore.Bullet
         public float Render_Angle { get; }
         public float Render_Size { get; }
     }
-    public class Projectile : IParticleRenderItem
+    public partial class Projectile : IParticleRenderItem
     {
         public struct HitPacket
         {

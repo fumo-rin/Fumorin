@@ -250,6 +250,7 @@ namespace rinCore
     #region Enemy Collection & Cast
     public partial class FumoUnit
     {
+        public abstract Cardinal Facing { get; }
         public static void ForceRemoveAliveEnemy(FumoUnit enemy)
         {
             if (aliveEnemies == null)
