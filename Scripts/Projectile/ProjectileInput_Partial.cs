@@ -16,11 +16,11 @@ namespace rinCore.Bullet
         /// Refresh Origin With Valid Sender. Does nothing if invalid sender.
         /// By struct ref.
         /// </summary>
-        public static ref Projectile.InputSettings rf_ori(ref this Projectile.InputSettings input)
+        public static ref Projectile.InputSettings rf_ori(ref this Projectile.InputSettings input, Vector2? @override = null)
         {
             if (input.Sender != null)
             {
-                input = input.With(origin: input.Sender.CurrentPosition);
+                input = input.With(origin: @override ?? input.Sender.CurrentPosition);
             }
             return ref input;
         }

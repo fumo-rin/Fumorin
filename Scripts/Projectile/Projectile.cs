@@ -265,6 +265,28 @@ namespace rinCore.Bullet
                 }
             }
         }
+        public static void SweepAll(Action<List<Vector2>> sweepAction = null)
+        {
+            ProjectileRunner.DestroyProjectilesOf(x => x.IsValid, sweepAction);
+        }
+        public struct SweepPacket
+        {
+            public SweepPacket(FumoUnit Owner)
+            {
+                this.Owner = Owner;
+                this.Distance = -1f;
+                this.Loot = 255;
+            }
+            public FumoUnit Owner; public float Distance; public byte Loot;
+        }
+        public static void SweepWith(SweepPacket sweep, Action<List<Vector2>> sweepAction)
+        {
+            ProjectileRunner.DestroyProjectilesOf(x =>
+            x.IsValid &&
+            x.Sender == sweep.Owner &&
+            sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance)
+            , sweepAction);
+        }
         public struct BulletPacket
         {
             public ProjectileDefine Define;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using rinCore;
+using System.Linq;
 
 namespace rinCore.Bullet
 {
@@ -310,6 +311,25 @@ namespace rinCore.Bullet
             {
                 ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, p.data.FlareSizeMod);
             }
+        }
+        public static void DestroyProjectilesOf(Predicate<Projectile> where, Action<List<Vector2>> action)
+        {
+            if (current == null || where == null) return;
+
+            List<Vector2> clearedPositions = new();
+            for (int i = 0; i < current.masterProjectileList.Count; i++)
+            {
+                var proj = current.masterProjectileList[i];
+                if (where(proj))
+                {
+                    clearedPositions.Add(proj.FinalizedPosition);
+                }
+            }
+            if (clearedPositions.Count > 0)
+            {
+                action?.Invoke(clearedPositions);
+            }
+            current.masterProjectileList.RemoveAll(where);
         }
 
         private void Awake()
