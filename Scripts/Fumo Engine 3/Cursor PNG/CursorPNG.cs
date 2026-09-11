@@ -12,7 +12,7 @@ namespace rinCore
         [System.Serializable]
         public struct Entry
         {
-            [SearchContext("label:SaneCursors")] public Sprite sprite;
+            [SearchContext("l:SaneCursors")] public Sprite sprite;
             public Vector2? hotspotOverride;
             public int priority;
 
@@ -161,7 +161,7 @@ namespace rinCore
                 targetHeight,
                 0,
                 RenderTextureFormat.Default,
-                RenderTextureReadWrite.Linear
+                RenderTextureReadWrite.sRGB
             );
 
             Vector2 uvMin = new Vector2(r.x / sourceTex.width, r.y / sourceTex.height);
