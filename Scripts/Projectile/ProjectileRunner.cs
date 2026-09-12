@@ -34,7 +34,7 @@ namespace rinCore.Bullet
 
                 Quaternion rotation = Quaternion.FromToRotation(Vector3.right, normal);
 
-                instance.hitParticle.PlayOneShotCached(
+                instance.hitParticle.FC_PlayOneShotCached(
                     position: position,
                     rotation: rotation,
                     overrideBurstCount: 6,
@@ -55,7 +55,7 @@ namespace rinCore.Bullet
         {
             if (instance == null || instance.bulletCancelParticlePrefab == null)
                 return;
-            instance.bulletCancelParticlePrefab.EmitSingleParticleCached(position, velocity * velocityMultiplier, 50f);
+            instance.bulletCancelParticlePrefab.FC_EmitSingleParticleCached(position, velocity * velocityMultiplier, 50f);
         }
     }
     #endregion
@@ -70,7 +70,7 @@ namespace rinCore.Bullet
             if (instance == null || instance.bulletFlareParticlePrefab == null)
                 return;
 
-            instance.bulletFlareParticlePrefab.EmitSingleParticleCached(
+            instance.bulletFlareParticlePrefab.FC_EmitSingleParticleCached(
                 position + new Vector3(0, 0, -1),
                 velocity ?? Vector3.zero,
                 0f,
@@ -312,24 +312,37 @@ namespace rinCore.Bullet
                 ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, p.data.FlareSizeMod);
             }
         }
-        public static void DestroyProjectilesOf(Predicate<Projectile> where, Action<List<Vector2>> action)
+        public static Action<List<Projectile>> StandardProjectileClear = (list) =>
         {
-            if (current == null || where == null) return;
+            foreach (var proj in list)
+            {
+                ProjectileRenderer.BulletCancelParticle(proj.FinalizedPosition, proj.VelocityNotZero);
+            }
+        };
+        public static Predicate<Projectile> ValidProjectiles = (proj) => proj.IsValid && !proj.Faction.IsFriendlyWith(FumoUnit.UFaction.Player);
 
-            List<Vector2> clearedPositions = new();
+        public static void DestroyProjectiles(Predicate<Projectile> where = null, Action<List<Projectile>> action = null)
+        {
+            if (current == null) return;
+
+            var predicate = where ?? ValidProjectiles;
+            List<Projectile> clearedPositions = new();
+
             for (int i = 0; i < current.masterProjectileList.Count; i++)
             {
                 var proj = current.masterProjectileList[i];
-                if (where(proj))
+                if (predicate(proj))
                 {
-                    clearedPositions.Add(proj.FinalizedPosition);
+                    proj.IsValid = false;
+                    clearedPositions.Add(proj);
                 }
             }
+
             if (clearedPositions.Count > 0)
             {
-                action?.Invoke(clearedPositions);
+                var final = action ?? StandardProjectileClear;
+                final?.Invoke(clearedPositions);
             }
-            current.masterProjectileList.RemoveAll(where);
         }
 
         private void Awake()

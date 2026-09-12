@@ -6,6 +6,7 @@ using rinCore.Bullet;
 
 namespace rinCore
 {
+    public record FEB_Unit_Death(FumoUnit unit, Vector2 position) : IRinEvent;
     #region Unit Movers
     public enum MoveResult
     {
@@ -412,6 +413,10 @@ namespace rinCore
     }
     public abstract partial class FumoUnit : MonoBehaviour
     {
+        protected void TriggerDeath()
+        {
+            new FEB_Unit_Death(this, CurrentPosition).Publish();
+        }
         public abstract IEnumerable<Collider2D> Hitboxes { get; }
         public static FumoUnit Player { get; protected set; }
         public static bool PlayerAs<T>(out T player) where T : FumoUnit

@@ -73,7 +73,7 @@ namespace rinCore
             {
                 if (Instance is GeneralManager g && g.gameObject != null && g.gameObject.activeInHierarchy)
                 {
-                    g.Explosion3D.EmitSingleParticleCached(packet.position, null, 0f, null, packet.scale);
+                    g.Explosion3D.FC_EmitSingleParticleCached(packet.position, null, 0f, null, packet.scale);
                     if (packet.playSound) g.funnyExplosionSound.Play(packet.position);
                 }
             }
