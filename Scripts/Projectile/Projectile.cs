@@ -199,7 +199,7 @@ namespace rinCore.Bullet
                     if (!clearRect.Value.Contains(proj.FinalizedPosition))
                     {
                         proj.IsValid = false;
-                        ProjectileRenderer.HitParticle(proj.FinalizedPosition, -proj.FinalizedVelocity);
+                        //ProjectileRenderer.HitParticle(proj.FinalizedPosition, -proj.FinalizedVelocity);
                         continue;
                     }
                 }

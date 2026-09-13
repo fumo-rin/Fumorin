@@ -29,11 +29,11 @@ namespace rinCore.Bullet
         /// Refresh Direction With Valid Sender. Does nothing if invalid sender.
         /// By struct ref.
         /// </summary>
-        public static ref Projectile.InputSettings rf_Dir(ref this Projectile.InputSettings input)
+        public static ref Projectile.InputSettings rf_dir(ref this Projectile.InputSettings input, Vector2? @override = null)
         {
             if (input.Sender != null)
             {
-                input = input.With(direction: input.Sender.Facing.Vec2());
+                input = input.With(direction: @override ?? input.Sender.Facing.Vec2());
             }
             return ref input;
         }
@@ -103,14 +103,14 @@ namespace rinCore.Bullet
     {
         static List<Projectile> iterationList;
 
-        public readonly struct InputSettings
+        public struct InputSettings
         {
-            public float BaseDamage { get; }
-            public FumoUnit Sender { get; }
-            public Vector2 Origin { get; }
-            public Vector2 Direction { get; }
-            public FumoUnit OptionalTarget { get; }
-            public float AddedForward { get; }
+            public float BaseDamage { get; set; }
+            public FumoUnit Sender { get; set; }
+            public Vector2 Origin { get; set; }
+            public Vector2 Direction { get; set; }
+            public FumoUnit OptionalTarget { get; set; }
+            public float AddedForward { get; set; }
 
             [NYI("Missing Auto Aim")]
             public static void Auto(FumoUnit sender, Vector2 direction, out InputSettings input)

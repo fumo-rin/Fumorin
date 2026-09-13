@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 070f83cb5bb53f04e95be8ee8baa3455, type: 3}
   m_Name: Spinning Spike Balls
   m_EditorClassIdentifier: rinCore::rinCore.Projectile.ProjectileDefine
-  animationSpeed: 3
+  animationSpeed: 2
   animationSpreadPercent: 7
   spin: 0
   SortingLayer: Projectile
   particleTemplate: {fileID: 5905382930097071747, guid: c82d88bdabe9e4848af1d74bc74ba1e3, type: 3}
-  Size: 1.25
-  FlareSizeMod: 1.65
+  Size: 1.05
+  FlareSizeMod: 1.35
   <ProjectileTint>k__BackingField:
     serializedVersion: 2
     rgba: 4288059135

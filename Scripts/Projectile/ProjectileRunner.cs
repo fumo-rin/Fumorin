@@ -264,11 +264,10 @@ namespace rinCore.Bullet
     public partial class ProjectileRunner
     {
         public static int? SlowdownProjectileTargetCount = null;
-
         public static float GetTargetSlowdown(int requiredProjectiles = 400)
         {
             if (!FumoUnit.PlayerAs<FumoUnit>(out FumoUnit player) || !player.IsAlive) return 1f;
-            if (player is IUnitIframes iframes && iframes.IFramesRemaining > 0.8f) return 1f;
+            if (!FumoUnit.IsPlayerIframesLessOrEqualTo(0.5f)) return 1f;
 
             float slowdownIdeal = 0.666f;
             float slowdownMax = 0.45f;

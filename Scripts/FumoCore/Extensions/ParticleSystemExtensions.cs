@@ -259,6 +259,8 @@ namespace rinCore
         }
     }
     #endregion
+
+
     #region Cached Playoneshot
     public static partial class ParticleSystemExtensions
     {
@@ -300,15 +302,14 @@ namespace rinCore
                         float arcAngle = shape.arc;
                         float randomAngle = UnityEngine.Random.Range(-arcAngle * 0.5f, arcAngle * 0.5f);
 
-                        Vector3 localDir = Quaternion.Euler(0f, 0f, randomAngle) * Vector3.up;
+                        Vector3 localDir = Quaternion.Euler(0f, 0f, randomAngle) * Vector3.right;
                         particleVelocity = rot * (localDir * main.startSpeed.Evaluate());
                     }
                     else
                     {
-                        particleVelocity = rot * (Vector3.up * main.startSpeed.Evaluate());
+                        particleVelocity = rot * (Vector3.right * main.startSpeed.Evaluate());
                     }
 
-                    // Unity internal EmitParams rotation3D requires RADIANS rather than degrees!
                     Vector3 baseEulers = (rot * Quaternion.Euler(
                         main.startRotationX.Evaluate(),
                         main.startRotationY.Evaluate(),

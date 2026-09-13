@@ -402,10 +402,24 @@ namespace rinCore
     {
         public float DamageMod { get; }
     }
+    #region IFrames
     public interface IUnitIframes
     {
+        public record PlayerIframes(float duration, float endTime) : IRinEvent;
         public float IFramesRemaining { get; }
     }
+    public partial class FumoUnit
+    {
+        public static bool IsPlayerIframesLessOrEqualTo(float maxFrames)
+        {
+            if (!FumoUnit.PlayerAs<FumoUnit>(out FumoUnit f))
+                return false;
+
+            return f.IsAlive && (!(f is IUnitIframes frames) || frames.IFramesRemaining <= maxFrames);
+        }
+        public static WaitUntil WaitForPlayerAliveWithIframes0_8 => new WaitUntil(() => IsPlayerIframesLessOrEqualTo(0.8f));
+    }
+    #endregion
     public interface IUnitCenter2
     {
         public FumoUnit CenterOwner { get; }

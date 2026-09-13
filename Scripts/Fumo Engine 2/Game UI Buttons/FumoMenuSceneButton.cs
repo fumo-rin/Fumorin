@@ -22,7 +22,8 @@ namespace rinCore
             if (sceneToLoad != null && !SceneLoader.IsLoading)
                 SceneLoader.LoadScenePair(sceneToLoad, new()
                 {
-                    Delay = 0.1f,
+                    Delay = 0.05f,
+                    FadeIn = 0.25f,
                     Payload = () =>
                     {
                         if (EndSession)
