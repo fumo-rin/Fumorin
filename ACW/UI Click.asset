@@ -15,7 +15,7 @@ MonoBehaviour:
   SoundName: UI Click
   soundVolume: 0.839
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: f51e12b964f70b04fbab5bbd307f8f61, type: 3}
+  - clip: {fileID: 8300000, guid: d0923300fdd2c514d9cb804822d1241b, type: 3}
     PitchVariancePercent: 11.6
     PitchOrigin: 1.95
     Volume: 1

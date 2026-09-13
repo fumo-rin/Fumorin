@@ -15,7 +15,7 @@ MonoBehaviour:
   SoundName: UI Hover
   soundVolume: 0.814
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: d187050b7fc4f1d4dbf576dfde05bd5f, type: 3}
+  - clip: {fileID: 8300000, guid: ade6a565e084cd14ba5627a998cb850d, type: 3}
     PitchVariancePercent: 9.6
     PitchOrigin: 2.45
     Volume: 0.786

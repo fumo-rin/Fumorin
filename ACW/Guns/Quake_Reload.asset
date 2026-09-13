@@ -15,12 +15,12 @@ MonoBehaviour:
   SoundName: Shot 2
   soundVolume: 1
   <soundClips>k__BackingField:
-  - clip: {fileID: 8300000, guid: b482d07af7b03f44192b9def72c38a1a, type: 3}
+  - clip: {fileID: 8300000, guid: fb24cfc6113191c4fb285b45730e94cb, type: 3}
     PitchVariancePercent: 5
     PitchOrigin: 1
     Volume: 1
     Muted: 0
-  - clip: {fileID: 8300000, guid: b482d07af7b03f44192b9def72c38a1a, type: 3}
+  - clip: {fileID: 8300000, guid: fb24cfc6113191c4fb285b45730e94cb, type: 3}
     PitchVariancePercent: 5
     PitchOrigin: 0.85
     Volume: 1
