@@ -163,6 +163,14 @@ namespace rinCore
                 MusicWrapper wrapper = Playlist.Dequeue();
                 wrapper.Play();
             }
+            else if (currentPlayMode == PlayMode.Shuffle)
+            {
+                if (QueueShuffleTrack() && Playlist.Count > 0)
+                {
+                    MusicWrapper wrapper = Playlist.Dequeue();
+                    wrapper.Play();
+                }
+            }
             started = true;
         }
 
@@ -216,7 +224,7 @@ namespace rinCore
                 return;
             }
 
-            if (mw.dontReplaceSelf && IsPlayingOnTrack(instance.selectedTrack, mw))
+            if (mw.dontReplaceSelf && currentlyPlaying.music == mw && IsPlaying)
                 return;
 
             instance.PlayTransition(mw, instance.crossFadeLength);
@@ -233,6 +241,12 @@ namespace rinCore
             {
                 StopCoroutine(transitionCoroutine);
                 transitionCoroutine = null;
+            }
+
+            if (fadeOutCoroutine != null)
+            {
+                StopCoroutine(fadeOutCoroutine);
+                fadeOutCoroutine = null;
             }
 
             transitionCoroutine = StartCoroutine(TransitionSequence(clip, fadeDuration));
@@ -267,7 +281,6 @@ namespace rinCore
                 {
                     instance.StopCoroutine(instance.transitionCoroutine);
                     instance.transitionCoroutine = null;
-                    instance.isFading = false;
                 }
 
                 AudioSource s = instance.selectedTrack == 1 ? instance.track1 : instance.track2;
@@ -284,9 +297,10 @@ namespace rinCore
 
         private IEnumerator FadeOut(AudioSource s, MusicWrapper w, float crossfade)
         {
+            isFading = true;
             crossfade = Mathf.Max(0.00f, crossfade);
             float timeElapsed = 0f;
-            float startVol = w != null ? w.musicVolume * GlobalVolume : s.volume;
+            float startVol = s.volume;
 
             if (crossfade == 0)
             {
@@ -302,6 +316,8 @@ namespace rinCore
                 }
             }
             s.Stop();
+            currentlyPlaying = default;
+            isFading = false;
             fadeOutCoroutine = null;
         }
 
