@@ -7,6 +7,7 @@ using rinCore.Bullet;
 namespace rinCore
 {
     public record FEB_Unit_Death(FumoUnit unit, Vector2 position) : IRinEvent;
+    public record FEB_Unit_PlayerDeath(FumoUnit unit, Vector2 position) : IRinEvent;
     #region Unit Movers
     public enum MoveResult
     {
@@ -398,6 +399,14 @@ namespace rinCore
         }
     }
     #endregion
+    #region Health
+    public interface IFumoUnit_Health
+    {
+        public float CurrentHealth { get; }
+        public float CurrentMaxHealth { get; }
+        public float currentHealthPercent01 => CurrentMaxHealth <= 0 ? 0f : CurrentHealth / CurrentMaxHealth;
+    }
+    #endregion
     public interface IDamageMod
     {
         public float DamageMod { get; }
@@ -429,6 +438,11 @@ namespace rinCore
     {
         protected void TriggerDeath()
         {
+            if (this == Player)
+            {
+                new FEB_Unit_PlayerDeath(this, CurrentPosition).Publish();
+                return;
+            }
             new FEB_Unit_Death(this, CurrentPosition).Publish();
         }
         public abstract IEnumerable<Collider2D> Hitboxes { get; }

@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
+    public record FEB_Request_RefreshUI();
     public class SceneLoader : MonoBehaviour
     {
         [SerializeField] private ScenePackSO scenePack;
@@ -293,6 +294,7 @@ namespace rinCore
             IsLoading = false;
 
             settings.Payload?.Invoke();
+            new FEB_Request_RefreshUI().Publish();
 
             if (settings.FadeOut > 0f && fadingImage != null)
             {
