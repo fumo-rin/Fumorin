@@ -554,5 +554,12 @@ namespace rinCore
                 ray.direction.RotateRelative(pitch, yaw, roll)
             );
         }
+        public static IEnumerable<Vector2> Many(this Vector2 v, int count, float maxRange)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return v + RNG.SeededRandomInsideUnitCircle * maxRange;
+            }
+        }
     }
 }

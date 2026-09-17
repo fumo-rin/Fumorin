@@ -6,6 +6,13 @@ using UnityEngine.SceneManagement;
 
 namespace rinCore
 {
+    public interface IParticlePosition
+    {
+        public Vector3 ParticlePosition { get; }
+        public float x => ParticlePosition.x;
+        public float y => ParticlePosition.y;
+        public float z => ParticlePosition.z;
+    }
     #region Loot Particle
 
     public static partial class ParticleSystemExtensions
@@ -489,7 +496,7 @@ namespace rinCore
                 particleArrayCache.Remove(key);
         }
         private static readonly Dictionary<ParticleSystem, ParticleSystem.Particle[]> particleArrayCache = new();
-        public static void FC_RenderAnimatedPointsFrame(this ParticleSystem ps, List<Vector2> positions, float animationLoopsPerSecond, bool staggerPhase = true)
+        public static void FC_RenderAnimatedPointsFrame<T>(this ParticleSystem ps, List<T> positions, float animationLoopsPerSecond, bool staggerPhase = true) where T : IParticlePosition
         {
             if (ps == null || positions == null)
                 return;
@@ -526,7 +533,7 @@ namespace rinCore
             }
             ps.SetParticles(particleArray, count);
         }
-        public static void FC_RenderAnimatedPointsFrame_3D(this ParticleSystem ps, List<Vector3> positions, float animationLoopsPerSecond, bool staggerPhase = true)
+        public static void FC_RenderAnimatedPointsFrame_3D(this ParticleSystem ps, List<IParticlePosition> positions, float animationLoopsPerSecond, bool staggerPhase = true)
         {
             if (ps == null || positions == null)
                 return;
