@@ -22,12 +22,14 @@ namespace rinCore
         [SerializeField] private SceneReference unloadPreventionScene;
 
         [Header("Starting Scenes")]
+        [SerializeField] private ScenePairSO absoluteMainMenu;
         [SerializeField] private ScenePairSO editorStartingScene;
         [SerializeField] private ScenePairSO buildStartingScene;
         [SerializeField] private bool loadStartingSceneInBuild;
 
         public SceneReference BootstrapperScene => bootstrapperScene;
         public SceneReference UnloadPreventionScene => unloadPreventionScene;
+        public ScenePairSO AbsoluteMainMenu => absoluteMainMenu;
         public ScenePairSO EditorStartingScene => editorStartingScene;
         public ScenePairSO BuildStartingScene => buildStartingScene;
         public bool LoadStartingSceneInBuild => loadStartingSceneInBuild;
@@ -45,6 +47,7 @@ namespace rinCore
             EditorUtility.SetDirty(this);
             Debug.Log("[ScenePackSO] Scene lists refreshed from selected folders.");
         }
+
         public void SetAsActiveAndSync(bool isActualBuildProcess = false)
         {
             if (!isActualBuildProcess)
@@ -88,11 +91,11 @@ namespace rinCore
                 }
             }
 
-            void AddPairToBuild(ScenePairSO pair)
+            void AddPairToBuild(ScenePairSO pair, bool forceInclude = false)
             {
                 if (pair == null) return;
 
-                if (isActualBuildProcess && !pair.IncludeInBuild) return;
+                if (!forceInclude && isActualBuildProcess && !pair.IncludeInBuild) return;
 
                 AddSceneToBuild(pair.MainScene);
                 if (pair.AdditiveScenes != null)
@@ -112,6 +115,8 @@ namespace rinCore
             }
 
             AddSceneToBuild(unloadPreventionScene);
+
+            AddPairToBuild(absoluteMainMenu, forceInclude: true);
             AddPairToBuild(editorStartingScene);
             AddPairToBuild(buildStartingScene);
 
@@ -245,8 +250,49 @@ namespace rinCore
                 }
             }
 
+            void AddPairScene(ScenePairSO pair, string label)
+            {
+                if (pair == null) return;
+
+                if (pair.MainScene != null && pair.MainScene.IsValid)
+                {
+                    string path = pair.MainScene.ScenePath;
+                    if (!seenScenePaths.Contains(path))
+                    {
+                        var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+                        if (asset != null)
+                        {
+                            seenScenePaths.Add(path);
+                            _cachedScenes.Add((pair.MainScene.GetSceneName(), label, asset, path, pair));
+                        }
+                    }
+                }
+
+                if (pair.AdditiveScenes != null)
+                {
+                    foreach (var sr in pair.AdditiveScenes)
+                    {
+                        if (sr == null || !sr.IsValid) continue;
+                        string path = sr.ScenePath;
+                        if (!seenScenePaths.Contains(path))
+                        {
+                            var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+                            if (asset != null)
+                            {
+                                seenScenePaths.Add(path);
+                                _cachedScenes.Add((sr.GetSceneName(), label, asset, path, pair));
+                            }
+                        }
+                    }
+                }
+            }
+
             AddSingleScene(pack.BootstrapperScene, "BOOTSTRAPPER");
             AddSingleScene(pack.UnloadPreventionScene, "PERSISTENT");
+
+            AddPairScene(pack.AbsoluteMainMenu, "MAIN MENU");
+            AddPairScene(pack.EditorStartingScene, "STARTING (EDITOR)");
+            AddPairScene(pack.BuildStartingScene, "STARTING (BUILD)");
 
             if (pack.scenePairSOFolders == null) return;
 
@@ -262,21 +308,8 @@ namespace rinCore
                 foreach (string guid in guids)
                 {
                     var so = AssetDatabase.LoadAssetAtPath<ScenePairSO>(AssetDatabase.GUIDToAssetPath(guid));
-                    if (so == null || so.Scenes == null) continue;
-
-                    foreach (var sr in so.Scenes)
-                    {
-                        if (sr == null || !sr.IsValid) continue;
-
-                        string path = sr.ScenePath;
-                        if (string.IsNullOrEmpty(path) || seenScenePaths.Contains(path)) continue;
-
-                        var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-                        if (asset == null) continue;
-
-                        seenScenePaths.Add(path);
-                        _cachedScenes.Add((sr.GetSceneName(), so.name, asset, path, so));
-                    }
+                    if (so == null) continue;
+                    AddPairScene(so, so.name);
                 }
             }
         }
@@ -287,7 +320,7 @@ namespace rinCore
 
             if (_cachedScenes.Count == 0)
             {
-                EditorGUILayout.HelpBox("No scenes found in the selected ScenePairSO folders.", MessageType.Info);
+                EditorGUILayout.HelpBox("No scenes found in the assigned slots or folder lists.", MessageType.Info);
                 return;
             }
 
@@ -325,6 +358,9 @@ namespace rinCore
                 {
                     "BOOTSTRAPPER" => "<color=#FFD700>(BOOTSTRAPPER)</color>",
                     "PERSISTENT" => "<color=#00FFFF>(PERSISTENT)</color>",
+                    "MAIN MENU" => "<color=#FF6600>(MAIN MENU)</color>",
+                    "STARTING (EDITOR)" => "<color=#ADFF2F>(STARTING EDITOR)</color>",
+                    "STARTING (BUILD)" => "<color=#1E90FF>(STARTING BUILD)</color>",
                     _ => $"<color=#7F7F7F>(from {entry.packName})</color>"
                 };
 
@@ -350,7 +386,10 @@ namespace rinCore
         {
             if (packName == "BOOTSTRAPPER") return 0;
             if (packName == "PERSISTENT") return 1;
-            return 2;
+            if (packName == "MAIN MENU") return 2;
+            if (packName == "STARTING (EDITOR)") return 3;
+            if (packName == "STARTING (BUILD)") return 4;
+            return 5;
         }
     }
 #endif

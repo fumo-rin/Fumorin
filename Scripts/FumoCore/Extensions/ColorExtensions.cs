@@ -6,6 +6,11 @@ namespace rinCore
 {
     public struct ColorHelper
     {
+        public struct HierarchyTypes
+        {
+            public static Color32 SessionStarter => new Color32(170, 120, 220, 50);
+            public static Color32 VersionText => ColorHelper.Gray7.Opacity(50);
+        }
         public static Color32 Peach => new Color32(235, 160, 90, 255);
         public static Color32 FullBlue => new Color32(0, 0, 255, 255);
         public static Color32 FullGreen => new Color32(0, 255, 0, 255);
@@ -27,7 +32,7 @@ namespace rinCore
         public static Color32 Gray1 => new Color32(25, 25, 25, 255);
         public static Color32 Gray2 => new Color32(51, 51, 51, 255);
         public static Color32 Gray3 => new Color32(76, 76, 76, 255);
-        public static Color32 Gray4 => new Color32(102, 102,102, 255);
+        public static Color32 Gray4 => new Color32(102, 102, 102, 255);
         public static Color32 Gray5 => new Color32(127, 127, 127, 255);
         public static Color32 Gray6 => new Color32(152, 152, 152, 255);
         public static Color32 Gray7 => new Color32(178, 178, 178, 255);

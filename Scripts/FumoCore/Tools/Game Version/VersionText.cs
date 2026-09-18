@@ -4,11 +4,14 @@ using UnityEngine;
 namespace rinCore
 {
     [RequireComponent(typeof(TMP_Text))]
-    public class VersionText : MonoBehaviour
+    public class VersionText : MonoBehaviour, IHierarchyComponentColor
     {
         TMP_Text text;
         [SerializeField] TMP_Text versionOnlyText;
         [SerializeField] bool dontShowVersion = false;
+
+        public Color LabelColor => ColorHelper.HierarchyTypes.VersionText;
+
         private void Awake()
         {
             text = GetComponent<TMP_Text>();

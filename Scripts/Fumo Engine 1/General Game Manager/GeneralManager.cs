@@ -184,6 +184,10 @@ namespace rinCore
                 SceneLoader.WhenFinishedLoadingAdditives -= UnPauseGame;
             }
         }
+        void OnApplicationQuit()
+        {
+            GameSession2.ClearSessions(true);
+        }
         private void Start()
         {
             if (Instance == this)

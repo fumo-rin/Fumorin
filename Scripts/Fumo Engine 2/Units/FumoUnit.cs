@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using rinCore.Bullet;
+using Mono.CSharp;
 
 namespace rinCore
 {
@@ -272,6 +273,8 @@ namespace rinCore
         }
         protected void MaintainAliveEnemy(FumoUnit unit, AliveSetterPacket packet)
         {
+            if (unit == Player)
+                return;
             if (packet.ForceOverride)
             {
                 if (packet.OverrideAliveState)
@@ -348,7 +351,8 @@ namespace rinCore
     {
         public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage)
         {
-            return WhenProjectileHit(packet, out processedDealtDamage);
+            bool hit = WhenProjectileHit(packet, out processedDealtDamage);
+            return hit;
         }
         public abstract bool WhenProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
     }
@@ -475,7 +479,16 @@ namespace rinCore
             cast = default;
             return false;
         }
-        public virtual void ForceKill() { }
+        public virtual void ForceKill()
+        {
+            gameObject.SetActive(false);
+            MaintainAliveEnemy(this, new()
+            {
+                ForceOverride = true,
+                OverrideAliveState = false
+            });
+            Destroy(gameObject);
+        }
         public bool IsAlive => CalculateAlive();
         protected abstract bool CalculateAlive();
         public Vector2 NearestOnNavmeshOrCurrentPosition(float randomRange = 0, Vector2? offset = null)
@@ -569,12 +582,16 @@ namespace rinCore
                 endTime = null
             };
             WhenDisable();
+            if (this.AssignedFaction == (UFaction.Enemy))
+                MaintainAliveEnemy(this, new());
         }
         private void OnEnable()
         {
             SwingLockEnd = Time.time + 0.75f;
             SwapLockEnd = Time.time + 0.75f;
             WhenEnable();
+            if (this.AssignedFaction == (UFaction.Enemy))
+                MaintainAliveEnemy(this, new());
         }
         protected abstract void WhenAwake();
         protected abstract void WhenStart();

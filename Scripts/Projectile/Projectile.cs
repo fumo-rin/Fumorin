@@ -265,13 +265,18 @@ namespace rinCore.Bullet
                 }
             }
         }
-        public static void SweepAll(Action<List<Projectile>> sweepAction = null)
-        {
-            ProjectileRunner.DestroyProjectiles();
-        }
         public struct SweepPacket
         {
-            public SweepPacket(FumoUnit Owner)
+            public byte Loot;
+            public float Duration;
+        }
+        public static void SweepAll(SweepPacket packet, Action<List<Projectile>> sweepAction = null)
+        {
+            ProjectileRunner.DestroyProjectiles(null, sweepAction);
+        }
+        public struct SealPacket
+        {
+            public SealPacket(FumoUnit Owner)
             {
                 this.Owner = Owner;
                 this.Distance = -1f;
@@ -279,7 +284,7 @@ namespace rinCore.Bullet
             }
             public FumoUnit Owner; public float Distance; public byte Loot;
         }
-        public static void SweepWith(SweepPacket sweep, Action<List<Projectile>> sweepAction)
+        public static void SealWith(SealPacket sweep, Action<List<Projectile>> sweepAction)
         {
             ProjectileRunner.DestroyProjectiles(x =>
             x.IsValid &&

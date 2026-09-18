@@ -101,7 +101,7 @@ namespace rinCore
 
         public static void MainMenu(SceneLoader.SceneLoadSettings? settings = null)
         {
-            if (Instance != null && Instance.scenePack != null && Instance.scenePack.EditorStartingScene is ScenePairSO p)
+            if (Instance != null && Instance.scenePack != null && Instance.scenePack.AbsoluteMainMenu is ScenePairSO p)
                 LoadScenePair(p, settings);
         }
 

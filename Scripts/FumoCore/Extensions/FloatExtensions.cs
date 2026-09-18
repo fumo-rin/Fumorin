@@ -102,9 +102,9 @@ namespace rinCore
         {
             return f + RNG.FloatRange(min, max);
         }
-        public static int ToInt(this float f)
+        public static int ToInt(this float f, float floatmultiplier = 1f)
         {
-            return Mathf.FloorToInt(f);
+            return Mathf.FloorToInt(f * floatmultiplier);
         }
         public static byte ToByte(this float f)
         {

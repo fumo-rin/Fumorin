@@ -8,7 +8,7 @@ namespace rinCore
     {
         Button b;
         [SerializeField] ScenePairSO sceneToLoad;
-        [SerializeField] bool EndSession;
+        [SerializeField] bool GameSession1_EndSession;
         private void Awake()
         {
             b = GetComponent<Button>();
@@ -26,7 +26,7 @@ namespace rinCore
                     FadeIn = 0.25f,
                     Payload = () =>
                     {
-                        if (EndSession)
+                        if (GameSession1_EndSession)
                         {
                             GameSession.EndSession(new()
                             {

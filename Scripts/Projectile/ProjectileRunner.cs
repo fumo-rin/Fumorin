@@ -50,7 +50,6 @@ namespace rinCore.Bullet
     public partial class ProjectileRenderer
     {
         [SerializeField] private ParticleSystem bulletCancelParticlePrefab;
-
         public static void BulletCancelParticle(Vector3 position, Vector3? velocity = null, float velocityMultiplier = 0.4f)
         {
             if (instance == null || instance.bulletCancelParticlePrefab == null)
@@ -334,6 +333,7 @@ namespace rinCore.Bullet
                 {
                     proj.IsValid = false;
                     clearedPositions.Add(proj);
+                    ProjectileRenderer.BulletCancelParticle(proj.FinalizedPosition, proj.FinalizedVelocity);
                 }
             }
 
@@ -342,6 +342,7 @@ namespace rinCore.Bullet
                 var final = action ?? StandardProjectileClear;
                 final?.Invoke(clearedPositions);
             }
+
         }
 
         private void Awake()
