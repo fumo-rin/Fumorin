@@ -104,15 +104,6 @@ namespace rinCore
         }
     }
 
-    // Lightweight DTO so background thread doesn't access Unity objects
-    public struct RawLeaderboardDto
-    {
-        public string PlayerName;
-        public string PlayerId;
-        public double Score;
-        public string Metadata;
-    }
-
     public class FumoLeaderboard : MonoBehaviour, IUINestRunable
     {
         private static FumoLeaderboard instance;
@@ -134,7 +125,7 @@ namespace rinCore
         [SerializeField] private Button decrementIndex;
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button prevPageButton;
-        [SerializeField] private TMP_Text leaderboardTitleText;
+        [SerializeField] private TMP_Text keyText;
         [SerializeField] private TMP_Text pageText;
 
         private int currentIndex = 0;
@@ -235,12 +226,12 @@ namespace rinCore
 
         private void UpdateLeaderboardLabel()
         {
-            if (leaderboardTitleText != null)
+            if (keyText != null)
             {
                 string keyToDisplay = GetOrFallbackKey(leaderBoardKeys);
                 if (!string.IsNullOrEmpty(keyToDisplay))
                 {
-                    leaderboardTitleText.text = keyToDisplay.SafeRemoveWords(Application.productName);
+                    keyText.text = keyToDisplay.SafeRemoveWords(Application.productName);
                 }
             }
         }
@@ -317,6 +308,7 @@ namespace rinCore
             {
                 int offset = page * count;
 
+                // Step 1: Call UGS on Main Thread so RateLimiter can safely read Time.unscaledTime
                 var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(
                     key,
                     new GetScoresOptions
@@ -329,33 +321,17 @@ namespace rinCore
 
                 if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
 
-                // Step 1: Extract lightweight plain C# DTOs on the main thread instantly without overhead
-                int resultsCount = scoresResponse.Results.Count;
-                var rawDtos = new RawLeaderboardDto[resultsCount];
-                for (int i = 0; i < resultsCount; i++)
-                {
-                    var item = scoresResponse.Results[i];
-                    rawDtos[i] = new RawLeaderboardDto
-                    {
-                        PlayerName = item.PlayerName,
-                        PlayerId = item.PlayerId,
-                        Score = item.Score,
-                        Metadata = item.Metadata
-                    };
-                }
-
-                // Yield briefly to let UI render frame smoothly before background parsing
-                await Task.Yield();
-                if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
-
-                // Step 2: Offload all string manipulation & filtering off the main thread completely!
+                // Step 2: Pass UGS payload into Task.Run to do parsing & profanity checks on Background Thread!
                 var cacheList = await Task.Run(() =>
                 {
                     var parsedList = new List<LeaderboardCacheEntry>(count);
+                    if (scoresResponse?.Results == null) return parsedList;
 
-                    for (int i = 0; i < rawDtos.Length && i < count; i++)
+                    int resultsCount = scoresResponse.Results.Count;
+
+                    for (int i = 0; i < resultsCount && i < count; i++)
                     {
-                        var data = rawDtos[i];
+                        var data = scoresResponse.Results[i];
                         string playerName = string.IsNullOrEmpty(data.PlayerName) ? data.PlayerId : data.PlayerName;
 
                         if (!string.IsNullOrEmpty(playerName) && BadWords.CleanReplaceFunny(playerName.RemoveAfter("#").Letterize(), BadWords.BadWordsList, out string clean, out string badWord, 16))
@@ -378,12 +354,13 @@ namespace rinCore
 
                         parsedList.Add(new LeaderboardCacheEntry(score, playerName, parsedMeta));
                     }
+
                     return parsedList;
                 }, token);
 
                 if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
 
-                // Step 3: Fast batch update on Main Thread
+                // Step 3: Apply UI updates on Main Thread cleanly!
                 for (int i = 0; i < board.Count; i++)
                 {
                     if (board[i] == null) continue;
