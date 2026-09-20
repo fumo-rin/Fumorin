@@ -6,7 +6,10 @@ namespace System.Runtime.CompilerServices
 }
 namespace rinCore
 {
-    public interface IRinEvent { }
+    public interface IRinEvent
+    {
+
+    }
     public static class EventBus
     {
         private static class EventHolder<T>
@@ -20,9 +23,9 @@ namespace rinCore
     }
     public static class EventBusTriggerExtension
     {
-        public static void Publish<T>(this T record) where T : class
+        public static void Publish<T>(this T item) where T : IRinEvent
         {
-            EventBus.Publish<T>(record);
+            EventBus.Publish<T>(item);
         }
     }
 }

@@ -8,8 +8,10 @@ namespace rinCore
     {
         public struct HierarchyTypes
         {
+            public static Color32 Error => ColorHelper.DeepRed.Opacity(100);
             public static Color32 SessionStarter => new Color32(170, 120, 220, 50);
             public static Color32 VersionText => ColorHelper.Gray7.Opacity(50);
+            public static Color32 UINest => new Color32(210, 130, 190, 50);
         }
         public static Color32 Peach => new Color32(235, 160, 90, 255);
         public static Color32 FullBlue => new Color32(0, 0, 255, 255);

@@ -1,28 +1,205 @@
-﻿using UnityEngine;
+﻿using rinCore.UGS;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Unity.Services.Leaderboards;
-using UnityEngine.UI;
 using TMPro;
-using Unity.Services.Authentication;
-using rinCore;
-using Unity.Services.Core;
-using rinCore.UGS;
+using Unity.Services.Leaderboards;
+using Unity.Services.Leaderboards.Exceptions;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace rinCore
 {
-    #region UI Controls
-    public partial class FumoLeaderboard
+    [Serializable]
+    public struct MetadataPair
     {
-        [SerializeField] List<string> leaderBoardKeys = new();
-        [SerializeField] Button incrementIndex, decrementIndex;
-        [SerializeField] Button nextPageButton, prevPageButton;
+        public string key;
+        public string value;
+
+        public MetadataPair(string key, object value)
+        {
+            this.key = key;
+            this.value = value?.ToString() ?? string.Empty;
+        }
+    }
+
+    [Serializable]
+    public class LeaderboardMetadata
+    {
+        public List<MetadataPair> entries = new();
+
+        public LeaderboardMetadata() { }
+
+        public LeaderboardMetadata(IEnumerable<KeyValuePair<string, object>> pairs)
+        {
+            if (pairs == null) return;
+            foreach (var kvp in pairs)
+            {
+                Add(kvp.Key, kvp.Value);
+            }
+        }
+
+        public void Add(string key, object val)
+        {
+            entries.Add(new MetadataPair(key, val));
+        }
+
+        public string Get(string key, string fallback = "")
+        {
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].key == key) return entries[i].value;
+            }
+            return fallback;
+        }
+
+        public bool TryGet(string key, out string result)
+        {
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].key == key)
+                {
+                    result = entries[i].value;
+                    return true;
+                }
+            }
+            result = null;
+            return false;
+        }
+    }
+
+    public struct LeaderboardCacheEntry
+    {
+        public long score;
+        public string player;
+        public LeaderboardMetadata metadata;
+
+        public LeaderboardCacheEntry(long score, string player, LeaderboardMetadata metadata)
+        {
+            this.score = score;
+            this.player = player;
+            this.metadata = metadata;
+        }
+    }
+
+    public class LeaderboardPageCache
+    {
+        private readonly Dictionary<int, List<LeaderboardCacheEntry>> pages = new();
+
+        public bool TryGetPage(int page, out List<LeaderboardCacheEntry> entries)
+        {
+            return pages.TryGetValue(page, out entries);
+        }
+
+        public void SetPage(int page, List<LeaderboardCacheEntry> entries)
+        {
+            pages[page] = entries;
+        }
+
+        public void Clear()
+        {
+            pages.Clear();
+        }
+    }
+
+    // Lightweight DTO so background thread doesn't access Unity objects
+    public struct RawLeaderboardDto
+    {
+        public string PlayerName;
+        public string PlayerId;
+        public double Score;
+        public string Metadata;
+    }
+
+    public class FumoLeaderboard : MonoBehaviour, IUINestRunable
+    {
+        private static FumoLeaderboard instance;
+
+        private static string _currentLeaderboardKey;
+        public static string CurrentLeaderboardKey
+        {
+            get => _currentLeaderboardKey;
+            set => _currentLeaderboardKey = value;
+        }
+
+        [Header("Leaderboard Settings")]
+        [SerializeField] private List<string> leaderBoardKeys = new();
+        [SerializeField] private FumoLeaderboardEntry copyableEntry;
+        [SerializeField] private int count = 20;
+
+        [Header("UI Controls")]
+        [SerializeField] private Button incrementIndex;
+        [SerializeField] private Button decrementIndex;
+        [SerializeField] private Button nextPageButton;
+        [SerializeField] private Button prevPageButton;
         [SerializeField] private TMP_Text leaderboardTitleText;
         [SerializeField] private TMP_Text pageText;
+
         private int currentIndex = 0;
         private int currentPage = 0;
-        int buildVersion;
+        private bool isSelectorInitialized = false;
+
+        private long activeFetchId = 0;
+        private CancellationTokenSource fetchCts;
+
+        private readonly List<FumoLeaderboardEntry> board = new();
+        private readonly Dictionary<string, LeaderboardPageCache> cachedLeaderboards = new();
+
+        public int RunnerPriority => -500;
+
+        private void Awake()
+        {
+            instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this) instance = null;
+            CancelPendingFetch();
+        }
+
+        public void RunNestComponent(UINest nest)
+        {
+            EnsureInitialized();
+            RefreshStateFromStorage();
+            EnsureBoardEntriesCreated();
+
+            string keyToUse = GetOrFallbackKey(leaderBoardKeys);
+            if (!string.IsNullOrEmpty(keyToUse))
+            {
+                CurrentLeaderboardKey = keyToUse;
+                UpdateLeaderboardLabel();
+                UpdatePageLabel();
+                TriggerFetch(keyToUse, currentPage);
+            }
+        }
+
+        public void EnsureInitialized()
+        {
+            if (isSelectorInitialized) return;
+            isSelectorInitialized = true;
+
+            if (incrementIndex != null) incrementIndex.BindSingleAction(() => CycleLeaderboard(1));
+            if (decrementIndex != null) decrementIndex.BindSingleAction(() => CycleLeaderboard(-1));
+            if (nextPageButton != null) nextPageButton.BindSingleAction(() => CyclePage(1));
+            if (prevPageButton != null) prevPageButton.BindSingleAction(() => CyclePage(-1));
+        }
+
+        public void RefreshStateFromStorage()
+        {
+            if (leaderBoardKeys != null && leaderBoardKeys.Count > 0)
+            {
+                PersistentJSON.TryLoad(out currentIndex, "Leaderboard Index");
+                PersistentJSON.TryLoad(out currentPage, "Leaderboard Page");
+
+                if (leaderBoardKeys.TryGetIndex(currentIndex, out var savedKey))
+                    CurrentLeaderboardKey = savedKey;
+                else
+                    CurrentLeaderboardKey = leaderBoardKeys[0];
+            }
+        }
 
         private void CycleLeaderboard(int delta)
         {
@@ -37,7 +214,7 @@ namespace rinCore
             UpdateLeaderboardLabel();
             UpdatePageLabel();
 
-            Build(CurrentLeaderboardKey, currentPage);
+            TriggerFetch(CurrentLeaderboardKey, currentPage);
         }
 
         private void CyclePage(int delta)
@@ -45,15 +222,26 @@ namespace rinCore
             currentPage = Mathf.Max(0, (currentPage + delta).Min(9));
             PersistentJSON.TrySave(currentPage, "Leaderboard Page");
             UpdatePageLabel();
-            if (!string.IsNullOrEmpty(CurrentLeaderboardKey))
-                Build(CurrentLeaderboardKey, currentPage);
+
+            string keyToUse = GetOrFallbackKey(leaderBoardKeys);
+            if (!string.IsNullOrEmpty(keyToUse))
+                TriggerFetch(keyToUse, currentPage);
+        }
+
+        private void TriggerFetch(string key, int page)
+        {
+            _ = BuildAsync(key, page);
         }
 
         private void UpdateLeaderboardLabel()
         {
-            if (leaderboardTitleText != null && leaderBoardKeys.TryGetIndex(currentIndex, out var key))
+            if (leaderboardTitleText != null)
             {
-                leaderboardTitleText.text = key.SafeRemoveWords(Application.productName);
+                string keyToDisplay = GetOrFallbackKey(leaderBoardKeys);
+                if (!string.IsNullOrEmpty(keyToDisplay))
+                {
+                    leaderboardTitleText.text = keyToDisplay.SafeRemoveWords(Application.productName);
+                }
             }
         }
 
@@ -63,125 +251,148 @@ namespace rinCore
                 pageText.text = $"Page {currentPage + 1}";
         }
 
-        private void StartLeaderboardSelector()
+        public static string GetOrFallbackKey(List<string> keys)
         {
-            if (incrementIndex != null) incrementIndex.BindSingleAction(() => CycleLeaderboard(1));
-            if (decrementIndex != null) decrementIndex.BindSingleAction(() => CycleLeaderboard(-1));
-            if (nextPageButton != null) nextPageButton.BindSingleAction(() => CyclePage(1));
-            if (prevPageButton != null) prevPageButton.BindSingleAction(() => CyclePage(-1));
-
-            if (leaderBoardKeys.Count > 0)
-            {
-                currentIndex = 0;
-                currentPage = 0;
-
-                PersistentJSON.TryLoad(out currentIndex, "Leaderboard Index");
-                PersistentJSON.TryLoad(out currentPage, "Leaderboard Page");
-
-                CurrentLeaderboardKey = leaderBoardKeys[currentIndex];
-                UpdateLeaderboardLabel();
-                UpdatePageLabel();
-            }
-        }
-    }
-    #endregion
-
-    public partial class FumoLeaderboard : MonoBehaviour
-    {
-        private static string _currentLeaderboardKey;
-        public static string CurrentLeaderboardKey
-        {
-            get => _currentLeaderboardKey;
-            set => _currentLeaderboardKey = value;
-        }
-
-        static FumoLeaderboard instance;
-
-        [SerializeField] FumoLeaderboardEntry copyableEntry;
-        [SerializeField] int count = 20;
-
-        private List<FumoLeaderboardEntry> board = new();
-        private Dictionary<string, Dictionary<int, List<(long score, string player)>>> cachedLeaderboards = new();
-
-        private void Awake()
-        {
-            instance = this;
-        }
-
-        private void Start()
-        {
-            copyableEntry.gameObject.SetActive(false);
-            copyableEntry.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                var clone = copyableEntry.Spawn2D(Vector2.zero, copyableEntry.transform.parent);
-                board.Add(clone);
-                clone.Clear();
-                clone.gameObject.SetActive(true);
-                clone.transform.localScale = Vector3.one;
-            }
-            StartLeaderboardSelector();
             if (!string.IsNullOrEmpty(CurrentLeaderboardKey))
-                Build(CurrentLeaderboardKey, currentPage);
+                return CurrentLeaderboardKey;
+
+            return keys != null && keys.Count > 0 ? keys[0] : string.Empty;
         }
 
-        private async void Build(string key, int page = 0)
+        private void EnsureBoardEntriesCreated()
         {
-            int version = ++buildVersion;
-            if (string.IsNullOrEmpty(key))
+            if (copyableEntry == null) return;
+
+            board.RemoveAll(x => x == null);
+
+            if (board.Count == 0)
             {
-                Debug.LogWarning("Leaderboard ID not set!");
-                return;
+                copyableEntry.gameObject.SetActive(false);
+                copyableEntry.Clear();
+                for (int i = 0; i < count; i++)
+                {
+                    var clone = copyableEntry.Spawn2D(Vector2.zero, copyableEntry.transform.parent);
+                    board.Add(clone);
+                    clone.Clear();
+                    clone.gameObject.SetActive(true);
+                    clone.transform.localScale = Vector3.one;
+                }
             }
-            bool ready = await UGSInitializer.IsReadyAsync();
-            if (!ready)
+        }
+
+        private void CancelPendingFetch()
+        {
+            activeFetchId++;
+            if (fetchCts != null)
             {
-                Debug.LogWarning("[FumoLeaderboard] UGS not ready, cannot fetch leaderboard yet.");
-                return;
+                fetchCts.Cancel();
+                fetchCts.Dispose();
+                fetchCts = null;
             }
-            if (version != buildVersion)
-                return;
-            if (cachedLeaderboards.TryGetValue(key, out var pageDict) && pageDict.TryGetValue(page, out var cachedData))
+        }
+
+        public async Task BuildAsync(string key, int page = 0)
+        {
+            if (string.IsNullOrEmpty(key)) return;
+
+            CurrentLeaderboardKey = key;
+            EnsureBoardEntriesCreated();
+
+            if (cachedLeaderboards.TryGetValue(key, out var cache) && cache.TryGetPage(page, out var cachedData))
             {
                 ApplyCachedEntries(cachedData);
                 return;
             }
-            foreach (var entry in board)
-                entry.Clear();
+
+            CancelPendingFetch();
+
+            long thisFetchId = ++activeFetchId;
+            fetchCts = new CancellationTokenSource();
+            var token = fetchCts.Token;
+
+            bool ready = await UGSInitializer.IsReadyAsync();
+            if (!ready || token.IsCancellationRequested || thisFetchId != activeFetchId) return;
 
             try
             {
                 int offset = page * count;
+
                 var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(
                     key,
                     new GetScoresOptions
                     {
                         Limit = count,
-                        Offset = offset
+                        Offset = offset,
+                        IncludeMetadata = true
                     }
                 );
 
-                if (version != buildVersion)
-                    return;
+                if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
 
-                var cacheList = new List<(long score, string player)>();
-
-                for (int i = 0; i < board.Count; i++)
+                // Step 1: Extract lightweight plain C# DTOs on the main thread instantly without overhead
+                int resultsCount = scoresResponse.Results.Count;
+                var rawDtos = new RawLeaderboardDto[resultsCount];
+                for (int i = 0; i < resultsCount; i++)
                 {
-                    if (i < scoresResponse.Results.Count)
+                    var item = scoresResponse.Results[i];
+                    rawDtos[i] = new RawLeaderboardDto
                     {
-                        var data = scoresResponse.Results[i];
+                        PlayerName = item.PlayerName,
+                        PlayerId = item.PlayerId,
+                        Score = item.Score,
+                        Metadata = item.Metadata
+                    };
+                }
+
+                // Yield briefly to let UI render frame smoothly before background parsing
+                await Task.Yield();
+                if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
+
+                // Step 2: Offload all string manipulation & filtering off the main thread completely!
+                var cacheList = await Task.Run(() =>
+                {
+                    var parsedList = new List<LeaderboardCacheEntry>(count);
+
+                    for (int i = 0; i < rawDtos.Length && i < count; i++)
+                    {
+                        var data = rawDtos[i];
                         string playerName = string.IsNullOrEmpty(data.PlayerName) ? data.PlayerId : data.PlayerName;
-                        if (BadWords.CleanReplaceFunny(playerName.RemoveAfter("#").Letterize(), BadWords.BadWordsList, out string clean, out string badWord, 16))
+
+                        if (!string.IsNullOrEmpty(playerName) && BadWords.CleanReplaceFunny(playerName.RemoveAfter("#").Letterize(), BadWords.BadWordsList, out string clean, out string badWord, 16))
                         {
-#if UNITY_EDITOR
-                            Debug.Log($"Replacing {playerName} with {clean}... Reason : {badWord}");
-#endif
                             playerName = clean;
                         }
                         long score = data.Score.ToLong();
-                        board[i].Set(score, playerName, offset + i + 1);
-                        cacheList.Add((score, playerName));
+
+                        string rawMeta = SanitizeInputString(data.Metadata, 1024);
+                        LeaderboardMetadata parsedMeta = null;
+
+                        if (!string.IsNullOrEmpty(rawMeta))
+                        {
+                            try
+                            {
+                                parsedMeta = JsonUtility.FromJson<LeaderboardMetadata>(rawMeta);
+                            }
+                            catch (Exception) { }
+                        }
+
+                        parsedList.Add(new LeaderboardCacheEntry(score, playerName, parsedMeta));
+                    }
+                    return parsedList;
+                }, token);
+
+                if (token.IsCancellationRequested || thisFetchId != activeFetchId) return;
+
+                // Step 3: Fast batch update on Main Thread
+                for (int i = 0; i < board.Count; i++)
+                {
+                    if (board[i] == null) continue;
+
+                    if (i < cacheList.Count)
+                    {
+                        var cacheEntry = cacheList[i];
+                        board[i].Set(cacheEntry.score, cacheEntry.player, offset + i + 1, cacheEntry.metadata);
+                        board[i].gameObject.SetActive(true);
                     }
                     else
                     {
@@ -189,26 +400,36 @@ namespace rinCore
                     }
                 }
 
-                if (!cachedLeaderboards.ContainsKey(key))
-                    cachedLeaderboards[key] = new();
+                if (!cachedLeaderboards.TryGetValue(key, out var pageCache))
+                {
+                    pageCache = new LeaderboardPageCache();
+                    cachedLeaderboards[key] = pageCache;
+                }
 
-                cachedLeaderboards[key][page] = cacheList;
-
-                Debug.Log($"Fetched and cached {scoresResponse.Results.Count} leaderboard entries for {key}, page {page}.");
+                pageCache.SetPage(page, cacheList);
             }
-            catch (System.Exception e)
+            catch (OperationCanceledException) { }
+            catch (Exception e)
             {
-                Debug.LogWarning($"Error fetching leaderboard: {e}");
+                if (!token.IsCancellationRequested && thisFetchId == activeFetchId)
+                {
+                    Debug.LogError($"[FumoLeaderboard] Exception fetching scores: {e}");
+                }
             }
         }
-        private void ApplyCachedEntries(List<(long score, string player)> cachedData)
+
+        private void ApplyCachedEntries(List<LeaderboardCacheEntry> cachedData)
         {
+            EnsureBoardEntriesCreated();
             for (int i = 0; i < board.Count; i++)
             {
+                if (board[i] == null) continue;
+
                 if (i < cachedData.Count)
                 {
                     var entry = cachedData[i];
-                    board[i].Set(entry.score, entry.player, i + 1);
+                    board[i].Set(entry, i + 1);
+                    board[i].gameObject.SetActive(true);
                 }
                 else
                 {
@@ -216,36 +437,81 @@ namespace rinCore
                 }
             }
         }
-        public static async Task SubmitScoreAsync(long score)
+
+        public static void InvalidateCache(string key = null)
         {
-            string key = CurrentLeaderboardKey;
-            if (score <= 0d)
-            {
-                return;
-            }
+            if (instance == null) return;
+
             if (string.IsNullOrEmpty(key))
             {
-                Debug.LogWarning("Leaderboard key is null or empty!");
-                return;
+                instance.cachedLeaderboards.Clear();
             }
-            bool ready = await UGSInitializer.IsReadyAsync();
-            if (!ready)
+            else
             {
-                Debug.LogWarning("[FumoLeaderboard] UGS not ready — cannot submit score.");
-                return;
+                instance.cachedLeaderboards.Remove(key);
             }
+        }
+
+        public static async Task SubmitScoreAsync(long score, LeaderboardMetadata metadata = null)
+        {
+            string key = CurrentLeaderboardKey;
+
+            if (score <= 0 || score == long.MaxValue || string.IsNullOrEmpty(key)) return;
+
+            bool ready = await UGSInitializer.IsReadyAsync();
+            if (!ready) return;
+
             try
             {
-                var result = await LeaderboardsService.Instance.AddPlayerScoreAsync(key, score);
-                Debug.Log($"Score {result.Score} submitted successfully to {key} for player {AuthenticationService.Instance.PlayerId}.");
+                try
+                {
+                    var existingScoreEntry = await LeaderboardsService.Instance.GetPlayerScoreAsync(key);
+                    if (existingScoreEntry != null && existingScoreEntry.Score >= score) return;
+                }
+                catch (LeaderboardsException ex) when (ex.Reason == LeaderboardsExceptionReason.EntryNotFound) { }
 
-                if (instance != null && instance.cachedLeaderboards.ContainsKey(key))
-                    instance.cachedLeaderboards.Remove(key);
+                var options = new AddPlayerScoreOptions();
+                if (metadata != null)
+                {
+                    string sanitizedJson = await Task.Run(() =>
+                    {
+                        string rawJson = JsonUtility.ToJson(metadata);
+                        string cleanJson = SanitizeInputString(rawJson, 1024);
+                        return (!string.IsNullOrEmpty(cleanJson) && Encoding.UTF8.GetByteCount(cleanJson) <= 1024) ? cleanJson : null;
+                    });
+
+                    if (!string.IsNullOrEmpty(sanitizedJson))
+                    {
+                        options.Metadata = sanitizedJson;
+                    }
+                }
+
+                await LeaderboardsService.Instance.AddPlayerScoreAsync(key, score, options);
+                InvalidateCache(key);
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                Debug.LogWarning($"Error submitting score to {key}: {e}");
+                Debug.LogError($"[FumoLeaderboard] Error submitting score: {e}");
             }
+        }
+
+        private static string SanitizeInputString(string input, int maxCharLimit)
+        {
+            if (string.IsNullOrEmpty(input)) return string.Empty;
+
+            if (input.Length > maxCharLimit)
+                input = input.Substring(0, maxCharLimit);
+
+            var sb = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (!char.IsControl(c) || c == '\r' || c == '\n' || c == '\t')
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

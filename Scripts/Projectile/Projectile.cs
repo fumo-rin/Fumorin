@@ -270,9 +270,12 @@ namespace rinCore.Bullet
             public byte Loot;
             public float Duration;
         }
+        public record FEB_Projectile_Sweep(SweepPacket packet) : IRinEvent;
+        public record FEB_Projectile_Seal(SealPacket packet) : IRinEvent;
         public static void SweepAll(SweepPacket packet, Action<List<Projectile>> sweepAction = null)
         {
             ProjectileRunner.DestroyProjectiles(null, sweepAction);
+            new FEB_Projectile_Sweep(packet).Publish();
         }
         public struct SealPacket
         {
@@ -282,7 +285,9 @@ namespace rinCore.Bullet
                 this.Distance = -1f;
                 this.Loot = 255;
             }
-            public FumoUnit Owner; public float Distance; public byte Loot;
+            public FumoUnit Owner;
+            public float Distance;
+            public byte Loot;
         }
         public static void SealWith(SealPacket sweep, Action<List<Projectile>> sweepAction)
         {
@@ -291,6 +296,7 @@ namespace rinCore.Bullet
             x.Sender == sweep.Owner &&
             sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance)
             , sweepAction);
+            new FEB_Projectile_Seal(sweep).Publish();
         }
         public struct BulletPacket
         {

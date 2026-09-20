@@ -187,6 +187,11 @@ namespace rinCore
             if (track1 == null) track1 = gameObject.AddComponent<AudioSource>();
             if (track2 == null) track2 = gameObject.AddComponent<AudioSource>();
 
+            track1.volume = 0f;
+            track2.volume = 0f;
+            track1.playOnAwake = false;
+            track2.playOnAwake = false;
+
             transform.SetParent(null);
             instance = this;
             DontDestroyOnLoad(transform.gameObject);
@@ -373,9 +378,29 @@ namespace rinCore
 
             toSource.clip = newClip.musicClip;
             float toTargetVol = newClip.musicVolume * GlobalVolume;
+
+            if (fadeDuration > 0f && (track1.isPlaying || track2.isPlaying))
+            {
+                toSource.volume = 0f;
+                toSource.Play();
+                toSource.loop = currentPlayMode != PlayMode.Shuffle;
+
+                float time = 0f;
+                while (time < fadeDuration)
+                {
+                    float t = time / fadeDuration;
+                    toSource.volume = Mathf.Lerp(0f, toTargetVol, t);
+                    time += Time.unscaledDeltaTime;
+                    yield return null;
+                }
+            }
+
             toSource.volume = toTargetVol;
-            toSource.Play();
-            toSource.loop = currentPlayMode != PlayMode.Shuffle;
+            if (!toSource.isPlaying)
+            {
+                toSource.Play();
+                toSource.loop = currentPlayMode != PlayMode.Shuffle;
+            }
 
             if (selectedTrack == 1) song1 = newClip;
             else song2 = newClip;

@@ -9,6 +9,7 @@ namespace rinCore
 {
     public record FEB_Unit_Death(FumoUnit unit, Vector2 position) : IRinEvent;
     public record FEB_Unit_PlayerDeath(FumoUnit unit, Vector2 position) : IRinEvent;
+    public record FEB_Scoring_Unit_Damaged(bool player, FumoUnit unit, float damage) : IRinEvent;
     #region Unit Movers
     public enum MoveResult
     {
@@ -352,6 +353,10 @@ namespace rinCore
         public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage)
         {
             bool hit = WhenProjectileHit(packet, out processedDealtDamage);
+            if (processedDealtDamage > 0f)
+            {
+                new FEB_Scoring_Unit_Damaged(player: Player == this, this, processedDealtDamage).Publish();
+            }
             return hit;
         }
         public abstract bool WhenProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);

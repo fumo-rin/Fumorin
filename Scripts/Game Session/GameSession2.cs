@@ -130,7 +130,12 @@ namespace rinCore
     {
         public struct Events
         {
-            public record AddScore(double score, bool quantized = true) : IRinEvent;
+            public struct AddScore : IRinEvent
+            {
+                public double score;
+                public bool quantized;
+                public bool contributePopup;
+            }
             public enum progressMode
             {
                 NextOrMainMenu = 0,

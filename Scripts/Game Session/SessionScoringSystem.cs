@@ -50,7 +50,7 @@ namespace rinCore
             }
         }
 
-        public void StoreAndUploadScore()
+        public void StoreAndUploadScore(LeaderboardMetadata meta = null)
         {
             PersistentJSON.LoadScore(FileFriendlyKey, out double storedScore);
             if (ProcessedFinalScore > storedScore)
@@ -60,7 +60,7 @@ namespace rinCore
 
             long submitableScore = ProcessedFinalScore.ToLong();
             FumoLeaderboard.CurrentLeaderboardKey = ScoreStorageKey;
-            _ = FumoLeaderboard.SubmitScoreAsync(submitableScore);
+            _ = FumoLeaderboard.SubmitScoreAsync(submitableScore, meta);
         }
 
         public static double FetchHighscore(string key)

@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
-    public record FEB_Request_RefreshUI();
+    public record FEB_Request_RefreshUI() : IRinEvent;
     public class SceneLoader : MonoBehaviour
     {
         [SerializeField] private ScenePackSO scenePack;

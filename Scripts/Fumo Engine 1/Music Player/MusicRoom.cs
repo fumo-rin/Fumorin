@@ -7,8 +7,7 @@ namespace rinCore
 {
     public class MusicRoom : MonoBehaviour
     {
-        [SerializeField] Button musicButton;
-        [SerializeField] RectTransform musicContainerTransform;
+        [SerializeField] Button buttonTemplate;
         [SerializeField] MusicRoomTracklist trackList;
         protected virtual List<MusicWrapper> Tracklist()
         {
@@ -29,22 +28,24 @@ namespace rinCore
             {
                 if (!selected)
                 {
-                    selected = CreateButton(musicButton, track).gameObject.Select_WithEventSystem();
+                    selected = CreateButton(buttonTemplate, track).gameObject.Select_WithEventSystem();
                     continue;
                 }
-                CreateButton(musicButton, track);
+                CreateButton(buttonTemplate, track);
             }
-            musicButton.gameObject.SetActive(false);
+
+            buttonTemplate.gameObject.SetActive(false);
         }
         private Button CreateButton(Button prefab, MusicWrapper music)
         {
-            Button b = Instantiate(prefab, musicContainerTransform);
+            Button b = Instantiate(prefab, buttonTemplate.transform.parent);
             b.BindSingleAction(() => music.Play());
             TMP_Text t = b.GetComponentInChildren<TMP_Text>();
             if (t != null)
             {
                 t.text = music.TrackName;
             }
+            b.gameObject.SetActive(true);
             return b;
         }
     }

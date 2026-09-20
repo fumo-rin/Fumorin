@@ -1,4 +1,6 @@
-using rinCore;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -12,120 +14,106 @@ namespace rinCore
         public static FumoUISoundManager Instance;
 
         [Header("Input")]
-        [SerializeField] InputActionReference submitAction;
+        [SerializeField] private InputActionReference submitAction;
 
         [Header("UI Sounds")]
         public ACWrapper hoverSound;
         public ACWrapper clickSound;
 
-        private GameObject lastHovered;
-        private bool submitPressedLastFrame;
+        private GameObject lastSelectedOrHovered;
 
         private void Awake()
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(this);
+                Destroy(gameObject);
                 return;
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            if (EventSystem.current == null) return;
-
-            HandleHover();
-            HandleSubmit();
+            if (submitAction != null && submitAction.action != null)
+            {
+                submitAction.action.Enable();
+            }
         }
 
-        #region Hover Detection
-
-        private void HandleHover()
+        private void Update()
         {
-            GameObject hoverTarget = null;
+            if (EventSystem.current == null || SceneLoader.IsLoading) return;
+
+            HandleSelectionAndHoverSound();
+            HandleSubmitSound();
+        }
+
+        #region Hover & Selection Detection
+
+        private void HandleSelectionAndHoverSound()
+        {
+            GameObject currentTarget = GetCurrentInteractableTarget();
+
+            if (currentTarget != null && currentTarget != lastSelectedOrHovered)
+            {
+                lastSelectedOrHovered = currentTarget;
+                hoverSound?.Play(ALHandler.Position);
+            }
+            else if (currentTarget == null)
+            {
+                lastSelectedOrHovered = null;
+            }
+        }
+
+        private GameObject GetCurrentInteractableTarget()
+        {
+            GameObject selected = EventSystem.current.currentSelectedGameObject;
+            if (selected != null && selected.activeInHierarchy && selected.GetComponent<Selectable>() is Selectable sel && sel.interactable)
+            {
+                return selected;
+            }
 
             if (Mouse.current != null)
             {
                 var pointerPos = Mouse.current.position.ReadValue();
                 var eventData = new PointerEventData(EventSystem.current) { position = pointerPos };
-                var results = new System.Collections.Generic.List<RaycastResult>();
+                var results = new List<RaycastResult>();
                 EventSystem.current.RaycastAll(eventData, results);
 
                 foreach (var result in results)
                 {
-                    if (result.gameObject.GetComponent<Selectable>() is Selectable s && s.interactable)
+                    if (result.gameObject.GetComponent<Selectable>() is Selectable hoverSel && hoverSel.interactable)
                     {
-                        hoverTarget = result.gameObject;
-                        break;
+                        return result.gameObject;
                     }
                 }
             }
 
-            if (hoverTarget == null)
-            {
-                var selected = EventSystem.current.currentSelectedGameObject;
-                if (selected != null && selected.GetComponent<Selectable>() is Selectable s && s.interactable)
-                    hoverTarget = selected;
-            }
-
-            if (hoverTarget != lastHovered && hoverTarget != null && !SceneLoader.IsLoading)
-            {
-                lastHovered = hoverTarget;
-                hoverSound?.Play(ALHandler.Position);
-            }
-
-            lastHovered = hoverTarget;
+            return null;
         }
 
         #endregion
 
         #region Submit Detection
 
-        private void HandleSubmit()
+        private void HandleSubmitSound()
         {
-            bool submitPressed = IsSubmitPressed();
+            if (!WasSubmitPressedThisFrame()) return;
 
-            GameObject submitTarget = null;
-
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                var pointerPos = Mouse.current.position.ReadValue();
-                var eventData = new PointerEventData(EventSystem.current) { position = pointerPos };
-                var results = new System.Collections.Generic.List<RaycastResult>();
-                EventSystem.current.RaycastAll(eventData, results);
-
-                foreach (var result in results)
-                {
-                    if (result.gameObject.GetComponent<Selectable>() is Selectable s && s.interactable)
-                    {
-                        submitTarget = result.gameObject;
-                        break;
-                    }
-                }
-            }
-
-            if (submitTarget == null && submitAction != null && submitAction.action != null && submitAction.action.WasPressedThisFrame())
-            {
-                var selected = EventSystem.current.currentSelectedGameObject;
-                if (selected != null && selected.GetComponent<Selectable>() is Selectable s && s.interactable)
-                    submitTarget = selected;
-            }
-
-            if (submitPressed && !submitPressedLastFrame && submitTarget != null && submitTarget.activeInHierarchy && !SceneLoader.IsLoading)
+            GameObject target = GetCurrentInteractableTarget();
+            if (target != null && target.activeInHierarchy)
             {
                 clickSound?.Play(ALHandler.Position);
             }
-
-            submitPressedLastFrame = submitPressed;
         }
 
-        private bool IsSubmitPressed()
+        private bool WasSubmitPressedThisFrame()
         {
-            bool mousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-            bool gamepadPressed = submitAction != null && submitAction.action != null && submitAction.action.WasPressedThisFrame();
-            return mousePressed || gamepadPressed;
+            bool mouseClicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            bool actionTriggered = submitAction != null && submitAction.action != null && submitAction.action.WasPressedThisFrame();
+
+            return mouseClicked || actionTriggered;
         }
 
         #endregion

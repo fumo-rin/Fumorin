@@ -150,7 +150,7 @@ namespace rinCore.UGS
 
             _isChangingName = false;
         }
-
+        //
         public static bool IsReadyFast()
         {
             return _isInitialized &&

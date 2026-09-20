@@ -1,12 +1,5 @@
-using rinCore;
-using System.Collections;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEngine.InputSystem;
-using System;
-using UnityEditor;
 
 namespace rinCore
 {
@@ -152,7 +145,7 @@ namespace rinCore
 #if UNITY_EDITOR
             true;
 #else
-            false;
+        false;
 #endif
     }
     #endregion

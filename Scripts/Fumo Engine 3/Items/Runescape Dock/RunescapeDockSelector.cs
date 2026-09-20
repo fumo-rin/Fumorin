@@ -30,7 +30,7 @@ namespace rinCore
         }
 
 
-        public record Runescape_Dock_Selection(RunescapeDock.DockItem item);
+        public record Runescape_Dock_Selection(RunescapeDock.DockItem item) : IRinEvent;
         public void OnPointerDown(PointerEventData eventData)
         {
             new Runescape_Dock_Selection(TabSelection_WithSideEffects).Publish();

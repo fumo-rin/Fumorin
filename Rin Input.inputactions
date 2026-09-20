@@ -1164,7 +1164,7 @@
                 {
                     "name": "",
                     "id": "abdd3e4f-ce83-4903-8fe8-2d0b72c59820",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Keyboard>/z",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1175,7 +1175,7 @@
                 {
                     "name": "",
                     "id": "f82ae95d-58e9-41ab-ab84-5b2964a4ec06",
-                    "path": "<Keyboard>/z",
+                    "path": "<Keyboard>/numpadEnter",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -1185,8 +1185,8 @@
                 },
                 {
                     "name": "",
-                    "id": "050d04f7-ee79-4ac1-8a89-3add0684393b",
-                    "path": "<Keyboard>/enter",
+                    "id": "93703539-d238-4c92-aae5-56a289406d05",
+                    "path": "*/{Submit}",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

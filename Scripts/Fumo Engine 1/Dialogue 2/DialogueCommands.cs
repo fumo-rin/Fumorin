@@ -62,37 +62,84 @@ namespace rinCore
     }
     public static class ShmupCommands
     {
-        private static readonly Dictionary<string, Action> commandMap = new();
+        private static readonly Dictionary<string, Action> commandMap = new(StringComparer.Ordinal);
+        private static bool isLoaded = false;
+
         [Initialize(-100)]
         public static void LoadAll()
         {
+            if (isLoaded) return;
+
             commandMap.Clear();
 
-            var methods = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a =>
-                {
-                    try { return a.GetTypes(); } catch { return Array.Empty<Type>(); }
-                })
-                .SelectMany(t => t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                .Where(m => m.GetCustomAttribute<DialogueCommandAttribute>() != null);
+            var userAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(IsUserAssembly);
 
-            foreach (var method in methods)
+            foreach (var assembly in userAssemblies)
             {
-                var attr = method.GetCustomAttribute<DialogueCommandAttribute>();
-
-                if (method.GetParameters().Length == 0 && method.ReturnType == typeof(void))
+                Type[] types;
+                try
                 {
-                    var del = (Action)Delegate.CreateDelegate(typeof(Action), method);
-                    commandMap[attr.Name] = del;
+                    types = assembly.GetTypes();
                 }
-                else
+                catch (ReflectionTypeLoadException e)
                 {
-                    UnityEngine.Debug.LogWarning($"Invalid DialogueCommand method '{method.Name}' — must be 'static void Method()'");
+                    types = e.Types.Where(t => t != null).ToArray();
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach (var type in types)
+                {
+                    if (type.IsInterface || type.IsGenericTypeDefinition) continue;
+
+                    var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+                    foreach (var method in methods)
+                    {
+                        var attr = method.GetCustomAttribute<DialogueCommandAttribute>(false);
+                        if (attr == null) continue;
+
+                        if (method.GetParameters().Length == 0 && method.ReturnType == typeof(void))
+                        {
+                            var del = (Action)Delegate.CreateDelegate(typeof(Action), method);
+                            commandMap[attr.Name] = del;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Invalid DialogueCommand method '{method.Name}' in '{type.Name}' — must be 'static void Method()'");
+                        }
+                    }
                 }
             }
+
+            isLoaded = true;
         }
+
+        private static bool IsUserAssembly(Assembly assembly)
+        {
+            string name = assembly.FullName;
+            if (string.IsNullOrEmpty(name)) return false;
+
+            if (name.StartsWith("System", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("Unity", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("mscorlib", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("Mono.", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static bool TryRun(string commandName)
         {
+            if (!isLoaded) LoadAll();
+
             if (commandMap.TryGetValue(commandName, out var action))
             {
                 try
@@ -102,19 +149,22 @@ namespace rinCore
                 }
                 catch (Exception e)
                 {
-                    UnityEngine.Debug.LogError($"Error executing command '{commandName}': {e.Message}");
+                    Debug.LogError($"Error executing command '{commandName}': {e.Message}");
                 }
             }
             else
             {
-                UnityEngine.Debug.LogWarning($"Unknown command: {commandName}");
+                Debug.LogWarning($"Unknown command: {commandName}");
             }
 
             return false;
         }
+
         public static bool HasCommand(string command)
         {
-            if (!commandMap.TryGetValue(command, out var action))
+            if (!isLoaded) LoadAll();
+
+            if (!commandMap.TryGetValue(command, out _))
             {
                 Debug.LogWarning($"Unknown Command: {command}");
                 return false;
