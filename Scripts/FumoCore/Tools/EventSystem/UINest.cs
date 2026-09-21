@@ -12,12 +12,7 @@ using UnityEditor;
 
 namespace rinCore
 {
-    public interface IUINestRunable
-    {
-        public int RunnerPriority { get; }
-        void RunNestComponent(UINest nest);
-    }
-
+    #region Editor Dropdown ID
     public class UINestIDAttribute : PropertyAttribute { }
 
 #if UNITY_EDITOR
@@ -37,7 +32,7 @@ namespace rinCore
 
             foreach (var nest in nests)
             {
-                if (!string.IsNullOrEmpty(nest.NestID) && !nestIDs.Contains(nest.NestID))
+                if (nest != null && !string.IsNullOrEmpty(nest.NestID) && !nestIDs.Contains(nest.NestID))
                 {
                     nestIDs.Add(nest.NestID);
                 }
@@ -48,11 +43,12 @@ namespace rinCore
 
             if (nestIDs.Count == 0)
             {
-                Rect labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, position.height);
-                Rect fieldRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.width - EditorGUIUtility.labelWidth, position.height, position.height);
-
-                EditorGUI.LabelField(labelRect, label);
-                property.stringValue = EditorGUI.TextField(fieldRect, currentVal);
+                EditorGUI.BeginChangeCheck();
+                string newVal = EditorGUI.TextField(position, label, currentVal);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    property.stringValue = newVal;
+                }
                 return;
             }
 
@@ -70,9 +66,11 @@ namespace rinCore
             }
 
             int currentIndex = isValid ? displayOptions.IndexOf(currentVal) : 0;
+
+            EditorGUI.BeginChangeCheck();
             int selectedIndex = EditorGUI.Popup(position, label.text, currentIndex, displayOptions.ToArray());
 
-            if (selectedIndex >= 0 && selectedIndex < displayOptions.Count)
+            if (EditorGUI.EndChangeCheck() && selectedIndex >= 0 && selectedIndex < displayOptions.Count)
             {
                 string selectedStr = displayOptions[selectedIndex];
 
@@ -80,137 +78,34 @@ namespace rinCore
                 {
                     property.stringValue = selectedStr;
                 }
+                else if (selectedStr == "<None / Empty>")
+                {
+                    property.stringValue = string.Empty;
+                }
             }
         }
     }
 #endif
+    #endregion
 
-    public struct FEB_UI_SelectNest : IRinEvent
+    public interface IUINestRunable
     {
-        public string TargetNestID;
-        public float Duration;
-
-        public FEB_UI_SelectNest(string targetNestID, float duration = -1f)
-        {
-            TargetNestID = targetNestID;
-            Duration = duration;
-        }
-
-        public readonly bool IsValid => UINest.IsValidNestID(TargetNestID);
+        public int RunnerPriority { get; }
+        void RunNestComponent(UINest nest);
     }
 
-    public class UINest : MonoBehaviour, IHierarchyComponentColor
+    #region Events
+    public record FEB_UI_SelectNest(string TargetNestID, float Duration) : IRinEvent;
+    public record FEB_UI_ClearSelection(string TargetNestID, float FadeOutDuration, bool DisregardNestCloseable) : IRinEvent;
+    #endregion
+    #region State & Transitions
+    public partial class UINest
     {
-        private static readonly HashSet<UINest> activeNests = new();
-        public static IEnumerable<UINest> ActiveNests => activeNests.Where(n => n != null).OrderBy(x => -x.Priority);
-        private static bool isGlobalTransitioning = false;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStaticState()
-        {
-            activeNests.Clear();
-            isGlobalTransitioning = false;
-        }
-
-        [Header("Components")]
-        [SerializeField] private CanvasGroup cGroup;
-
-        [Header("Nest Identity")]
-        [SerializeField] private string nestID = "MainMenu";
-        [SerializeField] private int priority = 0;
-        public const float DEFAULT_FADE_DURATION = 0.35f;
-        [SerializeField] private GameObject defaultSelection;
-
-        public CanvasGroup canvasGroup => cGroup;
-        public string NestID => nestID;
-        public int Priority => priority;
-
-        public Color LabelColor => cGroup != null ? ColorHelper.HierarchyTypes.UINest : ColorHelper.HierarchyTypes.Error;
-
-        private Coroutine activeTransitionRoutine;
-        private Coroutine sequenceRoutine;
-        private Coroutine selectionRoutine;
-        private List<IUINestRunable> nestRunners = new();
-        private GameObject lastValidSelection;
-
-        private void Awake()
-        {
-            CacheRunners();
-        }
-
-        public void CacheRunners()
-        {
-            if (cGroup == null)
-            {
-                nestRunners = new List<IUINestRunable>();
-                return;
-            }
-
-            Canvas rootCanvas = cGroup.GetComponentInParent<Canvas>();
-            Transform searchRoot = rootCanvas != null ? rootCanvas.transform : cGroup.transform.root;
-
-            nestRunners = searchRoot.GetComponentsInChildren<IUINestRunable>(true)
-                .Where(r => r != null)
-                .OrderByDescending(r => r.RunnerPriority)
-                .ToList();
-        }
-
-        private void OnEnable()
-        {
-            activeNests.Add(this);
-            EventBus.Bind<FEB_UI_SelectNest>(HandleNestChangeRequest);
-        }
-
-        private void OnDisable()
-        {
-            activeNests.Remove(this);
-            EventBus.Release<FEB_UI_SelectNest>(HandleNestChangeRequest);
-
-            StopAllCoroutines();
-            activeTransitionRoutine = null;
-            sequenceRoutine = null;
-            selectionRoutine = null;
-
-            if (activeNests.Count == 0 || activeNests.All(n => n.sequenceRoutine == null))
-            {
-                isGlobalTransitioning = false;
-            }
-        }
-
-        private void OnDestroy()
-        {
-            activeNests.Remove(this);
-            activeNests.RemoveWhere(n => n == null);
-        }
-
-        private void Start()
-        {
-            CacheRunners();
-
-            int maxPriority = int.MinValue;
-            foreach (var nest in activeNests)
-            {
-                if (nest != null && nest.priority > maxPriority)
-                {
-                    maxPriority = nest.priority;
-                }
-            }
-
-            bool isHighestPriority = priority == maxPriority;
-            SetStateDirect(isHighestPriority);
-        }
-
         public void TransitionTo(UINest next, float duration = -1f)
         {
             if (next == this) return;
 
             float actualDuration = duration < 0f ? DEFAULT_FADE_DURATION : duration;
-
-            if (next == null)
-            {
-                FadeOut(actualDuration);
-                return;
-            }
 
             if (sequenceRoutine != null)
             {
@@ -221,32 +116,49 @@ namespace rinCore
             sequenceRoutine = StartCoroutine(CO_SequentialTransition(this, next, actualDuration));
         }
 
-        private static IEnumerator CO_SequentialTransition(UINest current, UINest target, float totalDuration)
+        private static IEnumerator CO_SequentialTransition(List<UINest> currentActiveNests, UINest target, float totalDuration)
         {
             isGlobalTransitioning = true;
 
-            bool hasActiveCurrent = current != null && current.cGroup != null && current.cGroup.alpha > 0f;
-            float phaseDuration = (hasActiveCurrent && target != null) ? totalDuration * 0.5f : totalDuration;
+            bool hasActiveNests = currentActiveNests != null && currentActiveNests.Count > 0;
+            float phaseDuration = (hasActiveNests && target != null) ? totalDuration * 0.5f : totalDuration;
 
-            if (hasActiveCurrent && phaseDuration > 0f)
+            if (hasActiveNests && phaseDuration > 0f)
             {
-                bool fadeOutComplete = false;
-                current.FadeOut(phaseDuration, () => fadeOutComplete = true);
+                int completedFades = 0;
+                int totalFades = currentActiveNests.Count;
+
+                foreach (var current in currentActiveNests)
+                {
+                    if (current != null)
+                    {
+                        current.FadeOut(phaseDuration, () => completedFades++);
+                    }
+                    else
+                    {
+                        completedFades++;
+                    }
+                }
 
                 float timeout = phaseDuration + 0.1f;
                 float elapsed = 0f;
 
-                while (!fadeOutComplete && elapsed < timeout)
+                while (completedFades < totalFades && elapsed < timeout)
                 {
-                    if (current == null || current.cGroup == null || !current.cGroup.gameObject.activeInHierarchy) break;
                     elapsed += Time.unscaledDeltaTime;
                     yield return null;
                 }
             }
 
-            if (current != null)
+            if (hasActiveNests)
             {
-                current.SetStateDirect(false);
+                foreach (var current in currentActiveNests)
+                {
+                    if (current != null)
+                    {
+                        current.SetStateDirect(false);
+                    }
+                }
             }
 
             if (target != null && target.cGroup != null)
@@ -269,10 +181,30 @@ namespace rinCore
                     yield return null;
                 }
 
-                target.SetStateDirect(true);
+                if (target != null)
+                {
+                    target.SetStateDirect(true);
+                }
+            }
+            else
+            {
+                if (EventSystem.current != null)
+                {
+                    EventSystem.current.SetSelectedGameObject(null);
+                }
             }
 
             isGlobalTransitioning = false;
+        }
+
+        private static IEnumerator CO_SequentialTransition(UINest current, UINest target, float totalDuration)
+        {
+            List<UINest> currentList = null;
+            if (current != null)
+            {
+                currentList = new List<UINest> { current };
+            }
+            yield return CO_SequentialTransition(currentList, target, totalDuration);
         }
 
         public void FadeIn(float duration, Action onComplete = null)
@@ -339,7 +271,11 @@ namespace rinCore
                 cGroup.blocksRaycasts = true;
                 cGroup.interactable = true;
                 ExecuteRunners();
-                RequestSelection(defaultSelection);
+                new FEB_EventSystem_SelectBuffered(defaultSelection).Publish();
+            }
+            else
+            {
+                new FEB_EventSystem_SelectBuffered(null).Publish();
             }
 
             activeTransitionRoutine = null;
@@ -356,9 +292,38 @@ namespace rinCore
 
             if (active)
             {
+                if (defaultSelection != null)
+                {
+                    new FEB_EventSystem_SelectBuffered(defaultSelection).Publish();
+                }
                 ExecuteRunners();
-                RequestSelection(defaultSelection);
             }
+            else
+            {
+
+            }
+        }
+    }
+    #endregion
+
+    #region Execution & Selection
+    public partial class UINest
+    {
+        public void CacheRunners()
+        {
+            if (cGroup == null)
+            {
+                nestRunners = new List<IUINestRunable>();
+                return;
+            }
+
+            Canvas rootCanvas = cGroup.GetComponentInParent<Canvas>();
+            Transform searchRoot = rootCanvas != null ? rootCanvas.transform : cGroup.transform.root;
+
+            nestRunners = searchRoot.GetComponentsInChildren<IUINestRunable>(true)
+                .Where(r => r != null)
+                .OrderByDescending(r => r.RunnerPriority)
+                .ToList();
         }
 
         public void ExecuteRunners()
@@ -373,53 +338,112 @@ namespace rinCore
                 nestRunners[i]?.RunNestComponent(this);
             }
         }
+    }
+    #endregion
 
-        private void RequestSelection(GameObject target)
-        {
-            if (target == null) return;
-
-            if (selectionRoutine != null)
-            {
-                StopCoroutine(selectionRoutine);
-            }
-
-            selectionRoutine = StartCoroutine(CO_ApplySelection(target));
-        }
-
-        private IEnumerator CO_ApplySelection(GameObject target)
-        {
-            yield return null;
-
-            if (cGroup != null && cGroup.interactable && target != null && target.activeInHierarchy)
-            {
-                if (EventSystem.current != null)
-                {
-                    EventSystem.current.SetSelectedGameObject(null);
-                    EventSystem.current.SetSelectedGameObject(target);
-                }
-
-                new FEB_EventSystem_SelectBuffered(target).Publish();
-                lastValidSelection = target;
-            }
-
-            selectionRoutine = null;
-        }
-
+    #region Event Bus Handling
+    public partial class UINest
+    {
         private void HandleNestChangeRequest(FEB_UI_SelectNest evt)
         {
-            if (evt.TargetNestID != nestID || isGlobalTransitioning) return;
+            if (isGlobalTransitioning) return;
+            if (UINest.GetNestByID(evt.TargetNestID) == null)
+                return;
 
+            bool isTarget = !string.IsNullOrEmpty(evt.TargetNestID) && evt.TargetNestID == nestID;
             float duration = evt.Duration < 0f ? DEFAULT_FADE_DURATION : evt.Duration;
 
-            UINest activeNest = activeNests.FirstOrDefault(n => n != null && n != this && n.cGroup != null && n.cGroup.alpha > 0f);
-
-            if (sequenceRoutine != null)
+            if (isTarget)
             {
-                StopCoroutine(sequenceRoutine);
-                sequenceRoutine = null;
-            }
+                List<UINest> currentlyVisibleNests = activeNests
+                    .Where(n => n != null && n != this && n.cGroup != null && n.cGroup.alpha > 0f)
+                    .ToList();
 
-            sequenceRoutine = StartCoroutine(CO_SequentialTransition(activeNest, this, duration));
+                if (sequenceRoutine != null)
+                {
+                    StopCoroutine(sequenceRoutine);
+                    sequenceRoutine = null;
+                }
+
+                sequenceRoutine = StartCoroutine(CO_SequentialTransition(currentlyVisibleNests, this, duration));
+            }
+            else if (!IsValidNestID(evt.TargetNestID))
+            {
+                List<UINest> currentlyVisibleNests = activeNests
+                    .Where(n => n != null && n.cGroup != null && n.cGroup.alpha > 0f)
+                    .ToList();
+
+                if (currentlyVisibleNests.Count > 0)
+                {
+                    UINest runner = currentlyVisibleNests.FirstOrDefault(n => n == this) ?? currentlyVisibleNests[0];
+                    if (runner == this)
+                    {
+                        if (sequenceRoutine != null)
+                        {
+                            StopCoroutine(sequenceRoutine);
+                            sequenceRoutine = null;
+                        }
+
+                        sequenceRoutine = StartCoroutine(CO_SequentialTransition(currentlyVisibleNests, null, duration));
+                    }
+                }
+            }
+        }
+
+        private void HandleClearSelectionRequest(FEB_UI_ClearSelection evt)
+        {
+            if (isGlobalTransitioning) return;
+
+            bool hasSpecificTarget = !string.IsNullOrEmpty(evt.TargetNestID);
+            if (hasSpecificTarget && evt.TargetNestID != nestID) return;
+            if (hasSpecificTarget && !evt.DisregardNestCloseable && !isCloseable) return;
+
+            if (cGroup != null && cGroup.alpha > 0f)
+            {
+                List<UINest> nestsToClose;
+
+                if (hasSpecificTarget)
+                {
+                    nestsToClose = new List<UINest> { this };
+                }
+                else
+                {
+                    nestsToClose = activeNests
+                        .Where(n => n != null && n.cGroup != null && n.cGroup.alpha > 0f && (evt.DisregardNestCloseable || n.isCloseable))
+                        .ToList();
+                }
+
+                if (nestsToClose.Count > 0)
+                {
+                    UINest runner = nestsToClose.FirstOrDefault(n => n == this) ?? nestsToClose[0];
+                    if (runner == this)
+                    {
+                        if (sequenceRoutine != null)
+                        {
+                            StopCoroutine(sequenceRoutine);
+                            sequenceRoutine = null;
+                        }
+
+                        sequenceRoutine = StartCoroutine(CO_SequentialTransition(nestsToClose, null, evt.FadeOutDuration));
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Static Utilities & Registry
+    public partial class UINest
+    {
+        private static readonly HashSet<UINest> activeNests = new();
+        public static IEnumerable<UINest> ActiveNests => activeNests.Where(n => n != null).OrderBy(x => -x.Priority);
+        private static bool isGlobalTransitioning = false;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            activeNests.Clear();
+            isGlobalTransitioning = false;
         }
 
         public static bool IsValidNestID(string id)
@@ -445,6 +469,91 @@ namespace rinCore
                 if (nest != null && nest.nestID == id) return nest;
             }
             return null;
+        }
+    }
+    #endregion
+
+    public partial class UINest : MonoBehaviour, IHierarchyComponentColor
+    {
+        [Header("Components")]
+        [SerializeField] private CanvasGroup cGroup;
+
+        [Header("Nest Identity")]
+        [SerializeField] private string nestID = "MainMenu";
+        [SerializeField] private int priority = 0;
+        [SerializeField] private bool isCloseable = false;
+        public const float DEFAULT_FADE_DURATION = 0.35f;
+        [SerializeField] private GameObject defaultSelection;
+
+        public CanvasGroup canvasGroup => cGroup;
+        public string NestID => nestID;
+        public int Priority => priority;
+        public bool IsCloseable => isCloseable;
+
+        public Color LabelColor => cGroup != null ? ColorHelper.HierarchyTypes.UINest : ColorHelper.HierarchyTypes.Error;
+
+        private Coroutine activeTransitionRoutine;
+        private Coroutine sequenceRoutine;
+        private Coroutine selectionRoutine;
+        private List<IUINestRunable> nestRunners = new();
+        private GameObject lastValidSelection;
+
+        private void Awake()
+        {
+            CacheRunners();
+        }
+
+        private void OnEnable()
+        {
+            activeNests.Add(this);
+            EventBus.Bind<FEB_UI_SelectNest>(HandleNestChangeRequest);
+            EventBus.Bind<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+        }
+
+        private void OnDisable()
+        {
+            activeNests.Remove(this);
+            EventBus.Release<FEB_UI_SelectNest>(HandleNestChangeRequest);
+            EventBus.Release<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+
+            StopAllCoroutines();
+            activeTransitionRoutine = null;
+            sequenceRoutine = null;
+            selectionRoutine = null;
+
+            if (activeNests.Count == 0 || activeNests.All(n => n.sequenceRoutine == null))
+            {
+                isGlobalTransitioning = false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            activeNests.Remove(this);
+            activeNests.RemoveWhere(n => n == null);
+        }
+
+        private void Start()
+        {
+            CacheRunners();
+
+            int maxPriority = int.MinValue;
+            bool foundValidCandidate = false;
+
+            foreach (var nest in activeNests)
+            {
+                if (nest != null && nest.priority >= 0)
+                {
+                    foundValidCandidate = true;
+                    if (nest.priority > maxPriority)
+                    {
+                        maxPriority = nest.priority;
+                    }
+                }
+            }
+
+            bool isHighestPriority = foundValidCandidate && priority >= 0 && priority == maxPriority;
+            SetStateDirect(isHighestPriority);
         }
     }
 }

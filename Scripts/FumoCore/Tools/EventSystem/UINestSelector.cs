@@ -12,7 +12,7 @@ namespace rinCore
 
         public Color LabelColor => UINest.IsValidNestID(nest) ? ColorHelper.PastelGreen.Opacity(50) : ColorHelper.HierarchyTypes.Error;
 
-        private void Start()
+        private void Awake()
         {
             b = GetComponent<Button>();
             UINest foundNest = UINest.GetNestByID(nest);

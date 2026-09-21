@@ -13,6 +13,7 @@ namespace rinCore
     public record FEB_Request_RefreshUI() : IRinEvent;
     public class SceneLoader : MonoBehaviour
     {
+        public static WaitUntil WaitForLoadCompletion => new(() => !SceneLoader.IsLoading);
         [SerializeField] private ScenePackSO scenePack;
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private Image fadingImage;

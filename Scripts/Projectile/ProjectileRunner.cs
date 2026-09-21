@@ -5,6 +5,7 @@ using Unity.Collections;
 using UnityEngine;
 using rinCore;
 using System.Linq;
+using Pathfinding.RVO;
 
 namespace rinCore.Bullet
 {
@@ -260,8 +261,17 @@ namespace rinCore.Bullet
     #endregion
 
     #region Slowdown Calculation
+    public struct RProj_Slowdown_PickupsCount : IRinEvent
+    {
+        public int itemCount;
+    }
     public partial class ProjectileRunner
     {
+        private static void ApplyPickupsCount(RProj_Slowdown_PickupsCount pickups)
+        {
+            SlowdownPickupsCount = pickups.itemCount;
+        }
+        private static int? SlowdownPickupsCount = null;
         public static int? SlowdownProjectileTargetCount = null;
         public static float GetTargetSlowdown(int requiredProjectiles = 400)
         {
@@ -276,7 +286,7 @@ namespace rinCore.Bullet
             float overloadEnd = requiredProjectiles * 4f;
             int halfRequired = (int)(requiredProjectiles * 0.5f);
 
-            int bulletCount = BulletCount;
+            int bulletCount = BulletCount + (SlowdownPickupsCount ?? 0);
 
             if (bulletCount <= halfRequired) return slowdownNone;
             if (bulletCount <= requiredProjectiles)
@@ -357,11 +367,14 @@ namespace rinCore.Bullet
         {
             _renderer.Bind();
             EventBus.Bind<RProj_Global_Clear>(ApplyGlobalClear);
+            EventBus.Bind<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
+            SlowdownPickupsCount = null;
         }
         private void OnDisable()
         {
             _renderer.Release();
             EventBus.Release<RProj_Global_Clear>(ApplyGlobalClear);
+            EventBus.Release<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
         }
         private void ApplyGlobalClear(RProj_Global_Clear clear)
         {

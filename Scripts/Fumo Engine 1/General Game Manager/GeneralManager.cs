@@ -87,10 +87,12 @@ namespace rinCore
             if (state)
             {
                 IsPaused = true;
+                new FEB_UI_SelectNest("Pause", 0f).Publish();
             }
             else
             {
                 IsPaused = false;
+                new FEB_UI_ClearSelection("Pause", 0f, false).Publish();
             }
             WhenPauseToggle?.Invoke(state);
         }

@@ -416,6 +416,51 @@ namespace rinCore
         public float currentHealthPercent01 => CurrentMaxHealth <= 0 ? 0f : CurrentHealth / CurrentMaxHealth;
     }
     #endregion
+    #region Action Frame & STG
+    public record FEB_STG_ActionFrame(STG_Frame_Action actions = STG_Frame_Action.None) : IRinEvent;
+    [System.Flags]
+    public enum STG_Frame_Action
+    {
+        None = FlagsRaw_Int.None,
+        Right = FlagsRaw_Int._1,
+        Up = FlagsRaw_Int._2,
+        Left = FlagsRaw_Int._3,
+        Down = FlagsRaw_Int._4,
+        ShootHeld = FlagsRaw_Int._5,
+        ShootStarted = FlagsRaw_Int._6,
+        ShootEnd = FlagsRaw_Int._7,
+        FocusHeld = FlagsRaw_Int._8,
+        FocusStarted = FlagsRaw_Int._9,
+        FocusEnd = FlagsRaw_Int._10,
+        FocusProcessed = FlagsRaw_Int._11,
+        BombPressed = FlagsRaw_Int._12,
+        HyperPressed = FlagsRaw_Int._13,
+        Extra1 = FlagsRaw_Int._14,
+        Extra2 = FlagsRaw_Int._15,
+        Extra3 = FlagsRaw_Int._16,
+
+        ShootAny = ShootHeld | ShootStarted | ShootEnd,
+        FocusAny = FocusHeld | FocusStarted | FocusEnd,
+        All = FlagsRaw_Int.All,
+    }
+    public interface IFumoUnit_STG_PlayerActionFrame
+    {
+        public FEB_STG_ActionFrame Frame { get; }
+        public STG_Frame_Action STG_Action { get; }
+        public Vector2 Movement
+        {
+            get
+            {
+                Vector2 m = Vector2.zero;
+                if (STG_Action.Match(STG_Frame_Action.Right)) m += Cardinal.Right.Vec2();
+                if (STG_Action.Match(STG_Frame_Action.Up)) m += Cardinal.Up.Vec2();
+                if (STG_Action.Match(STG_Frame_Action.Left)) m += Cardinal.Left.Vec2();
+                if (STG_Action.Match(STG_Frame_Action.Down)) m += Cardinal.Down.Vec2();
+                return m;
+            }
+        }
+    }
+    #endregion
     public interface IDamageMod
     {
         public float DamageMod { get; }
