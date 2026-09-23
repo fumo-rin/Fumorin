@@ -86,7 +86,7 @@ namespace rinCore
         }
 
         private sealed class MonoBehaviourHost : MonoBehaviour { }
-        public static void FC_SpawnParticlesBatch(this ParticleSystem ps, IEnumerable<Vector2> positions, Transform target,
+        public static void FC_deprecated_SpawnParticlesBatch(this ParticleSystem ps, IEnumerable<Vector2> positions, Transform target,
             float duration = 0.5f, Color? color = null, float size = 0.35f,
             float startTimeSpread = 50f, float durationSpread = 50f)
         {
@@ -206,7 +206,7 @@ namespace rinCore
                 }
             }
         }
-        public static void FC_PlayCachedOnce(this ParticleSystem prefab, Vector3 position)
+        public static void FC_deprecated_PlayCachedOnce(this ParticleSystem prefab, Vector3 position)
         {
             if (prefab == null) return;
             if (!_pool.TryGetValue(prefab, out var list))

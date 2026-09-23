@@ -108,6 +108,7 @@ namespace rinCore.Bullet
             public float BaseDamage { get; set; }
             public FumoUnit Sender { get; set; }
             public Vector2 Origin { get; set; }
+            public Vector2 OriginWithForward => Origin + Direction.ScaleToMagnitude(AddedForward);
             public Vector2 Direction { get; set; }
             public FumoUnit OptionalTarget { get; set; }
             public float AddedForward { get; set; }

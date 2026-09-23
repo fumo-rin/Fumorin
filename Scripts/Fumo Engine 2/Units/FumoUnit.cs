@@ -439,8 +439,8 @@ namespace rinCore
         Extra2 = FlagsRaw_Int._15,
         Extra3 = FlagsRaw_Int._16,
 
-        ShootAny = ShootHeld | ShootStarted | ShootEnd,
-        FocusAny = FocusHeld | FocusStarted | FocusEnd,
+        ShootAny = ShootHeld | ShootStarted,
+        FocusAny = FocusHeld | FocusStarted,
         All = FlagsRaw_Int.All,
     }
     public interface IFumoUnit_STG_PlayerActionFrame
