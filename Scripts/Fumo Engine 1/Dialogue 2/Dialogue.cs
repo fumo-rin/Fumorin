@@ -191,7 +191,6 @@ namespace rinCore
         static void ReinitializeCharacterOverrides()
         {
             characterOverrides = new();
-            SceneLoader.WhenFinishedLoadingAdditives += () => characterOverrides = new();
         }
         static Dictionary<string, DialogueCharacterSO> characterOverrides;
         public static void AddCharacterOverride(string charName, DialogueCharacterSO c)

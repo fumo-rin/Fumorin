@@ -10,7 +10,10 @@ using UnityEngine.UI;
 
 namespace rinCore
 {
-    public record FEB_Request_RefreshUI() : IRinEvent;
+    public record Sceneloader_Finish_Request_RefreshUI() : IRinEvent;
+    public record Sceneloader_LoadingAdditives_Started() : IRinEvent;
+    public record Sceneloader_LoadingAdditives_Finished() : IRinEvent;
+
     public class SceneLoader : MonoBehaviour
     {
         public static WaitUntil WaitForLoadCompletion => new(() => !SceneLoader.IsLoading);
@@ -26,9 +29,6 @@ namespace rinCore
         private static string _currentMainSceneName = string.Empty;
 
         public static bool IsLoading { get; private set; }
-
-        public static event Action WhenStartLoadingAdditives;
-        public static event Action WhenFinishedLoadingAdditives;
 
         private void Awake()
         {
@@ -122,8 +122,8 @@ namespace rinCore
                 {
                     if (finalSettings.Delay <= 0f)
                     {
-                        WhenStartLoadingAdditives?.Invoke();
-                        WhenFinishedLoadingAdditives?.Invoke();
+                        new Sceneloader_LoadingAdditives_Started().Publish();
+                        new Sceneloader_LoadingAdditives_Finished().Publish();
                         finalSettings.Payload?.Invoke();
                     }
                     else
@@ -131,8 +131,8 @@ namespace rinCore
                         IEnumerator CO_RunPayloads(float delay)
                         {
                             yield return new WaitForSeconds(delay);
-                            WhenStartLoadingAdditives?.Invoke();
-                            WhenFinishedLoadingAdditives?.Invoke();
+                            new Sceneloader_LoadingAdditives_Started().Publish();
+                            new Sceneloader_LoadingAdditives_Finished().Publish();
                             finalSettings.Payload?.Invoke();
                         }
                         if (Instance is SceneLoader s)
@@ -186,7 +186,7 @@ namespace rinCore
 
             yield return CO_EnsureUnloadPreventionSceneLoaded();
 
-            WhenStartLoadingAdditives?.Invoke();
+            new Sceneloader_LoadingAdditives_Started().Publish();
 
             Scene bootScene = SceneManager.GetActiveScene();
             string persistentName = (scenePack != null && scenePack.UnloadPreventionScene != null && scenePack.UnloadPreventionScene.IsValid)
@@ -290,12 +290,12 @@ namespace rinCore
             UpdateLoadingText(1f);
             yield return null;
 
-            WhenFinishedLoadingAdditives?.Invoke();
+            new Sceneloader_LoadingAdditives_Finished().Publish();
             _currentScenePair = pair;
             IsLoading = false;
 
             settings.Payload?.Invoke();
-            new FEB_Request_RefreshUI().Publish();
+            new Sceneloader_Finish_Request_RefreshUI().Publish();
 
             if (settings.FadeOut > 0f && fadingImage != null)
             {

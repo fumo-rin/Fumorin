@@ -13,30 +13,48 @@ namespace rinCore.Bullet
         }
 
         /// <summary>
-        /// Refresh Origin With Valid Sender. Does nothing if invalid sender.
+        /// Refresh Origin With Valid Sender or Override. Does nothing if invalid sender and no override.
         /// By struct ref.
         /// </summary>
         public static ref Projectile.InputSettings rf_ori(ref this Projectile.InputSettings input, Vector2? @override = null, Vector2? offset = null)
         {
-            if (input.Sender != null)
+            Vector2 basePosition;
+
+            if (@override.HasValue)
             {
-                input = input.With(origin: offset.GetValueOrDefault() + (@override ?? input.Sender.CurrentPosition));
+                basePosition = @override.Value;
             }
+            else if (input.Sender != null)
+            {
+                basePosition = input.Sender.CurrentPosition;
+            }
+            else
+            {
+                return ref input;
+            }
+
+            input = input.With(origin: offset.GetValueOrDefault() + basePosition);
             return ref input;
         }
 
         /// <summary>
-        /// Refresh Direction With Valid Sender. Does nothing if invalid sender.
+        /// Refresh Direction With Valid Sender or Override. Does nothing if invalid sender and no override.
         /// By struct ref.
         /// </summary>
         public static ref Projectile.InputSettings rf_dir(ref this Projectile.InputSettings input, Vector2? @override = null)
         {
-            if (input.Sender != null)
+            if (@override.HasValue)
             {
-                input = input.With(direction: @override ?? input.Sender.Facing.Vec2());
+                input = input.With(direction: @override.Value);
             }
+            else if (input.Sender != null)
+            {
+                input = input.With(direction: input.Sender.Facing.Vec2());
+            }
+
             return ref input;
         }
+
         public static ref Projectile.InputSettings rf_aim(ref this Projectile.InputSettings input)
         {
             if (input.OptionalTarget != null)

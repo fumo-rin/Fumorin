@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,22 +22,30 @@ namespace rinCore
             EventSystem_Select(null);
         }
 
-        private static FEB_EventSystem_SelectBuffered? queued;
+        private static readonly Stack<FEB_EventSystem_SelectBuffered> selectionStack = new Stack<FEB_EventSystem_SelectBuffered>();
         private static SelectionBufferRunner runnerInstance;
 
         private class SelectionBufferRunner : MonoBehaviour
         {
             private void LateUpdate()
             {
-                if (EventSystem.current == null || SceneLoader.IsLoading) return;
+                if (SceneLoader.IsLoading) return;
 
-                if (queued is FEB_EventSystem_SelectBuffered b && b.queuedSelection)
+                if (EventSystem.current != null && selectionStack.Count > 0)
                 {
-                    Debug.Log("Executing Buffered Selection: " + b.queuedSelection.name);
-                    b.queuedSelection.Select_WithEventSystem();
-                }
+                    FEB_EventSystem_SelectBuffered lastSubmitted = selectionStack.Pop();
 
-                queued = null;
+                    if (lastSubmitted.queuedSelection != null && lastSubmitted.queuedSelection.activeInHierarchy)
+                    {
+                        Debug.Log("Executing Last Buffered Selection: " + lastSubmitted.queuedSelection.name);
+                        lastSubmitted.queuedSelection.Select_WithEventSystem();
+                    }
+                    else if (lastSubmitted.queuedSelection == null)
+                    {
+                        EventSystem_Deselect();
+                    }
+                }
+                selectionStack.Clear();
                 runnerInstance = null;
                 Destroy(gameObject);
             }
@@ -46,9 +55,21 @@ namespace rinCore
         private static void BindSelectionBuffer()
         {
             EventBus.Clear<FEB_EventSystem_SelectBuffered>();
+            selectionStack.Clear();
+
             EventBus.Bind<FEB_EventSystem_SelectBuffered>((a) =>
             {
-                queued = a;
+                if (a.queuedSelection != null)
+                {
+                    Debug.Log("Pushing queued selection to stack: " + a.queuedSelection.name);
+                }
+                else
+                {
+                    Debug.Log("Pushing clear selection request to stack.");
+                }
+
+                selectionStack.Push(a);
+
                 if (runnerInstance == null)
                 {
                     GameObject runnerGO = new GameObject("[SelectionBufferRunner]");

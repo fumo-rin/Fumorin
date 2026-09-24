@@ -171,19 +171,17 @@ namespace rinCore
                 bool fadeInComplete = false;
                 target.FadeIn(phaseDuration, () => fadeInComplete = true);
 
-                float timeout = phaseDuration + 0.1f;
-                float elapsed = 0f;
-
-                while (!fadeInComplete && elapsed < timeout)
+                if (phaseDuration > 0f)
                 {
-                    if (target == null || target.cGroup == null || !target.cGroup.gameObject.activeInHierarchy) break;
-                    elapsed += Time.unscaledDeltaTime;
-                    yield return null;
-                }
+                    float timeout = phaseDuration + 0.1f;
+                    float elapsed = 0f;
 
-                if (target != null)
-                {
-                    target.SetStateDirect(true);
+                    while (!fadeInComplete && elapsed < timeout)
+                    {
+                        if (target == null || target.cGroup == null || !target.cGroup.gameObject.activeInHierarchy) break;
+                        elapsed += Time.unscaledDeltaTime;
+                        yield return null;
+                    }
                 }
             }
             else
@@ -238,7 +236,7 @@ namespace rinCore
 
             if (duration <= 0f)
             {
-                SetStateDirect(interactable);
+                SetStateDirect(interactable, forceExecution: true);
                 activeTransitionRoutine = null;
                 onComplete?.Invoke();
                 yield break;
@@ -264,27 +262,22 @@ namespace rinCore
                 yield return null;
             }
 
-            cGroup.alpha = targetAlpha;
-
-            if (interactable)
-            {
-                cGroup.blocksRaycasts = true;
-                cGroup.interactable = true;
-                ExecuteRunners();
-                new FEB_EventSystem_SelectBuffered(defaultSelection).Publish();
-            }
-            else
-            {
-                new FEB_EventSystem_SelectBuffered(null).Publish();
-            }
+            SetStateDirect(interactable, forceExecution: true);
 
             activeTransitionRoutine = null;
             onComplete?.Invoke();
         }
 
-        public void SetStateDirect(bool active)
+        public void SetStateDirect(bool active, bool forceExecution = false)
         {
             if (cGroup == null) return;
+
+            bool stateUnchanged = (cGroup.interactable == active) && (cGroup.alpha == (active ? 1f : 0f));
+
+            if (stateUnchanged && !forceExecution)
+            {
+                return;
+            }
 
             cGroup.alpha = active ? 1f : 0f;
             cGroup.blocksRaycasts = active;
@@ -298,14 +291,9 @@ namespace rinCore
                 }
                 ExecuteRunners();
             }
-            else
-            {
-
-            }
         }
     }
     #endregion
-
     #region Execution & Selection
     public partial class UINest
     {
@@ -553,7 +541,7 @@ namespace rinCore
             }
 
             bool isHighestPriority = foundValidCandidate && priority >= 0 && priority == maxPriority;
-            SetStateDirect(isHighestPriority);
+            SetStateDirect(isHighestPriority, forceExecution: isHighestPriority);
         }
     }
 }

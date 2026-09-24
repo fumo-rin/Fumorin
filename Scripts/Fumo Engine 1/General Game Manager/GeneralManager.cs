@@ -81,20 +81,45 @@ namespace rinCore
         public delegate bool FreezePauseAbility();
         public static event FreezePauseAbility BlockTogglePause;
         public static bool IsPaused { get; private set; }
-        public static void SetPause(bool state)
+        public struct SetPauseSettings
         {
+            public bool TriggerUINestSelection;
+        }
+        public static void SetPause(bool state, SetPauseSettings? settings = null)
+        {
+            if (IsPaused == state) return;
+
             IsPaused = state;
-            if (state)
+            settings = settings ?? new SetPauseSettings()
             {
-                IsPaused = true;
-                new FEB_UI_SelectNest("Pause", 0f).Publish();
-            }
-            else
+                TriggerUINestSelection = true,
+            };
+            if (settings.Value is SetPauseSettings s && s.TriggerUINestSelection)
             {
-                IsPaused = false;
-                new FEB_UI_ClearSelection("Pause", 0f, false).Publish();
+                if (state)
+                {
+                    new FEB_UI_SelectNest("Pause", 0f).Publish();
+                }
+                else
+                {
+                    new FEB_UI_ClearSelection("Pause", 0f, false).Publish();
+                }
             }
             WhenPauseToggle?.Invoke(state);
+        }
+        private static void ScenePause(Sceneloader_LoadingAdditives_Finished f)
+        {
+            SetPause(false, new()
+            {
+                TriggerUINestSelection = false
+            });
+        }
+        private static void ScenePause(Sceneloader_LoadingAdditives_Started f)
+        {
+            SetPause(true, new()
+            {
+                TriggerUINestSelection = false
+            });
         }
         [QFSW.QC.Command("-Pause")]
         public static void PauseGame()
@@ -175,8 +200,8 @@ namespace rinCore
                     pauseKeybind.action.performed -= PressPauseInput;
                     pauseKeybind.action.Disable();
                 }
-                SceneLoader.WhenStartLoadingAdditives -= PauseGame;
-                SceneLoader.WhenFinishedLoadingAdditives -= UnPauseGame;
+                EventBus.Release<Sceneloader_LoadingAdditives_Started>(ScenePause);
+                EventBus.Release<Sceneloader_LoadingAdditives_Finished>(ScenePause);
             }
         }
         void OnApplicationQuit()
@@ -189,8 +214,8 @@ namespace rinCore
             {
                 InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsInDynamicUpdate;
                 TimeSlowHandler.Reload();
-                SceneLoader.WhenStartLoadingAdditives += PauseGame;
-                SceneLoader.WhenFinishedLoadingAdditives += UnPauseGame;
+                EventBus.Bind<Sceneloader_LoadingAdditives_Started>(ScenePause);
+                EventBus.Bind<Sceneloader_LoadingAdditives_Finished>(ScenePause);
                 if (pauseKeybind)
                 {
                     pauseKeybind.action.Enable();

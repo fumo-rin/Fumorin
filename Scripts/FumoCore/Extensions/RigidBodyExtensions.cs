@@ -43,6 +43,14 @@ namespace rinCore
             }
             return rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, direction, delta * Time.deltaTime);
         }
+        public static Vector2 VelocityTowardsWithTime(this Rigidbody2D rb, Vector2 direction, float delta, float time)
+        {
+            if (delta <= 0.001f)
+            {
+                return rb.linearVelocity = direction;
+            }
+            return rb.linearVelocity = Vector2.MoveTowards(rb.linearVelocity, direction, delta * time);
+        }
         public static Vector2 VelocityScale(this Rigidbody2D rb, Vector2 direction, float scale)
         {
             return rb.linearVelocity = direction * scale;

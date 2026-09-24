@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using rinCore.Bullet;
 using System;
+using System.IO;
 
 namespace rinCore
 {
@@ -419,13 +420,15 @@ namespace rinCore
             IEnumerator Move_Out(Vector2 direction)
             {
                 exiting = true;
+                Vector2 v = Vector2.zero;
                 while (this != null && this.IsAlive)
                 {
                     if (space.HasValue && !space.Value.Contains(this.CurrentPosition))
                     {
                         yield break;
                     }
-                    rb.VelocityTowards(direction, 12f);
+                    v = v.MoveTowards(direction, 12f);
+                    transform.position += (Vector3)v * Time.deltaTime;
                     yield return null;
                 }
             }
