@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using rinCore.Bullet;
-using Mono.CSharp;
+using System;
 
 namespace rinCore
 {
@@ -317,10 +317,45 @@ namespace rinCore
                 }
                 foreach (var item in aliveEnemies)
                 {
-                    if (item != null && item.gameObject != null && item.IsAlive)
+                    if (item != null && item.gameObject != null && item.IsAlive && !item.exiting)
                         yield return item;
                 }
             }
+        }
+        public struct AutoAimSettings
+        {
+            public Vector2 relativeAim;
+            public float maxDot;
+        }
+        public static bool AutoAim(Vector2 point, AutoAimSettings settings, out FumoUnit result)
+        {
+            result = null;
+            if (settings.relativeAim == Vector2.zero)
+            {
+                return false;
+            }
+            float bestDot = settings.maxDot;
+
+            foreach (var unit in AliveEnemies)
+            {
+                Vector2 position = unit.CurrentPosition;
+                Vector2 diff = position - point;
+
+                if (diff == Vector2.zero)
+                {
+                    continue;
+                }
+
+                float dot = Vector2.Dot(settings.relativeAim.normalized, diff.normalized);
+
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    result = unit;
+                }
+            }
+
+            return result != null;
         }
     }
     #endregion
@@ -371,12 +406,41 @@ namespace rinCore
             endTime = null,
             startTime = -1f
         };
+        bool exiting = false;
         public void Action_CEM_Stop()
         {
             if (currentExternalMovement != null)
             {
                 StopCoroutine(currentExternalMovement);
             }
+        }
+        public void Action_CEM_Exit(Vector2 direction, Rect? space, float delay, Action whenFinish)
+        {
+            IEnumerator Move_Out(Vector2 direction)
+            {
+                exiting = true;
+                while (this != null && this.IsAlive)
+                {
+                    if (space.HasValue && !space.Value.Contains(this.CurrentPosition))
+                    {
+                        yield break;
+                    }
+                    rb.VelocityTowards(direction, 12f);
+                    yield return null;
+                }
+            }
+            IEnumerator CO_WaitAndRun()
+            {
+                yield return delay.WaitForSeconds();
+                Action_CEM_Stop();
+                cemData = new()
+                {
+                    startTime = Time.time,
+                    endTime = -1f
+                };
+                currentExternalMovement = StartCoroutine(Move_Out(direction).Wrap(() => currentExternalMovement = null).Wrap(() => whenFinish?.Invoke()));
+            }
+            StartCoroutine(CO_WaitAndRun());
         }
         public void Action_CEM_Arbitrary(IEnumerator coroutine, float duration)
         {
@@ -552,7 +616,7 @@ namespace rinCore
             {
                 return CurrentPosition;
             }
-            pather.GetNearestOnNavmesh(CurrentPosition + actualOffset + (randomRange > 0.05f ? Random.insideUnitCircle * randomRange : new(0f, 0f)), out Vector2 navmesh, randomRange * 2f);
+            pather.GetNearestOnNavmesh(CurrentPosition + actualOffset + (randomRange > 0.05f ? RNG.SeededRandomInsideUnitCircle * randomRange : new(0f, 0f)), out Vector2 navmesh, randomRange * 2f);
             return navmesh;
         }
         public void SetPosition(Vector2 worldPosition)

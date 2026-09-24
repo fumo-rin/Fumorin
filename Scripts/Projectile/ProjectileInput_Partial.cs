@@ -37,6 +37,14 @@ namespace rinCore.Bullet
             }
             return ref input;
         }
+        public static ref Projectile.InputSettings rf_aim(ref this Projectile.InputSettings input)
+        {
+            if (input.OptionalTarget != null)
+            {
+                input = input.With(direction: input.OptionalTarget.CenterOrCurrentPosition - input.Origin);
+            }
+            return ref input;
+        }
 
         public static Projectile.InputSettings SetOrigin(this Projectile.InputSettings input, Vector2 position)
         {
@@ -113,11 +121,24 @@ namespace rinCore.Bullet
             public FumoUnit OptionalTarget { get; set; }
             public float AddedForward { get; set; }
 
-            [NYI("Missing Auto Aim")]
-            public static void Auto(FumoUnit sender, Vector2 direction, out InputSettings input)
+            public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
                 FumoUnit autoAim = null;
-                input = new(sender.CurrentPosition, sender, direction, 1f, autoAim);
+                if (FumoUnit.Player == sender)
+                {
+                    if (FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, out autoAim))
+                    {
+
+                    }
+                }
+                else
+                {
+                    if (sender.AssignedFaction.Match(FumoUnit.UFaction.Enemy))
+                    {
+                        autoAim = FumoUnit.Player;
+                    }
+                }
+                input = new(sender.CurrentPosition, sender, settings.relativeAim, 1f, autoAim);
             }
 
             public InputSettings(Vector2 origin, FumoUnit sender, Vector2 direction, float baseDamage = 1f, FumoUnit optionalTarget = null, float addedForward = 0f)
