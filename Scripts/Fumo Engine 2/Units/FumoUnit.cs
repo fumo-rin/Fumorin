@@ -8,9 +8,9 @@ using System.IO;
 
 namespace rinCore
 {
-    public record FEB_Unit_Death(FumoUnit unit, Vector2 position) : IRinEvent;
+    public record FEB_Unit_Death(FumoUnit unit, Vector2 position, bool forceKill = false) : IRinEvent;
     public record FEB_Unit_PlayerDeath(FumoUnit unit, Vector2 position) : IRinEvent;
-    public record FEB_Scoring_Unit_Damaged(bool player, FumoUnit unit, float damage) : IRinEvent;
+    public record FEB_Unit_Damaged(bool player, FumoUnit unit, float damage) : IRinEvent;
     #region Unit Movers
     public enum MoveResult
     {
@@ -391,7 +391,7 @@ namespace rinCore
             bool hit = WhenProjectileHit(packet, out processedDealtDamage);
             if (processedDealtDamage > 0f)
             {
-                new FEB_Scoring_Unit_Damaged(player: Player == this, this, processedDealtDamage).Publish();
+                new FEB_Unit_Damaged(player: Player == this, this, processedDealtDamage).Publish();
             }
             return hit;
         }
@@ -564,7 +564,7 @@ namespace rinCore
                 new FEB_Unit_PlayerDeath(this, CurrentPosition).Publish();
                 return;
             }
-            new FEB_Unit_Death(this, CurrentPosition).Publish();
+            new FEB_Unit_Death(this, CurrentPosition, false).Publish();
         }
         public abstract IEnumerable<Collider2D> Hitboxes { get; }
         public static FumoUnit Player { get; protected set; }
@@ -598,6 +598,7 @@ namespace rinCore
         }
         public virtual void ForceKill()
         {
+            new FEB_Unit_Death(this, CurrentPosition, true).Publish();
             gameObject.SetActive(false);
             MaintainAliveEnemy(this, new()
             {

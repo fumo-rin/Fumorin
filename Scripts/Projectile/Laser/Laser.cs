@@ -59,6 +59,28 @@ namespace rinCore.Bullet
             return targetLaser;
         }
 
+        public void Stop()
+        {
+            if (activeCoroutine != null)
+            {
+                StopCoroutine(activeCoroutine);
+                activeCoroutine = null;
+            }
+
+            if (Line != null)
+            {
+                Line.positionCount = 0;
+            }
+
+            foreach (var kvp in parentInstances)
+            {
+                if (kvp.Value != null)
+                {
+                    kvp.Value.Stop();
+                }
+            }
+        }
+
         IEnumerator CO_Lifecycle(Settings s)
         {
             float remaining = s.duration;

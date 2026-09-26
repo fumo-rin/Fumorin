@@ -31,7 +31,7 @@ namespace rinCore
         }
         #endregion
         #region Naming
-        private static readonly Regex UnityNameSuffixRegex = new Regex(@"(\s\(\d+\)|\.\d+|-\d+)$", RegexOptions.Compiled);
+        private static readonly Regex UnityNameSuffixRegex = new Regex(@"(?i)(\s*\((?:Clone|\d+)\)|\.\d+|[_-]\d+)+$", RegexOptions.Compiled);
 
         /// <summary>
         /// Removes Unity-generated duplicate naming suffixes

@@ -6,6 +6,12 @@ using Unity.Mathematics;
 
 namespace rinCore.Bullet
 {
+    #region Events
+    public record RSTG_Graze_Frame(int count, Vector2 firstPosition) : IRinEvent;
+    public partial class Projectile
+    {
+    }
+    #endregion
     #region Extended Actions & Utilities
     public partial class Projectile
     {
@@ -105,6 +111,8 @@ namespace rinCore.Bullet
     }
     public partial class Projectile : IParticleRenderItem
     {
+        public static int CurrentIndex;
+        public int SpawnIndex { get; private set; }
         public struct HitPacket
         {
             public FumoUnit Sender;
@@ -185,8 +193,15 @@ namespace rinCore.Bullet
                 GlobalClear = null;
             }
         }
+        static HashSet<int> grazedProjectiles;
         public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, Settings settings, Action<IProjectileHit> extraHitAction)
         {
+            if (grazedProjectiles == null)
+                grazedProjectiles = new();
+            int grazeCount = 0;
+            Vector2? firstGraze = null;
+            bool graze = FumoUnit.PlayerAs(out FumoUnit player) && player.IsAlive;
+            Vector2 fallbackGraze = player == null ? Vector2.zero : player.CenterOrCurrentPosition;
             batchContactFilter.SetLayerMask(settings.hitLayers);
             Rect? clearRect;
             foreach (var proj in projCollection)
@@ -202,6 +217,18 @@ namespace rinCore.Bullet
                         //ProjectileRenderer.HitParticle(proj.FinalizedPosition, -proj.FinalizedVelocity);
                         continue;
                     }
+                }
+
+                if (graze && !grazedProjectiles.Contains(proj.SpawnIndex) &&
+                    proj.Faction.IsHostileWith(player.AssignedFaction) &&
+                    proj.FinalizedPosition.SquareDistanceToLessThan(player.CenterOrCurrentPosition, 1.15f))
+                {
+                    if (!firstGraze.HasValue)
+                    {
+                        firstGraze = proj.FinalizedPosition;
+                    }
+                    grazedProjectiles.Add(proj.SpawnIndex);
+                    grazeCount++;
                 }
 
                 Vector2 startPos = proj.FinalizedPosition;
@@ -264,6 +291,11 @@ namespace rinCore.Bullet
                     }
                 }
             }
+
+            if (grazeCount > 0f)
+            {
+                new RSTG_Graze_Frame(grazeCount, firstGraze ?? fallbackGraze).Publish();
+            }
         }
         public struct SweepPacket
         {
@@ -311,6 +343,7 @@ namespace rinCore.Bullet
             if (CreateProjectile(b.Define, b.Sender, b.Position, b.VelocityDirection, out Projectile newP))
             {
                 newP.BaseDamage = b.Damage;
+                newP.SpawnIndex = CurrentIndex++;
                 return newP;
             }
             return null;
