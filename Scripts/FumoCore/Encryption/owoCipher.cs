@@ -27,6 +27,7 @@ namespace rinCore
         /// <summary>
         /// Encodes raw UTF-8 string data directly into dash-separated OwO cipher tokens.
         /// </summary>
+        [QFSW.QC.Command(".owo.encode")]
         public static string Encode(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))

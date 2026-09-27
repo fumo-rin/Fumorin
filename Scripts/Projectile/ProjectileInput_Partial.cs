@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Unity.Profiling;
 using UnityEngine;
 
 namespace rinCore.Bullet
@@ -9,7 +9,8 @@ namespace rinCore.Bullet
     {
         public static Projectile.InputSettings SetOptionalTarget(this Projectile.InputSettings input, FumoUnit t)
         {
-            return input.With(optionalTarget: t);
+            input.OptionalTarget = t;
+            return input;
         }
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace rinCore.Bullet
                 return ref input;
             }
 
-            input = input.With(origin: offset.GetValueOrDefault() + basePosition);
+            input.Origin = basePosition + offset.GetValueOrDefault();
             return ref input;
         }
 
@@ -45,28 +46,35 @@ namespace rinCore.Bullet
         {
             if (@override.HasValue)
             {
-                input = input.With(direction: @override.Value);
+                input.Direction = @override.Value;
             }
             else if (input.Sender != null)
             {
-                input = input.With(direction: input.Sender.Facing.Vec2());
+                input.Direction = input.Sender.Facing.Vec2();
             }
 
             return ref input;
         }
-
+        /// <summary>
+        /// Refresh Direction as aim from origin to optional target.
+        /// Does nothing if no optional target.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static ref Projectile.InputSettings rf_aim(ref this Projectile.InputSettings input)
         {
             if (input.OptionalTarget != null)
             {
-                input = input.With(direction: input.OptionalTarget.CenterOrCurrentPosition - input.Origin);
+                input.Direction = input.OptionalTarget.CenterOrCurrentPosition - input.Origin;
             }
+
             return ref input;
         }
 
         public static Projectile.InputSettings SetOrigin(this Projectile.InputSettings input, Vector2 position)
         {
-            return input.With(origin: position);
+            input.Origin = position;
+            return input;
         }
 
         public static Projectile.InputSettings SetDirectionToTarget(this Projectile.InputSettings input, FumoUnit target)
@@ -75,51 +83,63 @@ namespace rinCore.Bullet
             {
                 return input;
             }
-            return input.With(direction: target.CurrentPosition - input.Origin);
+
+            input.Direction = target.CurrentPosition - input.Origin;
+            return input;
         }
 
         public static Projectile.InputSettings Reposition(this Projectile.InputSettings input)
         {
             if (input.Sender != null)
             {
-                return input.SetOrigin(input.Sender.CurrentPosition);
+                input.Origin = input.Sender.CurrentPosition;
             }
+
             return input;
         }
 
         public static Projectile.InputSettings ReAimWithOptionalTarget(this Projectile.InputSettings input, Vector2? origin = null)
         {
-            if (origin != null)
+            if (origin.HasValue)
             {
-                input = input.SetOrigin(origin.Value);
+                input.Origin = origin.Value;
             }
+
             if (input.OptionalTarget != null)
             {
-                input = input.SetDirectionToTarget(input.OptionalTarget);
+                input.Direction = input.OptionalTarget.CurrentPosition - input.Origin;
             }
+
             return input;
         }
 
         public static Projectile.InputSettings SetDirection(this Projectile.InputSettings input, Vector2 direction)
         {
-            return input.With(direction: direction);
+            input.Direction = direction;
+            return input;
         }
 
         public static Projectile.InputSettings AimTo(this Projectile.InputSettings input, FumoUnit unit)
         {
             if (unit == null)
+            {
                 return input;
-            return input.SetDirection(unit.CurrentPosition - input.Origin);
+            }
+
+            input.Direction = unit.CurrentPosition - input.Origin;
+            return input;
         }
 
         public static Projectile.InputSettings AssignTarget(this Projectile.InputSettings input, FumoUnit target)
         {
-            return input.With(optionalTarget: target);
+            input.OptionalTarget = target;
+            return input;
         }
 
         public static Projectile.InputSettings Rotate(this Projectile.InputSettings input, float r)
         {
-            return input.With(direction: input.Direction.Rotate2D(r));
+            input.Direction = input.Direction.Rotate2D(r);
+            return input;
         }
     }
     #endregion
@@ -127,64 +147,53 @@ namespace rinCore.Bullet
     #region Input Settings & Pattern Spawning
     public partial class Projectile
     {
-        static List<Projectile> iterationList;
-
         public struct InputSettings
         {
-            public float BaseDamage { get; set; }
-            public FumoUnit Sender { get; set; }
-            public Vector2 Origin { get; set; }
+            public List<IProjectileMod> Mods;
+            public float BaseDamage;
+            public FumoUnit Sender;
+            public Vector2 Origin;
             public Vector2 OriginWithForward => Origin + Direction.ScaleToMagnitude(AddedForward);
-            public Vector2 Direction { get; set; }
-            public FumoUnit OptionalTarget { get; set; }
-            public float AddedForward { get; set; }
+            public Vector2 Direction;
+            public FumoUnit OptionalTarget;
+            public float AddedForward;
 
             public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
                 FumoUnit autoAim = null;
+
                 if (FumoUnit.Player == sender)
                 {
-                    if (FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, out autoAim))
-                    {
-
-                    }
+                    FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, out autoAim);
                 }
-                else
+                else if (sender.AssignedFaction.Match(FumoUnit.UFaction.Enemy))
                 {
-                    if (sender.AssignedFaction.Match(FumoUnit.UFaction.Enemy))
-                    {
-                        autoAim = FumoUnit.Player;
-                    }
+                    autoAim = FumoUnit.Player;
                 }
-                input = new(sender.CurrentPosition, sender, settings.relativeAim, 1f, autoAim);
+
+                input = new(
+                    sender.CurrentPosition,
+                    sender,
+                    settings.relativeAim,
+                    1f,
+                    autoAim);
             }
 
-            public InputSettings(Vector2 origin, FumoUnit sender, Vector2 direction, float baseDamage = 1f, FumoUnit optionalTarget = null, float addedForward = 0f)
-            {
-                this.BaseDamage = baseDamage;
-                this.Sender = sender;
-                this.Origin = origin;
-                this.Direction = direction;
-                this.OptionalTarget = optionalTarget;
-                this.AddedForward = addedForward;
-            }
-
-            public InputSettings With(
-                float? baseDamage = null,
-                FumoUnit sender = null,
-                Vector2? origin = null,
-                Vector2? direction = null,
+            public InputSettings(
+                Vector2 origin,
+                FumoUnit sender,
+                Vector2 direction,
+                float baseDamage = 1f,
                 FumoUnit optionalTarget = null,
-                float? addedForward = null)
+                float addedForward = 0f)
             {
-                return new InputSettings(
-                    origin ?? this.Origin,
-                    sender ?? this.Sender,
-                    direction ?? this.Direction,
-                    baseDamage ?? this.BaseDamage,
-                    optionalTarget ?? this.OptionalTarget,
-                    addedForward ?? this.AddedForward
-                );
+                Mods = null;
+                BaseDamage = baseDamage;
+                Sender = sender;
+                Origin = origin;
+                Direction = direction;
+                OptionalTarget = optionalTarget;
+                AddedForward = addedForward;
             }
 
             public InputSettings Copy()
@@ -200,8 +209,8 @@ namespace rinCore.Bullet
 
             public SingleSettings(float addedAngle, float projectileSpeed)
             {
-                this.AddedAngle = addedAngle;
-                this.ProjectileSpeed = projectileSpeed;
+                AddedAngle = addedAngle;
+                ProjectileSpeed = projectileSpeed;
             }
 
             public bool Spawn(InputSettings input, ProjectileDefine define, out Projectile output)
@@ -220,11 +229,11 @@ namespace rinCore.Bullet
 
             public ArcSettings(float startingAngle, float arcEndAngle, float arcInterval, float projectileSpeed)
             {
-                this.StartingAngle = startingAngle;
-                this.EndingAngle = arcEndAngle;
-                this.ArcInterval = arcInterval;
-                this.ProjectileSpeed = projectileSpeed;
-                this.IsReverse = false;
+                StartingAngle = startingAngle;
+                EndingAngle = arcEndAngle;
+                ArcInterval = arcInterval;
+                ProjectileSpeed = projectileSpeed;
+                IsReverse = false;
             }
 
             public static ArcSettings operator *(ArcSettings settings, float multiplier)
@@ -243,11 +252,11 @@ namespace rinCore.Bullet
             {
                 return new ArcSettings()
                 {
-                    StartingAngle = this.StartingAngle * multiplier,
-                    EndingAngle = this.EndingAngle * multiplier,
-                    ArcInterval = this.ArcInterval * multiplier,
-                    ProjectileSpeed = this.ProjectileSpeed,
-                    IsReverse = this.IsReverse
+                    StartingAngle = StartingAngle * multiplier,
+                    EndingAngle = EndingAngle * multiplier,
+                    ArcInterval = ArcInterval * multiplier,
+                    ProjectileSpeed = ProjectileSpeed,
+                    IsReverse = IsReverse
                 };
             }
 
@@ -255,11 +264,11 @@ namespace rinCore.Bullet
             {
                 return new ArcSettings()
                 {
-                    StartingAngle = this.StartingAngle,
-                    EndingAngle = this.EndingAngle,
-                    ArcInterval = this.ArcInterval,
-                    ProjectileSpeed = this.ProjectileSpeed * multiplier,
-                    IsReverse = this.IsReverse
+                    StartingAngle = StartingAngle,
+                    EndingAngle = EndingAngle,
+                    ArcInterval = ArcInterval,
+                    ProjectileSpeed = ProjectileSpeed * multiplier,
+                    IsReverse = IsReverse
                 };
             }
 
@@ -267,22 +276,24 @@ namespace rinCore.Bullet
             {
                 return new ArcSettings()
                 {
-                    StartingAngle = this.StartingAngle,
-                    EndingAngle = this.EndingAngle,
-                    ArcInterval = this.ArcInterval,
-                    ProjectileSpeed = this.ProjectileSpeed,
-                    IsReverse = !this.IsReverse
+                    StartingAngle = StartingAngle,
+                    EndingAngle = EndingAngle,
+                    ArcInterval = ArcInterval,
+                    ProjectileSpeed = ProjectileSpeed,
+                    IsReverse = !IsReverse
                 };
             }
 
             public IEnumerable<Projectile> SpawnForeach(InputSettings input, ProjectileDefine define)
             {
-                if (SpawnArc(define, input, this, out iterationList))
+                if (!SpawnArc(define, input, this, out List<Projectile> output))
                 {
-                    foreach (Projectile projectile in iterationList)
-                    {
-                        yield return projectile;
-                    }
+                    yield break;
+                }
+
+                foreach (Projectile projectile in output)
+                {
+                    yield return projectile;
                 }
             }
 
@@ -312,8 +323,12 @@ namespace rinCore.Bullet
 
             public IEnumerable<Projectile> SpawnForeach(InputSettings input, ProjectileDefine define)
             {
-                SpawnCircle(define, input, this, out iterationList);
-                foreach (var item in iterationList)
+                if (!SpawnCircle(define, input, this, out List<Projectile> output))
+                {
+                    yield break;
+                }
+
+                foreach (Projectile item in output)
                 {
                     yield return item;
                 }
@@ -322,8 +337,9 @@ namespace rinCore.Bullet
 
         public static bool SpawnSingle(ProjectileDefine define, InputSettings input, SingleSettings settings, out Projectile output)
         {
-            Vector2 offset = input.Direction.Rotate2D(settings.AddedAngle).ScaleToMagnitude(input.AddedForward);
-            Vector2 velocity = input.Direction.Rotate2D(settings.AddedAngle).ScaleToMagnitude(settings.ProjectileSpeed);
+            Vector2 rotatedDirection = input.Direction.Rotate2D(settings.AddedAngle);
+            Vector2 offset = rotatedDirection.ScaleToMagnitude(input.AddedForward);
+            Vector2 velocity = rotatedDirection.ScaleToMagnitude(settings.ProjectileSpeed);
 
             output = BuildProjectile(new BulletPacket
             {
@@ -331,25 +347,33 @@ namespace rinCore.Bullet
                 Sender = input.Sender,
                 Position = input.Origin + offset,
                 VelocityDirection = velocity,
-                Damage = input.BaseDamage
+                Damage = input.BaseDamage,
+                Mods = input.Mods
             });
 
             bool spawnedBullet = output != null;
+
             if (spawnedBullet && define.Flare)
             {
-                ProjectileRenderer.BulletFlareParticle(output.FinalizedPosition + offset, define.FlareColor, output.FinalizedVelocity, define.FlareSizeMod);
+                ProjectileRenderer.BulletFlareParticle(
+                    output.FinalizedPosition,
+                    define.FlareColor,
+                    output.FinalizedVelocity,
+                    define.FlareSizeMod);
             }
+
             return spawnedBullet;
         }
 
         public static bool SpawnArc(ProjectileDefine define, InputSettings input, ArcSettings settings, out List<Projectile> output)
         {
             output = new();
+
             Vector2 offset;
             Vector2 rotatedDirection;
             float angle;
 
-            foreach (var item in settings.ArcInterval.StepFromTo(settings.StartingAngle, settings.EndingAngle))
+            foreach (float item in settings.ArcInterval.StepFromTo(settings.StartingAngle, settings.EndingAngle))
             {
                 angle = item * (settings.IsReverse ? -1f : 1f);
                 rotatedDirection = input.Direction.Rotate2D(angle);
@@ -361,7 +385,8 @@ namespace rinCore.Bullet
                     Sender = input.Sender,
                     Position = input.Origin + offset,
                     VelocityDirection = rotatedDirection.normalized * settings.ProjectileSpeed,
-                    Damage = input.BaseDamage
+                    Damage = input.BaseDamage,
+                    Mods = input.Mods
                 });
 
                 if (p == null)
@@ -371,16 +396,27 @@ namespace rinCore.Bullet
 
                 if (define.Flare)
                 {
-                    ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition + offset, define.FlareColor, p.FinalizedVelocity, define.FlareSizeMod);
+                    ProjectileRenderer.BulletFlareParticle(
+                        p.FinalizedPosition,
+                        define.FlareColor,
+                        p.FinalizedVelocity,
+                        define.FlareSizeMod);
                 }
+
                 output.Add(p);
             }
-            return output != null && output.Count > 0;
+
+            return output.Count > 0;
         }
 
         public static bool SpawnCircle(ProjectileDefine define, InputSettings input, CircleSettings settings, out List<Projectile> output)
         {
-            ArcSettings s = new ArcSettings(-360f + settings.StartingAngle, settings.StartingAngle, settings.ArcInterval, settings.ProjectileSpeed);
+            ArcSettings s = new ArcSettings(
+                -360f + settings.StartingAngle,
+                settings.StartingAngle,
+                settings.ArcInterval,
+                settings.ProjectileSpeed);
+
             return SpawnArc(define, input, s, out output);
         }
     }

@@ -7,6 +7,61 @@ using UnityEngine;
 
 namespace rinCore
 {
+    public readonly struct ArcRotationalOffset
+    {
+        public float TargetSpeed { get; }
+        public float OptimalDistance { get; }
+        public float ProjectileSpeed { get; }
+        public float FrameTime { get; }
+
+        private const float ReferenceSpeed = 5f;
+        private const float ReferenceDistance = 6f;
+        private const float ReferenceProjectileSpeed = 8f;
+        private const float ReferenceFrameTime = 1f / 59.997f;
+        private const float ReferenceDegreesPerTick = 3f;
+
+        public ArcRotationalOffset(
+            float targetSpeed,
+            float optimalDistance,
+            float projectileSpeed,
+            float frameTime = ReferenceFrameTime)
+        {
+            TargetSpeed = targetSpeed;
+            OptimalDistance = optimalDistance;
+            ProjectileSpeed = projectileSpeed;
+            FrameTime = frameTime;
+        }
+
+        public readonly float DegreesPerTick
+        {
+            get
+            {
+                if (OptimalDistance <= 0f || ProjectileSpeed <= 0f || FrameTime <= 0f)
+                    return 0f;
+
+                return ReferenceDegreesPerTick
+                    * (TargetSpeed / ReferenceSpeed)
+                    * (ReferenceDistance / OptimalDistance)
+                    * (ReferenceProjectileSpeed / ProjectileSpeed)
+                    * (FrameTime / ReferenceFrameTime);
+            }
+        }
+
+        public static implicit operator float(ArcRotationalOffset offset)
+            => offset.DegreesPerTick;
+
+        public static float operator *(ArcRotationalOffset offset, float multiplier)
+            => offset.DegreesPerTick * multiplier;
+
+        public static float operator *(float multiplier, ArcRotationalOffset offset)
+            => offset.DegreesPerTick * multiplier;
+
+        public static float operator +(ArcRotationalOffset offset, float value)
+            => offset.DegreesPerTick + value;
+
+        public static float operator -(ArcRotationalOffset offset, float value)
+            => offset.DegreesPerTick - value;
+    }
     public static class FloatExtensions
     {
         public static readonly float Percent = 0.01f;

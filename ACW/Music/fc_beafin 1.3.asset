@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9376c3e930513a47b7f77626dbe3390, type: 3}
-  m_Name: fc_doom 10
+  m_Name: fc_beafin 1.3
   m_EditorClassIdentifier: rinCore::rinCore.MusicWrapper
   bpm: 193
-  TrackName: doom 10
-  musicClip: {fileID: 8300000, guid: d40490de4c0d24b4c82de3d0c79dc3a3, type: 3}
-  clipVolume: 0.9
+  TrackName: beafin 3 alt
+  musicClip: {fileID: 8300000, guid: 34fee438c718d3b489628b4e8563733f, type: 3}
+  clipVolume: 1
   <dontReplaceSelf>k__BackingField: 1

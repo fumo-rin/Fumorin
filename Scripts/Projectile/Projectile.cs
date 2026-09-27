@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using UnityEngine.Tilemaps;
+using UnityEngine.Assertions.Must;
 
 namespace rinCore.Bullet
 {
@@ -83,12 +85,12 @@ namespace rinCore.Bullet
     {
         public static Projectile.ArcSettings Arc(float centerAimAngle, float arcSize, int shotCount, float projectileSpeed)
         {
-            var result = new Projectile.ArcSettings(
+            return
+              new Projectile.ArcSettings(
                 centerAimAngle - (arcSize * 0.5f),
                 centerAimAngle + (arcSize * 0.5f),
                 arcSize / Mathf.Clamp(shotCount - 1, 1, 9999),
                 projectileSpeed);
-            return result;
         }
         public static Projectile.SingleSettings Single(float addedAngle, float projectileSpeed)
             => new Projectile.SingleSettings(addedAngle, projectileSpeed);
@@ -96,6 +98,101 @@ namespace rinCore.Bullet
             => new Projectile.CircleSettings(addedAngle, segments, projectileSpeed);
     }
     #endregion
+    #region Projectile Mod
+    public interface IProjectileMod
+    {
+        public float Duration { get; }
+        public bool Sequential { get; }
+        public void Run(Projectile p, float deltaTime, ref float elapsed);
+    }
+    public partial class Projectile
+    {
+        public List<IProjectileMod> mods = null;
+        public partial struct Mods
+        {
+            public struct Accelerate : IProjectileMod
+            {
+                public float TargetSpeed;
+                public float Acceleration;
+                public float Duration;
+                public bool Sequential;
+                float IProjectileMod.Duration => Duration;
+                bool IProjectileMod.Sequential => Sequential;
+                public void Run(Projectile p, float deltaTime, ref float elapsed)
+                {
+                    Vector2 target = p._regularVelocity.ScaleToMagnitude(TargetSpeed);
+                    p._regularVelocity = p._regularVelocity.MoveTowards(target, Acceleration);
+                    elapsed += deltaTime;
+                }
+            }
+            public struct Rotate : IProjectileMod
+            {
+                public float TotalArcSizeDegrees;
+                public float Duration;
+                public bool Sequential;
+                float IProjectileMod.Duration => Duration;
+                bool IProjectileMod.Sequential => Sequential;
+                public void Run(Projectile p, float deltaTime, ref float elapsed)
+                {
+                    float step = TotalArcSizeDegrees / Duration;
+                    p.Action_AddRotation(step * deltaTime);
+                    elapsed += deltaTime;
+                }
+            }
+            public struct Wait : IProjectileMod
+            {
+                public float Duration;
+
+                float IProjectileMod.Duration => Duration;
+                bool IProjectileMod.Sequential => true;
+                public void Run(Projectile p, float deltaTime, ref float elapsed)
+                {
+                    elapsed += deltaTime;
+                }
+            }
+        }
+        public static void RunMods(Projectile p, float deltaTime)
+        {
+            if (p.mods == null || p.mods.Count == 0)
+                return;
+
+            float time = Time.time - p.spawnTime;
+            float sequenceTime = 0f;
+
+            for (int i = 0; i < p.mods.Count; i++)
+            {
+                IProjectileMod mod = p.mods[i];
+                if (mod == null)
+                    continue;
+
+                float duration = Mathf.Max(0f, mod.Duration);
+
+                if (mod.Sequential)
+                {
+                    float start = sequenceTime;
+                    float end = start + duration;
+
+                    if (time >= start && time < end)
+                    {
+                        float elapsed = Mathf.Clamp(time - start, 0f, duration);
+                        mod.Run(p, elapsed - (elapsed - deltaTime), ref elapsed);
+                    }
+
+                    sequenceTime = end;
+                }
+                else
+                {
+                    if (time < 0f || time >= duration)
+                        continue;
+
+                    float elapsed = Mathf.Clamp(time, 0f, duration);
+                    mod.Run(p, deltaTime, ref elapsed);
+                }
+            }
+        }
+    }
+    #endregion
+
     public static class FactionExtension
     {
         public static bool IsFriendlyWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is not FumoUnit.UFaction.None && fac == other;
@@ -231,6 +328,8 @@ namespace rinCore.Bullet
                     grazeCount++;
                 }
 
+                RunMods(proj, dt);
+
                 Vector2 startPos = proj.FinalizedPosition;
                 proj.PreviousPosition = startPos;
                 Vector2 moveDelta = dt * proj.FinalizedVelocity;
@@ -337,10 +436,11 @@ namespace rinCore.Bullet
             public Vector2 Position;
             public Vector2 VelocityDirection;
             public float Damage;
+            public List<IProjectileMod> Mods;
         }
         public static Projectile BuildProjectile(BulletPacket b)
         {
-            if (CreateProjectile(b.Define, b.Sender, b.Position, b.VelocityDirection, out Projectile newP))
+            if (CreateProjectile(b, out Projectile newP))
             {
                 newP.BaseDamage = b.Damage;
                 newP.SpawnIndex = CurrentIndex++;
@@ -348,14 +448,14 @@ namespace rinCore.Bullet
             }
             return null;
         }
-        static bool CreateProjectile(ProjectileDefine define, FumoUnit sender, Vector2 position, Vector2 velocityDirection, out Projectile p)
+        static bool CreateProjectile(BulletPacket b, out Projectile p)
         {
             void Cancel(Vector2 position, Vector2 direction)
             {
                 ProjectileRenderer.BulletCancelParticle(position, direction);
             }
             p = default;
-            if (define == null)
+            if (b.Define == null)
             {
                 return false;
             }
@@ -367,22 +467,23 @@ namespace rinCore.Bullet
                 if (RNG)
                 {
                     //PointItemRunner.SpawnPointItem(position + Random.insideUnitCircle);
-                    Cancel(position, velocityDirection);
+                    Cancel(b.Position, b.VelocityDirection);
                 }
                 return false;
             }
             p = new Projectile
             {
-                data = define,
-                _currentPosition = position,
-                PreviousPosition = position,
-                _regularVelocity = velocityDirection,
+                Sender = b.Sender,
+                data = b.Define,
+                _currentPosition = b.Position,
+                PreviousPosition = b.Position,
+                _regularVelocity = b.VelocityDirection,
                 spawnTime = Time.time,
-                animationOffsetSeconds = (1f / define.animationSpeed) * (define.animationSpreadPercent.RandomPositiveNegativeRange().Multiply(0.01f)),
+                animationOffsetSeconds = (1f / b.Define.animationSpeed) * (b.Define.animationSpreadPercent.RandomPositiveNegativeRange().Multiply(0.01f)),
+                mods = b.Mods,
                 //mods = mods?.Select(m => m.Clone()).ToList(),
                 IsValid = true
             };
-            p.Sender = sender;
             ProjectileRunner.InjectProjectile(p);
             return true;
         }

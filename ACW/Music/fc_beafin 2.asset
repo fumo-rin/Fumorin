@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9376c3e930513a47b7f77626dbe3390, type: 3}
-  m_Name: fc_beafin 3
+  m_Name: fc_beafin 2
   m_EditorClassIdentifier: rinCore::rinCore.MusicWrapper
-  bpm: 193
-  TrackName: beafin 3 alt
-  musicClip: {fileID: 8300000, guid: 045101ff7e35ce9408949c0afd3d2640, type: 3}
+  bpm: 158
+  TrackName: beafin 2
+  musicClip: {fileID: 8300000, guid: 12bdaf1bbcceed04496359dd727692da, type: 3}
   clipVolume: 1
   <dontReplaceSelf>k__BackingField: 1
