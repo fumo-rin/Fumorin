@@ -561,5 +561,15 @@ namespace rinCore
                 yield return v + RNG.SeededRandomInsideUnitCircle * maxRange;
             }
         }
+        public static float SquishedDot(this Vector2 direction, Vector2 target, float arcSpan, float minScale = 0f)
+        {
+            if (direction == Vector2.zero || target == Vector2.zero)
+                return minScale;
+
+            float absAngle = Mathf.Abs(Vector2.SignedAngle(direction, target));
+            float halfAngle = arcSpan * 0.5f;
+            float normalizedAngle = (absAngle / halfAngle).Clamp(0f, 1f);
+            return Mathf.Lerp(1f, minScale, normalizedAngle);
+        }
     }
 }
