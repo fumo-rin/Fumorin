@@ -278,7 +278,7 @@ namespace rinCore.Bullet
         static ContactFilter2D batchContactFilter = new ContactFilter2D()
         {
             useLayerMask = true,
-            useTriggers = false
+            useTriggers = true
         };
         public struct Settings
         {

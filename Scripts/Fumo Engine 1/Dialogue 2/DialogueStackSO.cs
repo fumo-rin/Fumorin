@@ -21,13 +21,20 @@ namespace rinCore
         public bool GetWord(int hashValue, out AudioClip result)
         {
             result = null;
-            if (speechClips.Count <= 1)
+            if (speechClips == null || speechClips.Count == 0)
+            {
+                return false;
+            }
+
+            if (speechClips.Count == 1)
             {
                 result = speechClips[0];
             }
             else
             {
-                result = speechClips[hashValue % speechClips.Count];
+                int positiveHash = hashValue & int.MaxValue;
+                int index = positiveHash % speechClips.Count;
+                result = speechClips[index];
             }
             return result != null;
         }
