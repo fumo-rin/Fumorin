@@ -323,6 +323,8 @@ namespace rinCore
         {
             return d * m;
         }
+        public static double Max(this double a, double b) => Math.Max(a, b);
+        public static double Min(this double a, double b) => Math.Min(a, b);
         public static double Floor(this double d)
         {
             return Math.Floor(d);

@@ -40,7 +40,7 @@ namespace rinCore
                     {
                         Delay = 0.05f,
                         FadeIn = 0.35f,
-                        FadeOut = 0f,
+                        FadeOut = 0.35f,
                         ForceReload = false,
                     });
                     return true;
@@ -166,9 +166,9 @@ namespace rinCore
 
         private static void ClearSessionEvents()
         {
-            EventBus.Clear<Events.AddScore>();
-            EventBus.Clear<Events.ProgressScene>();
-            EventBus.Bind<Events.ProgressScene>(SessionScenes.MissingSessionProgressEvent);
+            RinBus.Clear<Events.AddScore>();
+            RinBus.Clear<Events.ProgressScene>();
+            RinBus.Bind<Events.ProgressScene>(SessionScenes.MissingSessionProgressEvent);
         }
 
         protected virtual void OnAddScore(Events.AddScore a)
@@ -185,15 +185,15 @@ namespace rinCore
 
         protected virtual void WhenBind()
         {
-            EventBus.Release<Events.ProgressScene>(SessionScenes.MissingSessionProgressEvent);
-            EventBus.Bind<Events.ProgressScene>(scenes.PerformNextSceneEvent);
-            EventBus.Bind<Events.AddScore>(OnAddScore);
+            RinBus.Release<Events.ProgressScene>(SessionScenes.MissingSessionProgressEvent);
+            RinBus.Bind<Events.ProgressScene>(scenes.PerformNextSceneEvent);
+            RinBus.Bind<Events.AddScore>(OnAddScore);
         }
 
         protected virtual void WhenUnbind()
         {
-            EventBus.Release<Events.ProgressScene>(scenes.PerformNextSceneEvent);
-            EventBus.Release<Events.AddScore>(OnAddScore);
+            RinBus.Release<Events.ProgressScene>(scenes.PerformNextSceneEvent);
+            RinBus.Release<Events.AddScore>(OnAddScore);
         }
 
         protected virtual void WhenEnd() { }

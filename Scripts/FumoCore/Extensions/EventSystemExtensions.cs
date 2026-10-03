@@ -54,10 +54,10 @@ namespace rinCore
         [Initialize(191919)]
         private static void BindSelectionBuffer()
         {
-            EventBus.Clear<FEB_EventSystem_SelectBuffered>();
+            RinBus.Clear<FEB_EventSystem_SelectBuffered>();
             selectionStack.Clear();
 
-            EventBus.Bind<FEB_EventSystem_SelectBuffered>((a) =>
+            RinBus.Bind<FEB_EventSystem_SelectBuffered>((a) =>
             {
                 if (a.queuedSelection != null)
                 {

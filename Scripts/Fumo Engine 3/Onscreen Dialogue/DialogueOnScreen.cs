@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -67,12 +68,12 @@ namespace rinCore
 
         private void OnEnable()
         {
-            EventBus.Bind<Entry>(QueueEntry);
+            RinBus.Bind<Entry>(QueueEntry);
         }
 
         private void OnDisable()
         {
-            EventBus.Release<Entry>(QueueEntry);
+            RinBus.Release<Entry>(QueueEntry);
             if (currentDialogueRoutine != null)
             {
                 StopCoroutine(currentDialogueRoutine);
@@ -317,10 +318,9 @@ namespace rinCore
 
             while (elapsed < duration)
             {
-                elapsed += Time.unscaledDeltaTime;
-
                 if (characterDisplay.sprite != c.sprite && elapsed >= 0.015f)
                     characterDisplay.sprite = c.sprite;
+                elapsed += Time.unscaledDeltaTime;
 
                 float wave = Mathf.Sin((elapsed / duration) * Mathf.PI);
                 float x = 1f - (wave * 0.2f);

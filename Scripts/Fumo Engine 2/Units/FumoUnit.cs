@@ -399,6 +399,7 @@ namespace rinCore
     }
     #endregion
     #region MoveLerp
+    [SelectionBase]
     public partial class FumoUnit
     {
         public Coroutine currentExternalMovement;
@@ -505,6 +506,7 @@ namespace rinCore
         Extra1 = FlagsRaw_Int._14,
         Extra2 = FlagsRaw_Int._15,
         Extra3 = FlagsRaw_Int._16,
+        Paused = FlagsRaw_Int._31,
 
         ShootAny = ShootHeld | ShootStarted,
         FocusAny = FocusHeld | FocusStarted,

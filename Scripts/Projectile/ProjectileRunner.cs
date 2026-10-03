@@ -286,7 +286,7 @@ namespace rinCore.Bullet
             float overloadEnd = requiredProjectiles * 4f;
             int halfRequired = (int)(requiredProjectiles * 0.5f);
 
-            int bulletCount = BulletCount + (SlowdownPickupsCount ?? 0);
+            int bulletCount = BulletCount + (SlowdownPickupsCount?.MultiplyAndFloor(0.3f) ?? 0);
 
             if (bulletCount <= halfRequired) return slowdownNone;
             if (bulletCount <= requiredProjectiles)
@@ -366,15 +366,15 @@ namespace rinCore.Bullet
         private void OnEnable()
         {
             _renderer.Bind();
-            EventBus.Bind<RProj_Global_Clear>(ApplyGlobalClear);
-            EventBus.Bind<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
+            RinBus.Bind<RProj_Global_Clear>(ApplyGlobalClear);
+            RinBus.Bind<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
             SlowdownPickupsCount = null;
         }
         private void OnDisable()
         {
             _renderer.Release();
-            EventBus.Release<RProj_Global_Clear>(ApplyGlobalClear);
-            EventBus.Release<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
+            RinBus.Release<RProj_Global_Clear>(ApplyGlobalClear);
+            RinBus.Release<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
         }
         private void ApplyGlobalClear(RProj_Global_Clear clear)
         {

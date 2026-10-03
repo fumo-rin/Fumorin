@@ -36,8 +36,8 @@ namespace rinCore
         private void OnEnable()
         {
             frameEntries.Clear();
-            EventBus.Bind<Cursor_Set_Frame>(OnCursorSetFrame);
-            EventBus.Bind<Cursor_Set_Size>(SetSize);
+            RinBus.Bind<Cursor_Set_Frame>(OnCursorSetFrame);
+            RinBus.Bind<Cursor_Set_Size>(SetSize);
             if (PersistentJSON.TryLoad(out int size, settingName))
             {
                 new Cursor_Set_Size(size).Publish();
@@ -46,8 +46,8 @@ namespace rinCore
 
         private void OnDisable()
         {
-            EventBus.Release<Cursor_Set_Frame>(OnCursorSetFrame);
-            EventBus.Release<Cursor_Set_Size>(SetSize);
+            RinBus.Release<Cursor_Set_Frame>(OnCursorSetFrame);
+            RinBus.Release<Cursor_Set_Size>(SetSize);
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             lastAppliedSprite = null;
             lastAppliedScale = -1;

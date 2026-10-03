@@ -8,11 +8,11 @@ namespace rinCore
         [SerializeField] CinemachinePositionComposer positionComposer;
         private void OnEnable()
         {
-            EventBus.Bind<FEB_Camera_Offset>(Apply);
+            RinBus.Bind<FEB_Camera_Offset>(Apply);
         }
         private void OnDisable()
         {
-            EventBus.Release<FEB_Camera_Offset>(Apply);
+            RinBus.Release<FEB_Camera_Offset>(Apply);
         }
         private void Apply(FEB_Camera_Offset offset)
         {

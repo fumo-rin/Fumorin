@@ -51,14 +51,14 @@ namespace rinCore
 
         private void OnEnable()
         {
-            EventBus.Bind<FInv_SetSlotItem>(SetItem);
-            EventBus.Bind<FInv_SelectSlot>(Select);
+            RinBus.Bind<FInv_SetSlotItem>(SetItem);
+            RinBus.Bind<FInv_SelectSlot>(Select);
         }
 
         private void OnDisable()
         {
-            EventBus.Release<FInv_SetSlotItem>(SetItem);
-            EventBus.Release<FInv_SelectSlot>(Select);
+            RinBus.Release<FInv_SetSlotItem>(SetItem);
+            RinBus.Release<FInv_SelectSlot>(Select);
         }
 
         private void LateUpdate()

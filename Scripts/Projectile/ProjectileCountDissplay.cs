@@ -33,13 +33,13 @@ namespace rinCore
                 itemCount = 0
             };
             frame = new(0);
-            EventBus.Bind<FEB_Projectile_Count_Frame>(Process);
-            EventBus.Bind<RProj_Slowdown_PickupsCount>(ProcessPickups);
+            RinBus.Bind<FEB_Projectile_Count_Frame>(Process);
+            RinBus.Bind<RProj_Slowdown_PickupsCount>(ProcessPickups);
         }
         private void OnDisable()
         {
-            EventBus.Release<FEB_Projectile_Count_Frame>(Process);
-            EventBus.Release<RProj_Slowdown_PickupsCount>(ProcessPickups);
+            RinBus.Release<FEB_Projectile_Count_Frame>(Process);
+            RinBus.Release<RProj_Slowdown_PickupsCount>(ProcessPickups);
         }
     }
 }

@@ -13,11 +13,11 @@ namespace rinCore
 
         private void Awake()
         {
-            EventBus.Bind<FInv_HeldItem_To_UI>(Apply);
+            RinBus.Bind<FInv_HeldItem_To_UI>(Apply);
         }
         private void OnDestroy()
         {
-            EventBus.Release<FInv_HeldItem_To_UI>(Apply);
+            RinBus.Release<FInv_HeldItem_To_UI>(Apply);
         }
         private void Apply(FInv_HeldItem_To_UI action)
         {

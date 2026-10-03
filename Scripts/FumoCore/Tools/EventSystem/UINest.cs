@@ -97,6 +97,7 @@ namespace rinCore
     #region Events
     public record FEB_UI_SelectNest(string TargetNestID, float Duration) : IRinEvent;
     public record FEB_UI_ClearSelection(string TargetNestID, float FadeOutDuration, bool DisregardNestCloseable) : IRinEvent;
+    public record FEB_UI_ReselectCurrent() : IRinEvent;
     #endregion
     #region State & Transitions
     public partial class UINest
@@ -268,6 +269,7 @@ namespace rinCore
             onComplete?.Invoke();
         }
 
+        bool currentlySelected = false;
         public void SetStateDirect(bool active, bool forceExecution = false)
         {
             if (cGroup == null) return;
@@ -282,7 +284,7 @@ namespace rinCore
             cGroup.alpha = active ? 1f : 0f;
             cGroup.blocksRaycasts = active;
             cGroup.interactable = active;
-
+            currentlySelected = active;
             if (active)
             {
                 if (defaultSelection != null)
@@ -332,6 +334,33 @@ namespace rinCore
     #region Event Bus Handling
     public partial class UINest
     {
+        public void Reselect(FEB_UI_ReselectCurrent evt = null)
+        {
+            if (cGroup == null || !gameObject.activeInHierarchy || !currentlySelected)
+            {
+                return;
+            }
+
+            GameObject targetToSelect = defaultSelection;
+
+            if (targetToSelect == null)
+            {
+                var childSelectable = GetComponentInChildren<Selectable>(false);
+                if (childSelectable != null)
+                {
+                    targetToSelect = childSelectable.gameObject;
+                }
+            }
+
+            if (targetToSelect != null)
+            {
+                new FEB_EventSystem_SelectBuffered(targetToSelect).Publish();
+            }
+            else
+            {
+                Debug.LogWarning($"[UINest] Reselect failed on '{name}' cause defaultSelection is null and no child Selectable exists!", this);
+            }
+        }
         private void HandleNestChangeRequest(FEB_UI_SelectNest evt)
         {
             if (isGlobalTransitioning) return;
@@ -494,15 +523,17 @@ namespace rinCore
         private void OnEnable()
         {
             activeNests.Add(this);
-            EventBus.Bind<FEB_UI_SelectNest>(HandleNestChangeRequest);
-            EventBus.Bind<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+            RinBus.Bind<FEB_UI_SelectNest>(HandleNestChangeRequest);
+            RinBus.Bind<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+            RinBus.Bind<FEB_UI_ReselectCurrent>(Reselect);
         }
 
         private void OnDisable()
         {
             activeNests.Remove(this);
-            EventBus.Release<FEB_UI_SelectNest>(HandleNestChangeRequest);
-            EventBus.Release<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+            RinBus.Release<FEB_UI_SelectNest>(HandleNestChangeRequest);
+            RinBus.Release<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
+            RinBus.Release<FEB_UI_ReselectCurrent>(Reselect);
 
             StopAllCoroutines();
             activeTransitionRoutine = null;

@@ -113,16 +113,16 @@ namespace rinCore
         public void OnEnable()
         {
             nextTickTime = Time.time + 0.5f;
-            EventBus.Bind<FFac_SetFactoryPiece>(SetFactoryPiece);
-            EventBus.Bind<FFac_Floor_Click>(StartDummyItem);
-            EventBus.Bind<BusUI.Close>(CloseUI);
+            RinBus.Bind<FFac_SetFactoryPiece>(SetFactoryPiece);
+            RinBus.Bind<FFac_Floor_Click>(StartDummyItem);
+            RinBus.Bind<BusUI.Close>(CloseUI);
         }
 
         void OnDisable()
         {
-            EventBus.Release<FFac_SetFactoryPiece>(SetFactoryPiece);
-            EventBus.Release<FFac_Floor_Click>(StartDummyItem);
-            EventBus.Release<BusUI.Close>(CloseUI);
+            RinBus.Release<FFac_SetFactoryPiece>(SetFactoryPiece);
+            RinBus.Release<FFac_Floor_Click>(StartDummyItem);
+            RinBus.Release<BusUI.Close>(CloseUI);
         }
         private void CloseUI(BusUI.Close action)
         {

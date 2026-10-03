@@ -17,11 +17,11 @@ namespace rinCore
         }
         private void OnEnable()
         {
-            EventBus.Bind<IUnitIframes.PlayerIframes>(WhenIframes);
+            RinBus.Bind<IUnitIframes.PlayerIframes>(WhenIframes);
         }
         private void OnDisable()
         {
-            EventBus.Release<IUnitIframes.PlayerIframes>(WhenIframes);
+            RinBus.Release<IUnitIframes.PlayerIframes>(WhenIframes);
         }
     }
 }

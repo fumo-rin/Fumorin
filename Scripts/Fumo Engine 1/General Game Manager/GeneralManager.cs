@@ -200,8 +200,8 @@ namespace rinCore
                     pauseKeybind.action.performed -= PressPauseInput;
                     pauseKeybind.action.Disable();
                 }
-                EventBus.Release<Sceneloader_LoadingAdditives_Started>(ScenePause);
-                EventBus.Release<Sceneloader_LoadingAdditives_Finished>(ScenePause);
+                RinBus.Release<Sceneloader_LoadingAdditives_Started>(ScenePause);
+                RinBus.Release<Sceneloader_LoadingAdditives_Finished>(ScenePause);
             }
         }
         void OnApplicationQuit()
@@ -214,8 +214,8 @@ namespace rinCore
             {
                 InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsInDynamicUpdate;
                 TimeSlowHandler.Reload();
-                EventBus.Bind<Sceneloader_LoadingAdditives_Started>(ScenePause);
-                EventBus.Bind<Sceneloader_LoadingAdditives_Finished>(ScenePause);
+                RinBus.Bind<Sceneloader_LoadingAdditives_Started>(ScenePause);
+                RinBus.Bind<Sceneloader_LoadingAdditives_Finished>(ScenePause);
                 if (pauseKeybind)
                 {
                     pauseKeybind.action.Enable();

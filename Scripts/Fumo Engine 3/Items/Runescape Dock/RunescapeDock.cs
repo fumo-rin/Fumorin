@@ -97,7 +97,7 @@ namespace rinCore
         static DockItem? currentSelection;
         private void Awake()
         {
-            EventBus.Bind<RunescapeDockSelector.Runescape_Dock_Selection>(SelectionAction);
+            RinBus.Bind<RunescapeDockSelector.Runescape_Dock_Selection>(SelectionAction);
         }
         private void Start()
         {
@@ -113,7 +113,7 @@ namespace rinCore
         }
         private void OnDestroy()
         {
-            EventBus.Release<RunescapeDockSelector.Runescape_Dock_Selection>(SelectionAction);
+            RinBus.Release<RunescapeDockSelector.Runescape_Dock_Selection>(SelectionAction);
         }
         void SelectionAction(RunescapeDockSelector.Runescape_Dock_Selection action)
         {

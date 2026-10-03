@@ -35,8 +35,8 @@ namespace rinCore
         [Initialize(-999)]
         private static void StartCacheSubscription()
         {
-            EventBus.Clear<BuildItemLookup>();
-            EventBus.Bind<BuildItemLookup>(BuildCacheFrom);
+            RinBus.Clear<BuildItemLookup>();
+            RinBus.Bind<BuildItemLookup>(BuildCacheFrom);
         }
         private static void BuildCacheFrom(BuildItemLookup action)
         {
@@ -189,16 +189,16 @@ namespace rinCore
 
         public void Start()
         {
-            EventBus.Bind<FInv_AddItem>(AddItem);
-            EventBus.Bind<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
-            EventBus.Bind<FInv_External_SetAmount>(ChangeAmount);
+            RinBus.Bind<FInv_AddItem>(AddItem);
+            RinBus.Bind<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
+            RinBus.Bind<FInv_External_SetAmount>(ChangeAmount);
         }
 
         public void End()
         {
-            EventBus.Release<FInv_AddItem>(AddItem);
-            EventBus.Release<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
-            EventBus.Release<FInv_External_SetAmount>(ChangeAmount);
+            RinBus.Release<FInv_AddItem>(AddItem);
+            RinBus.Release<FInv_External_Select_ItemSlot>(ExternalSelectSlot);
+            RinBus.Release<FInv_External_SetAmount>(ChangeAmount);
         }
 
         public void ChangeAmount(FInv_External_SetAmount action)
@@ -225,7 +225,7 @@ namespace rinCore
                     RegisterSlotInLookup(slotToUpdate);
                 }
 
-                EventBus.Publish(new FInv_SetSlotItem(targetSlotIndex, slotToUpdate));
+                RinBus.Publish(new FInv_SetSlotItem(targetSlotIndex, slotToUpdate));
             }
         }
 
@@ -251,7 +251,7 @@ namespace rinCore
                 selectedItem = item;
             }
 
-            EventBus.Publish(new FInv_SelectSlot(slot, selectedItem));
+            RinBus.Publish(new FInv_SelectSlot(slot, selectedItem));
             return true;
         }
         private void ExternalSelectSlot(FInv_External_Select_ItemSlot action)
@@ -379,7 +379,7 @@ namespace rinCore
                         existingSlot.Amount += addAmount;
                         item.Amount -= addAmount;
 
-                        EventBus.Publish(new FInv_SetSlotItem(i, existingSlot));
+                        RinBus.Publish(new FInv_SetSlotItem(i, existingSlot));
                     }
                 }
             }
@@ -403,7 +403,7 @@ namespace rinCore
                 item.Amount -= addAmount;
 
                 RegisterSlotInLookup(emptySlot);
-                EventBus.Publish(new FInv_SetSlotItem(emptyIdx, emptySlot));
+                RinBus.Publish(new FInv_SetSlotItem(emptyIdx, emptySlot));
             }
 
             return true;
@@ -418,7 +418,7 @@ namespace rinCore
                 {
                     UnregisterSlotFromLookup(slot);
                     slot.Clear();
-                    EventBus.Publish(new FInv_SetSlotItem(i, slot));
+                    RinBus.Publish(new FInv_SetSlotItem(i, slot));
                 }
             }
         }

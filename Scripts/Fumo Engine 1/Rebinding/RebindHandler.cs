@@ -11,7 +11,7 @@ namespace rinCore
         static RebindHandler instance;
 
         [SerializeField] RebindButton buttonPrefab;
-        [SerializeField] RebindButtonVec2 vec2ButtonPrefab;
+        [SerializeField] RebindButtonXY vec2ButtonPrefab;
         [SerializeField] Button resetDefaultsButton;
         [SerializeField] Transform buttonsContainer;
         [SerializeField] GameObject toggleAnchor;
@@ -23,7 +23,7 @@ namespace rinCore
         public static InputActionRebindingExtensions.RebindingOperation rebindingOperation;
 
         readonly HashSet<RebindButton> buttons = new();
-        readonly HashSet<RebindButtonVec2> vec2Buttons = new();
+        readonly HashSet<RebindButtonXY> vec2Buttons = new();
 
         public static bool IsVisible => instance != null && instance.toggleAnchor.activeInHierarchy;
 

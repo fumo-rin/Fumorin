@@ -209,16 +209,16 @@ namespace rinCore
 
         private void OnEnable()
         {
-            EventBus.Bind<FEB_Unit_Damaged>(UnitDamaged);
-            EventBus.Bind<FEB_Unit_Death>(UnitDeath);
-            EventBus.Bind<FEB_Unit_AssignBossBar>(RegisterBoss);
+            RinBus.Bind<FEB_Unit_Damaged>(UnitDamaged);
+            RinBus.Bind<FEB_Unit_Death>(UnitDeath);
+            RinBus.Bind<FEB_Unit_AssignBossBar>(RegisterBoss);
         }
 
         private void OnDisable()
         {
-            EventBus.Release<FEB_Unit_Damaged>(UnitDamaged);
-            EventBus.Release<FEB_Unit_Death>(UnitDeath);
-            EventBus.Release<FEB_Unit_AssignBossBar>(RegisterBoss);
+            RinBus.Release<FEB_Unit_Damaged>(UnitDamaged);
+            RinBus.Release<FEB_Unit_Death>(UnitDeath);
+            RinBus.Release<FEB_Unit_AssignBossBar>(RegisterBoss);
         }
 
         private void Update()

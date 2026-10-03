@@ -9,12 +9,12 @@ namespace rinCore
         [SerializeField] private CinemachineCamera _camera;
         private void OnEnable()
         {
-            EventBus.Bind<FEB_Camera_Focus>(SetNewTarget);
+            RinBus.Bind<FEB_Camera_Focus>(SetNewTarget);
         }
 
         private void OnDisable()
         {
-            EventBus.Release<FEB_Camera_Focus>(SetNewTarget);
+            RinBus.Release<FEB_Camera_Focus>(SetNewTarget);
         }
 
         private void SetNewTarget(FEB_Camera_Focus action)

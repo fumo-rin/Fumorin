@@ -83,7 +83,7 @@ namespace rinCore
                 foreach (var list in nameLists)
                 {
                     if (list.Count == 0) continue;
-                    string part = list[UnityEngine.Random.Range(0, list.Count)].Capitalized();
+                    string part = list[RNG.FloatRange(0f, list.Count).ToInt()].Capitalized();
                     generatedName += part;
                 }
             }

@@ -81,14 +81,20 @@ namespace rinCore.Bullet
             }
         }
 
+        float lastFrameTime = -1f;
         IEnumerator CO_Lifecycle(Settings s)
         {
             float remaining = s.duration;
             float fade;
-            bool firstFrame = true;
 
             while (remaining >= 0f)
             {
+                bool isNewFrame = Time.time > lastFrameTime;
+                if (isNewFrame)
+                {
+                    lastFrameTime = Time.time;
+                }
+
                 fade = Mathf.Min(s.fadeIn > 0f ? (s.duration - remaining) / s.fadeIn : 1f, s.fadeOut > 0f ? remaining / s.fadeOut : 1f);
                 fade = Mathf.Clamp01(fade);
 
@@ -96,8 +102,8 @@ namespace rinCore.Bullet
                 {
                     Color sCol = Line.startColor;
                     Color eCol = Line.endColor;
-                    sCol.a = fade * fade * fade * fade;
-                    eCol.a = fade * fade * fade * fade;
+                    sCol.a = fade;
+                    eCol.a = fade;
                     Line.startColor = sCol;
                     Line.endColor = eCol;
 
@@ -108,56 +114,54 @@ namespace rinCore.Bullet
                     }
                 }
 
-                if (firstFrame || fade >= 1f)
+                Vector2 startPos = s.parent != null ? (Vector2)transform.position : (Vector2)Input.OriginWithForward;
+                Vector2 dir = s.parent != null ? (Vector2)(s.parent.TransformDirection(Input.Direction)).normalized : Input.Direction.normalized;
+                float maxDist = s.maxLength > 0f ? s.maxLength : 1000f;
+
+                float laserWidth = s.width > 0f ? s.width : 0.05f;
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+                RaycastHit2D[] hits = Physics2D.BoxCastAll(startPos, new Vector2(0.01f, laserWidth), angle, dir, maxDist, hitMask);
+
+                Vector2 endPosWorld = startPos + dir * maxDist;
+                RaycastHit2D validHit = default;
+                bool foundValidHit = false;
+
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    firstFrame = false;
+                    RaycastHit2D candidateHit = hits[i];
+                    if (candidateHit.collider == null)
+                        continue;
 
-                    Vector2 startPos = s.parent != null ? (Vector2)transform.position : (Vector2)Input.OriginWithForward;
-                    Vector2 dir = s.parent != null ? (Vector2)(s.parent.TransformDirection(Input.Direction)).normalized : Input.Direction.normalized;
-                    float maxDist = s.maxLength > 0f ? s.maxLength : 1000f;
+                    Transform hitTrans = candidateHit.transform;
 
-                    float laserWidth = s.width > 0f ? s.width : 0.05f;
-                    float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
-                    RaycastHit2D[] hits = Physics2D.BoxCastAll(startPos, new Vector2(0.01f, laserWidth), angle, dir, maxDist, hitMask);
-
-                    Vector2 endPosWorld = startPos + dir * maxDist;
-                    RaycastHit2D validHit = default;
-                    bool foundValidHit = false;
-
-                    for (int i = 0; i < hits.Length; i++)
+                    if (Input.Sender != null)
                     {
-                        RaycastHit2D candidateHit = hits[i];
-                        if (candidateHit.collider == null)
+                        if (hitTrans == Input.Sender.transform || hitTrans.IsChildOf(Input.Sender.transform))
                             continue;
 
-                        Transform hitTrans = candidateHit.transform;
-
-                        if (Input.Sender != null)
-                        {
-                            if (hitTrans == Input.Sender.transform || hitTrans.IsChildOf(Input.Sender.transform))
-                                continue;
-
-                            if (candidateHit.collider.gameObject == Input.Sender.gameObject)
-                                continue;
-                        }
-
-                        if (candidateHit.transform.TryGetComponent(out IProjectileHit ihit))
-                        {
-                            if (Input.Sender == (object)ihit)
-                                continue;
-                        }
-
-                        validHit = candidateHit;
-                        foundValidHit = true;
-                        break;
+                        if (candidateHit.collider.gameObject == Input.Sender.gameObject)
+                            continue;
                     }
 
-                    if (foundValidHit)
+                    if (candidateHit.transform.TryGetComponent(out IProjectileHit ihit))
                     {
-                        endPosWorld = validHit.point;
-                        Transform hitTrans = validHit.transform;
+                        if (Input.Sender == (object)ihit)
+                            continue;
+                    }
 
+                    validHit = candidateHit;
+                    foundValidHit = true;
+                    break;
+                }
+
+                if (foundValidHit)
+                {
+                    endPosWorld = validHit.point;
+                    Transform hitTrans = validHit.transform;
+
+                    if (isNewFrame)
+                    {
                         if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
                         {
                             ProjectileRenderer.HitParticle(validHit.point - validHit.normal.ScaleToMagnitude(.25f), validHit.normal, new()
@@ -186,24 +190,24 @@ namespace rinCore.Bullet
                             }
                         }
                     }
+                }
 
-                    if (Line != null)
+                if (Line != null)
+                {
+                    Line.positionCount = 2;
+                    if (s.parent != null)
                     {
-                        Line.positionCount = 2;
-                        if (s.parent != null)
-                        {
-                            Line.useWorldSpace = false;
-                            Line.SetPosition(0, Vector3.zero);
+                        Line.useWorldSpace = false;
+                        Line.SetPosition(0, Vector3.zero);
 
-                            float actualDist = Vector2.Dot(endPosWorld - startPos, dir);
-                            Line.SetPosition(1, Input.Direction.normalized * actualDist);
-                        }
-                        else
-                        {
-                            Line.useWorldSpace = true;
-                            Line.SetPosition(0, startPos);
-                            Line.SetPosition(1, endPosWorld);
-                        }
+                        float actualDist = Vector2.Dot(endPosWorld - startPos, dir);
+                        Line.SetPosition(1, Input.Direction.normalized * actualDist);
+                    }
+                    else
+                    {
+                        Line.useWorldSpace = true;
+                        Line.SetPosition(0, startPos);
+                        Line.SetPosition(1, endPosWorld);
                     }
                 }
 
