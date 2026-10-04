@@ -334,6 +334,10 @@ namespace rinCore
     #region Event Bus Handling
     public partial class UINest
     {
+        public void SceneFinish(Sceneloader_LoadingAdditives_Finished evt)
+        {
+            Reselect(new FEB_UI_ReselectCurrent());
+        } 
         public void Reselect(FEB_UI_ReselectCurrent evt = null)
         {
             if (cGroup == null || !gameObject.activeInHierarchy || !currentlySelected)
@@ -526,6 +530,7 @@ namespace rinCore
             RinBus.Bind<FEB_UI_SelectNest>(HandleNestChangeRequest);
             RinBus.Bind<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
             RinBus.Bind<FEB_UI_ReselectCurrent>(Reselect);
+            RinBus.Bind<Sceneloader_LoadingAdditives_Finished>(SceneFinish);
         }
 
         private void OnDisable()
@@ -534,6 +539,7 @@ namespace rinCore
             RinBus.Release<FEB_UI_SelectNest>(HandleNestChangeRequest);
             RinBus.Release<FEB_UI_ClearSelection>(HandleClearSelectionRequest);
             RinBus.Release<FEB_UI_ReselectCurrent>(Reselect);
+            RinBus.Release<Sceneloader_LoadingAdditives_Finished>(SceneFinish);
 
             StopAllCoroutines();
             activeTransitionRoutine = null;
