@@ -485,9 +485,9 @@ namespace rinCore
     }
     #endregion
     #region Action Frame & STG
-    public record FEB_STG_ActionFrame(STG_Frame_Action actions = STG_Frame_Action.None) : IRinEvent;
+    public record FEB_STG_ActionFrame(STG_ActionFrame actions = STG_ActionFrame.None) : IRinEvent;
     [System.Flags]
-    public enum STG_Frame_Action
+    public enum STG_ActionFrame
     {
         None = FlagsRaw_Int.None,
         Right = FlagsRaw_Int._1,
@@ -515,16 +515,16 @@ namespace rinCore
     public interface IFumoUnit_STG_PlayerActionFrame
     {
         public FEB_STG_ActionFrame Frame { get; }
-        public STG_Frame_Action STG_Action { get; }
+        public STG_ActionFrame STG_Action { get; }
         public Vector2 Movement
         {
             get
             {
                 Vector2 m = Vector2.zero;
-                if (STG_Action.Match(STG_Frame_Action.Right)) m += Cardinal.Right.Vec2();
-                if (STG_Action.Match(STG_Frame_Action.Up)) m += Cardinal.Up.Vec2();
-                if (STG_Action.Match(STG_Frame_Action.Left)) m += Cardinal.Left.Vec2();
-                if (STG_Action.Match(STG_Frame_Action.Down)) m += Cardinal.Down.Vec2();
+                if (STG_Action.Match(STG_ActionFrame.Right)) m += Cardinal.Right.Vec2();
+                if (STG_Action.Match(STG_ActionFrame.Up)) m += Cardinal.Up.Vec2();
+                if (STG_Action.Match(STG_ActionFrame.Left)) m += Cardinal.Left.Vec2();
+                if (STG_Action.Match(STG_ActionFrame.Down)) m += Cardinal.Down.Vec2();
                 return m;
             }
         }

@@ -135,7 +135,8 @@ namespace rinCore
         {
             if (BlockTogglePause?.Invoke() == true)
                 return;
-            SetPause(!IsPaused);
+            if (!SceneLoader.IsLoading)
+                SetPause(!IsPaused);
         }
         [QFSW.QC.Command("-timescale")]
         public static void Command_SetTimescale(float timescale)

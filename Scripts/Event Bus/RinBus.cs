@@ -5,6 +5,7 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using WebSocketSharp;
 #endif
 
 namespace System.Runtime.CompilerServices
@@ -119,8 +120,29 @@ namespace rinCore
         public static void Clear<T>() =>
             EventHolder<T>.Clear();
     }
+    public struct RinEventFilter
+    {
+        public int? hash => !stringIndex.IsNullOrEmpty() ? stringIndex?.GetHashCode() : intIndex;
+        public string stringIndex;
+        public int? intIndex;
+        public RinEventFilter(string id)
+        {
+            stringIndex = id;
+            intIndex = null;
+        }
+        public RinEventFilter(int id)
+        {
+            stringIndex = null;
+            intIndex = id;
+        }
+    }
     public static class EventBusTriggerExtension
     {
+        public static void Publish<T>(this T item, RinEventFilter filter)
+            where T : IRinEvent
+        {
+            RinBus.Publish(item, filter.hash);
+        }
         public static void Publish<T>(this T item, int? target = null)
             where T : IRinEvent
         {
