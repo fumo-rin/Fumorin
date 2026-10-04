@@ -1,13 +1,16 @@
+using Mono.CSharp;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
-using UnityEngine.Tilemaps;
+using UnityEngine;
 using UnityEngine.Assertions.Must;
+using UnityEngine.Tilemaps;
 
 namespace rinCore.Bullet
 {
+    public record RSTG_LootList(List<Vector2> points, Vector2? senderPoint, SweepMode mode = SweepMode.Sweep) : IRinEvent;
+    public record RProj_Global_Clear(Rect? clear) : IRinEvent;
     #region Events
     public record RSTG_Graze_Frame(int count, Vector2 firstPosition) : IRinEvent;
     public partial class Projectile
@@ -125,6 +128,52 @@ namespace rinCore.Bullet
                     elapsed += deltaTime;
                 }
             }
+            public struct DFK_Cancel : IProjectileMod
+            {
+                public float Duration;
+                float IProjectileMod.Duration => Duration;
+                bool IProjectileMod.Sequential => Sequential;
+                public bool Sequential;
+                public float Radius;
+                public bool ClearSenderProjectile;
+                public FumoUnit.UFaction clearForFaction;
+                [ThreadStatic] static List<Vector2> points;
+                public void Run(Projectile p, float deltaTime, ref float elapsed)
+                {
+                    if (!p.IsValid) return;
+
+                    FumoUnit.UFaction clearFaction = clearForFaction;
+                    Vector2 point = p.FinalizedPosition;
+                    float radius = Radius;
+                    bool clear = ClearSenderProjectile;
+
+                    points ??= new List<Vector2>();
+                    points.Clear();
+
+                    ProjectileRunner.DestroyProjectiles(
+                        cand => cand.IsValid
+                             && cand.Faction.IsFriendlyWith(clearFaction)
+                             && cand.FinalizedPosition.SquareDistanceToLessThan(point, radius),
+
+                        destroyedList =>
+                        {
+                            for (int i = 0; i < destroyedList.Count; i++)
+                            {
+                                points.Add(destroyedList[i].FinalizedPosition);
+                            }
+
+                            if (clear && destroyedList.Count > 0)
+                            {
+                                p.IsValid = false;
+                            }
+                        });
+
+                    if (points.Count > 0)
+                    {
+                        new RSTG_LootList(points, null, SweepMode.Seal).Publish();
+                    }
+                }
+            }
             public struct Rotate : IProjectileMod
             {
                 public float TotalArcSizeDegrees;
@@ -198,7 +247,12 @@ namespace rinCore.Bullet
         public static bool IsFriendlyWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is not FumoUnit.UFaction.None && fac == other;
         public static bool IsHostileWith(this FumoUnit.UFaction fac, FumoUnit.UFaction other) => fac is FumoUnit.UFaction.None || fac != other;
     }
-    public record RProj_Global_Clear(Rect? clear) : IRinEvent;
+    public enum SweepMode
+    {
+        Dummy = 0,
+        Sweep = 1,
+        Seal = 100,
+    }
     public interface IParticleRenderItem
     {
         public bool SkipRender { get; }
@@ -295,35 +349,37 @@ namespace rinCore.Bullet
         {
             if (grazedProjectiles == null)
                 grazedProjectiles = new();
+
             int grazeCount = 0;
             Vector2? firstGraze = null;
             bool graze = FumoUnit.PlayerAs(out FumoUnit player) && player.IsAlive;
             Vector2 fallbackGraze = player == null ? Vector2.zero : player.CenterOrCurrentPosition;
-            batchContactFilter.SetLayerMask(settings.hitLayers);
-            Rect? clearRect;
+
+            // Make sure contact filter retains triggers!
+            batchContactFilter.useTriggers = true;
+            batchContactFilter.useLayerMask = true;
+
             foreach (var proj in projCollection)
             {
                 if (!proj.IsValid)
                     continue;
+
+                // Global Clear
                 if (settings.GlobalClear != null && settings.GlobalClear.clear.HasValue)
                 {
-                    clearRect = settings.GlobalClear.clear.Value;
-                    if (!clearRect.Value.Contains(proj.FinalizedPosition))
+                    if (!settings.GlobalClear.clear.Value.Contains(proj.FinalizedPosition))
                     {
                         proj.IsValid = false;
-                        //ProjectileRenderer.HitParticle(proj.FinalizedPosition, -proj.FinalizedVelocity);
                         continue;
                     }
                 }
 
+                // Graze check
                 if (graze && !grazedProjectiles.Contains(proj.SpawnIndex) &&
                     proj.Faction.IsHostileWith(player.AssignedFaction) &&
                     proj.FinalizedPosition.SquareDistanceToLessThan(player.CenterOrCurrentPosition, 1.15f))
                 {
-                    if (!firstGraze.HasValue)
-                    {
-                        firstGraze = proj.FinalizedPosition;
-                    }
+                    firstGraze ??= proj.FinalizedPosition;
                     grazedProjectiles.Add(proj.SpawnIndex);
                     grazeCount++;
                 }
@@ -335,63 +391,60 @@ namespace rinCore.Bullet
                 Vector2 moveDelta = dt * proj.FinalizedVelocity;
                 Vector2 endPos = startPos + moveDelta;
                 proj._currentPosition = endPos;
+
                 float travelDistance = moveDelta.magnitude;
                 Vector2 castDirection = travelDistance > 0.0001f ? moveDelta / travelDistance : Vector2.zero;
 
+                // Pass the settings.hitLayers directly so we don't accidentally ignore hurtbox layers!
+                batchContactFilter.SetLayerMask(settings.hitLayers);
+
                 int hitsCount = Physics2D.CircleCast(startPos, proj.data.CollisionRadius, castDirection, batchContactFilter, hits, travelDistance);
-                if (hitsCount > 0)
+
+                for (int i = 0; i < hitsCount; i++)
                 {
-                    hitList.Clear();
-                    for (int i = 0; i < hitsCount; i++)
+                    RaycastHit2D hit = hits[i];
+                    Transform hitTrans = hit.transform;
+                    if (hitTrans == null) continue;
+
+                    // Check for target component
+                    if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
                     {
-                        RaycastHit2D hit = hits[i];
-                        Transform hitTrans = hit.transform;
-
-                        if (hitTrans == null)
-                            continue;
-
-                        if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
-                        {
-                            proj.IsValid = false;
-
-                            ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.25f), hit.normal, new()
-                            {
-                                colorOverride = null,
-                                forceMultiplier = 1f
-                            });
-                            continue;
-                        }
-
-                        if (ihit.PHitFaction.IsFriendlyWith(proj.Faction))
-                            continue;
-
-                        if (proj.Sender == (object)ihit || !hitList.Add(ihit))
-                            continue;
-
-
-                        ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                        // If it hit terrain/environment wall without IProjectileHit
+                        proj.IsValid = false;
+                        ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.25f), hit.normal, new()
                         {
                             colorOverride = null,
                             forceMultiplier = 1f
                         });
-
-                        if (ihit.TryProjectileHit(new()
-                        {
-                            Damage = proj.FinalDamage,
-                            Sender = proj.Sender,
-                            Normal = hit.normal,
-                            Point = hit.point
-                        }, out float hitActualDamage))
-                        {
-
-                        }
-                        proj.IsValid = false;
-                        extraHitAction?.Invoke(ihit);
+                        break; // Stop checking hit array for this bullet
                     }
+
+                    // Ignore friendly units
+                    if (ihit.PHitFaction.IsFriendlyWith(proj.Faction) || proj.Sender == (object)ihit)
+                        continue;
+
+                    // Valid hostile hit!
+                    ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                    {
+                        colorOverride = null,
+                        forceMultiplier = 1f
+                    });
+
+                    ihit.TryProjectileHit(new()
+                    {
+                        Damage = proj.FinalDamage,
+                        Sender = proj.Sender,
+                        Normal = hit.normal,
+                        Point = hit.point
+                    }, out _);
+
+                    proj.IsValid = false;
+                    extraHitAction?.Invoke(ihit);
+                    break; // Bullet consumed!
                 }
             }
 
-            if (grazeCount > 0f)
+            if (grazeCount > 0)
             {
                 new RSTG_Graze_Frame(grazeCount, firstGraze ?? fallbackGraze).Publish();
             }
@@ -402,7 +455,6 @@ namespace rinCore.Bullet
             public float Duration;
         }
         public record FEB_Projectile_Sweep(SweepPacket packet) : IRinEvent;
-        public record FEB_Projectile_Seal(SealPacket packet) : IRinEvent;
         public static void SweepAll(SweepPacket packet, Action<List<Projectile>> sweepAction = null)
         {
             ProjectileRunner.DestroyProjectiles(null, sweepAction);
@@ -427,7 +479,6 @@ namespace rinCore.Bullet
             x.Sender == sweep.Owner &&
             sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance)
             , sweepAction);
-            new FEB_Projectile_Seal(sweep).Publish();
         }
         public struct BulletPacket
         {

@@ -15,9 +15,10 @@ namespace rinCore
             public DialogueCharacterSO character;
             public string dialogue;
             public float expireDuration;
-            public Entry AsEntry => new(character, dialogue, expireDuration);
+            public bool fastForward;
+            public Entry AsEntry => new(character, dialogue, expireDuration, fastForward);
         }
-        public record Entry(DialogueCharacterSO character, string dialogue, float expireDuration = 3f) : IRinEvent;
+        public record Entry(DialogueCharacterSO character, string dialogue, float expireDuration = 3f, bool fastForward = false) : IRinEvent;
 
         [Header("UI References")]
         [SerializeField] CanvasGroup dialogueGroup;
@@ -88,6 +89,32 @@ namespace rinCore
 
         void QueueEntry(Entry e)
         {
+            if (e.fastForward)
+            {
+                entries.Clear();
+                if (currentDialogueRoutine != null)
+                {
+                    StopCoroutine(currentDialogueRoutine);
+                    currentDialogueRoutine = null;
+                }
+
+                if (activeJiggleRoutine != null)
+                {
+                    StopCoroutine(activeJiggleRoutine);
+                    activeJiggleRoutine = null;
+                    if (characterDisplay != null)
+                    {
+                        characterDisplay.rectTransform.localScale = Vector3.one;
+                    }
+                }
+
+                ClearUI();
+
+                entries.Enqueue(e);
+                currentDialogueRoutine = StartCoroutine(ProcessQueue());
+                return;
+            }
+
             entries.Enqueue(e);
             if (currentDialogueRoutine == null)
             {
@@ -103,7 +130,10 @@ namespace rinCore
                 SetupCharacterUI(firstEntry);
             }
 
-            yield return AnimateGroupVisibility(true);
+            if (dialogueGroup != null && dialogueGroup.alpha < 1f)
+            {
+                yield return AnimateGroupVisibility(true);
+            }
 
             while (entries.Count > 0)
             {
@@ -188,7 +218,6 @@ namespace rinCore
                 dialogueGroup.blocksRaycasts = false;
             }
         }
-
         private IEnumerator RunEntry(Entry e)
         {
             SetupCharacterUI(e);

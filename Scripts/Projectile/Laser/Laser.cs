@@ -178,7 +178,7 @@ namespace rinCore.Bullet
                                 forceMultiplier = 1f
                             });
 
-                            if (ihit.TryProjectileHit(new()
+                            if (s.frameDamage > 0f && ihit.TryProjectileHit(new()
                             {
                                 Damage = s.frameDamage,
                                 Sender = Input.Sender,

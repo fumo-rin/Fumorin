@@ -122,7 +122,7 @@ namespace rinCore
     }
     public struct RinEventFilter
     {
-        public int? hash => !stringIndex.IsNullOrEmpty() ? stringIndex?.GetHashCode() : intIndex;
+        public int? hash => !string.IsNullOrEmpty(stringIndex) ? stringIndex.GetHashCode() : intIndex;
         public string stringIndex;
         public int? intIndex;
         public RinEventFilter(string id)
