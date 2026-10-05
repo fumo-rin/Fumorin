@@ -10,7 +10,7 @@ namespace rinCore
     #region Single Generic Parameter Populate
     public static partial class ListExtensions
     {
-        public static TList Populate<TList, T>(this TList l, params T[] items) where TList : IList<T>
+        public static TList Populate<TList, T>(this TList l, params T[] items) where TList : List<T>
         {   /*                       _oo0oo_
             *                      o8888888o
             *                      88" . "88
@@ -40,8 +40,7 @@ namespace rinCore
             l.Clear();
             if (items != null)
             {
-                if (l is List<T> list)
-                    list.EnsureCapacity(items.Length);
+                l.EnsureCapacity(items.Length);
 
                 for (int i = 0; i < items.Length; i++)
                     l.Add(items[i]);
