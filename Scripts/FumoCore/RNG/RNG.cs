@@ -31,7 +31,7 @@ namespace rinCore
         {
             randomIntIndex = 0;
             int maxValue = 255;
-            int length = 4096;
+            int length = 32767;
             randomIntTable = new byte[length];
             int seed = 3378;
             rng = new System.Random(seed);

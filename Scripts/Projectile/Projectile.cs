@@ -148,6 +148,7 @@ namespace rinCore.Bullet
     }
     public partial class Projectile
     {
+        [System.Serializable]
         struct appliedSweep
         {
             public HashSet<(float, byte)> sweeps;
@@ -162,8 +163,13 @@ namespace rinCore.Bullet
             public bool Sweeping => Time.time < EndTime;
         }
         static appliedSweep sweep;
-        static Projectile()
+        [Initialize(100)]
+        static void reinit()
         {
+            sweep = new()
+            {
+                sweeps = new()
+            };
             RinBus.Bind<FEB_WhenProjectileSweep>((a) =>
             {
                 sweep.ApplySweep(a);

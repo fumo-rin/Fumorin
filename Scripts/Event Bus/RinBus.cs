@@ -182,16 +182,18 @@ namespace rinCore
 
     public static class EventBusTriggerExtension
     {
-        public static void Publish<T>(this T item, RinEventFilter filter)
+        public static T Publish<T>(this T item, RinEventFilter filter)
             where T : IRinEvent
         {
             RinBus.Publish(item, filter.hash);
+            return item;
         }
 
-        public static void Publish<T>(this T item, int? target = null)
+        public static T Publish<T>(this T item, int? target = null)
             where T : IRinEvent
         {
             RinBus.Publish(item, target);
+            return item;
         }
     }
 }
