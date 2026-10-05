@@ -33,7 +33,8 @@ namespace rinCore
                 SceneLoader.LoadScenePair(sceneToLoad, new()
                 {
                     Delay = 0.05f,
-                    FadeIn = 0.25f,
+                    FadeIn = 0.35f,
+                    FadeOut = 0.35f,
                     Payload = () =>
                     {
                         if (Deprecated_EndSession_GS1 || Mode.Match(SessionEndingMode.GameSession1_EndSession))

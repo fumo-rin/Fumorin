@@ -16,9 +16,9 @@ namespace rinCore
 
             static SceneLoader.SceneLoadSettings MainMenuSettings => new()
             {
-                Delay = 1.25f,
+                Delay = 0.05f,
                 FadeIn = 0.35f,
-                FadeOut = 0f,
+                FadeOut = 0.35f,
                 Payload = () =>
                 {
                     ClearSessions(true);
@@ -98,6 +98,9 @@ namespace rinCore
                     case Events.progressMode.MainMenu:
                         success = GoToScene(MainMenuScene, MainMenuSettings);
                         break;
+                    case Events.progressMode.ReturnOrMainMenu:
+                        success = GoToScene(ReturnScene == null ? MainMenuScene : ReturnScene, MainMenuSettings);
+                        break;
                     case Events.progressMode.NextOrReturnScene:
                         var exit = ReturnScene == null ? MainMenuScene : ReturnScene;
                         success = GoToNextOrFallback(exit, standardSceneLoad, standardSceneLoad);
@@ -142,6 +145,7 @@ namespace rinCore
                 MainMenu = -100,
                 NextOrReturnScene = 200,
                 NextOrNothing = 300,
+                ReturnOrMainMenu = 400,
             }
             public record ProgressScene(progressMode mode, Action Payload, Action PostUnloadPayload, bool ForceReload) : IRinEvent;
         }

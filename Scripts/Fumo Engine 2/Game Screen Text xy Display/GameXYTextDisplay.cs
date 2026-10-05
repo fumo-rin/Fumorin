@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace rinCore
 {
+    public record FEB_XYText(string text, string key = "", GameXYTextDisplay.textPacket packet = null) : IRinEvent;
     public class GameXYTextDisplay : MonoBehaviour
     {
         #region Text Packet
@@ -28,6 +29,13 @@ namespace rinCore
             {
                 this.fadeIn = 0.5f;
                 this.fadeOut = 0.5f;
+                this.duration = 2f;
+                this.color = ColorHelper.White;
+                this.a01 = new(0.3f, 0.5f);
+                this.b01 = new(0.7f, 0.7f);
+                this.fontSize = 20f;
+                this.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                this.verticalAlignment = VerticalAlignmentOptions.Bottom;
             }
         }
         #endregion
@@ -51,6 +59,18 @@ namespace rinCore
             cloneable.gameObject.SetActive(false);
         }
 
+        void OnEnable()
+        {
+            RinBus.Bind<FEB_XYText>(ProcessTextEvent);
+        }
+        void OnDisable()
+        {
+            RinBus.Release<FEB_XYText>(ProcessTextEvent);
+        }
+        private void ProcessTextEvent(FEB_XYText t)
+        {
+            CreateText(t.text, t.packet ?? new(), t.key);
+        }
         public static void CreateText(string text, textPacket packet, string key = "")
         {
             if (!RinHelper.ValidGameObjects(instance))

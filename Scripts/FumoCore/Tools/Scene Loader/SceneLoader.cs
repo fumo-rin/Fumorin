@@ -55,7 +55,7 @@ namespace rinCore
             {
                 yield return null;
 #if UNITY_EDITOR
-                LoadScenePair(scenePack.EditorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f });
+                LoadScenePair(scenePack.EditorStartingScene, new SceneLoadSettings { Payload = null, Delay = 0f, FadeOut = 0.35f });
 #else
                 if (scenePack.LoadStartingSceneInBuild && scenePack.BuildStartingScene != null)
                     LoadScenePair(scenePack.BuildStartingScene, new SceneLoadSettings { Payload = null, Delay = 5f });
@@ -111,8 +111,8 @@ namespace rinCore
             SceneLoadSettings finalSettings = settings ?? new SceneLoadSettings()
             {
                 Delay = 0f,
-                FadeIn = 0.1f,
-                FadeOut = 0.1f,
+                FadeIn = 0.35f,
+                FadeOut = 0.35f,
                 ForceReload = false
             };
 
@@ -156,7 +156,7 @@ namespace rinCore
             IsLoading = true;
 
             Application.backgroundLoadingPriority = ThreadPriority.High;
-
+            loadingScreenText.color = loadingScreenText.color.Opacity(0);
             EventSystem cachedEventSystem = null;
             if (EventSystem.current is EventSystem e)
             {
@@ -175,6 +175,7 @@ namespace rinCore
                 c.a = (settings.FadeIn > 0f) ? 0f : 1f;
                 fadingImage.color = c;
             }
+
 
             if (loadingScreen != null) loadingScreen.SetActive(true);
             UpdateLoadingText(0f);
@@ -288,24 +289,27 @@ namespace rinCore
             }
 
             UpdateLoadingText(1f);
+            loadingScreenText.color = loadingScreenText.color.Opacity(0);
             yield return null;
 
-            new Sceneloader_LoadingAdditives_Finished().Publish();
             _currentScenePair = pair;
             IsLoading = false;
 
-            settings.Payload?.Invoke();
-            new Sceneloader_Finish_Request_RefreshUI().Publish();
 
             if (settings.FadeOut > 0f && fadingImage != null)
             {
                 yield return CO_FadeImage(fadingImage, 1f, 0f, settings.FadeOut);
             }
 
-            if (loadingScreen != null) loadingScreen.SetActive(false);
             if (EventSystem.current != null) EventSystem.current.enabled = true;
             Application.backgroundLoadingPriority = ThreadPriority.BelowNormal;
             if (cachedEventSystem != null) cachedEventSystem.enabled = true;
+
+            new Sceneloader_LoadingAdditives_Finished().Publish();
+            settings.Payload?.Invoke();
+            new Sceneloader_Finish_Request_RefreshUI().Publish();
+            new FEB_UI_ReselectCurrent().Publish();
+            if (loadingScreen != null) loadingScreen.SetActive(false);
         }
 
         private IEnumerator CO_FadeImage(Image image, float startAlpha, float targetAlpha, float duration)
@@ -327,6 +331,7 @@ namespace rinCore
 
         private void UpdateLoadingText(float progress)
         {
+            loadingScreenText.color = loadingScreenText.color.Opacity(255);
             if (loadingScreenText != null)
                 loadingScreenText.text = $"Loading: {Mathf.RoundToInt(Mathf.Clamp01(progress) * 100f)}%";
         }
