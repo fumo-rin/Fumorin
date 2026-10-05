@@ -41,8 +41,8 @@ namespace rinCore
                 action = action.SetMatch(STG_ActionFrame.FocusEnd, true);
             wasFocused = focused;
 
-            action = action.SetMatch(STG_ActionFrame.BombPressed, bomb.IsPressed());
-            action = action.SetMatch(STG_ActionFrame.HyperPressed, hyper.IsPressed());
+            action = action.SetMatch(STG_ActionFrame.BombPressed, bomb.JustPressed());
+            action = action.SetMatch(STG_ActionFrame.HyperPressed, hyper.JustPressed());
             action = action.SetMatch(STG_ActionFrame.Extra1, extra1.IsPressed());
             action = action.SetMatch(STG_ActionFrame.Extra2, extra2.IsPressed());
             action = action.SetMatch(STG_ActionFrame.Extra3, extra3.IsPressed());

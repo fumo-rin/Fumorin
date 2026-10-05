@@ -371,9 +371,9 @@ namespace rinCore
     public partial class FumoUnit
     {
         public UFaction AssignedFaction = UFaction.None;
-        public enum UFaction
+        public enum UFaction : byte
         {
-            None = -1,
+            None = 255,
             Default = 0,
             Player = 100,
             Enemy = 200,

@@ -180,7 +180,7 @@ namespace rinCore.Bullet
 
                             if (s.frameDamage > 0f && ihit.TryProjectileHit(new()
                             {
-                                Damage = s.frameDamage,
+                                Damage = s.frameDamage * (Input.Sender is IDamageMod mod ? mod.DamageMod : 1f),
                                 Sender = Input.Sender,
                                 Normal = validHit.normal,
                                 Point = validHit.point

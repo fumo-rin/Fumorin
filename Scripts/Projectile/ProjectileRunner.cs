@@ -385,21 +385,34 @@ namespace rinCore.Bullet
         private void Update()
         {
             int count = masterProjectileList.Count;
-            if (count == 0) return;
 
-            float dt = Time.deltaTime;
-            var runSettings = new Projectile.Settings(CollisionLayer)
+            if (count == 0)
             {
-                GlobalClear = currentClear
-            };
-            Projectile.ProcessBatch(masterProjectileList, dt, runSettings, (Projectile.IProjectileHit hit) =>
+                //Run stuff when there are no projectiles.
+                TimeSlowHandler.SetSimulatedSlowdownTarget(GetTargetSlowdown(SlowdownProjectileTargetCount ?? 400));
+            }
+            else
             {
+                float dt = Time.deltaTime;
+                var runSettings = new Projectile.Settings(CollisionLayer)
+                {
+                    GlobalClear = currentClear
+                };
+                Projectile.ProcessBatch(masterProjectileList, dt, runSettings, (Projectile.IProjectileHit hit) =>
+                {
 
-            });
+                });
 
-            masterProjectileList.RemoveAll(x => x == null || !x.IsValid);
+                masterProjectileList.RemoveAll(x => x == null || !x.IsValid);
 
-            TimeSlowHandler.SetSimulatedSlowdownTarget(GetTargetSlowdown(SlowdownProjectileTargetCount ?? 400));
+                TimeSlowHandler.SetSimulatedSlowdownTarget(GetTargetSlowdown(SlowdownProjectileTargetCount ?? 400));
+            }
+            //Post Process Frame
+            if (Projectile.GetLootFrame(out RSTG_LootList lingeringSweepLoot))
+            {
+                lingeringSweepLoot.Publish();
+            }
+
         }
 
         private void LateUpdate()

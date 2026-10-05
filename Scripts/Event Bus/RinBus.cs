@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Unity.Services.Matchmaker.Models;
+
 
 #region Jank
 #if UNITY_EDITOR
@@ -42,6 +44,7 @@ namespace rinCore
     }
 #endif
     #endregion
+
     public static partial class RinBus
     {
         private static class EventHolder<T>
@@ -55,8 +58,10 @@ namespace rinCore
             }
 #endif
             #endregion
+
             public static Action<T> untargettedEvent;
             private static readonly Dictionary<int, Action<T>> targetedEvents = new();
+
             #region Strapping
             public static void Bind(Action<T> listener, int? target = null)
             {
@@ -66,8 +71,15 @@ namespace rinCore
                     return;
                 }
 
-                targetedEvents[target.Value] =
-                    targetedEvents.GetValueOrDefault(target.Value) + listener;
+                int key = target.Value;
+                if (targetedEvents.TryGetValue(key, out var existing))
+                {
+                    targetedEvents[key] = existing + listener;
+                }
+                else
+                {
+                    targetedEvents[key] = listener;
+                }
             }
 
             public static void Release(Action<T> listener, int? target = null)
@@ -78,15 +90,16 @@ namespace rinCore
                     return;
                 }
 
-                if (!targetedEvents.TryGetValue(target.Value, out var action))
+                int key = target.Value;
+                if (!targetedEvents.TryGetValue(key, out var action))
                     return;
 
                 action -= listener;
 
                 if (action == null)
-                    targetedEvents.Remove(target.Value);
+                    targetedEvents.Remove(key);
                 else
-                    targetedEvents[target.Value] = action;
+                    targetedEvents[key] = action;
             }
 
             public static void Publish(T eventData, int? target = null)
@@ -98,7 +111,7 @@ namespace rinCore
                 }
 
                 if (targetedEvents.TryGetValue(target.Value, out var action))
-                    action.Invoke(eventData);
+                    action?.Invoke(eventData);
             }
 
             public static void Clear()
@@ -108,6 +121,7 @@ namespace rinCore
             }
             #endregion
         }
+
         public static void Bind<T>(Action<T> listener, int? target = null) =>
             EventHolder<T>.Bind(listener, target);
 
@@ -120,22 +134,52 @@ namespace rinCore
         public static void Clear<T>() =>
             EventHolder<T>.Clear();
     }
-    public struct RinEventFilter
+
+    public readonly struct RinEventFilter
     {
-        public int? hash => !string.IsNullOrEmpty(stringIndex) ? stringIndex.GetHashCode() : intIndex;
-        public string stringIndex;
-        public int? intIndex;
+        public readonly string stringIndex;
+        public readonly int rawHash;
+        public readonly bool hasValue;
+
+        public int? hash => hasValue ? rawHash : null;
+
         public RinEventFilter(string id)
         {
             stringIndex = id;
-            intIndex = null;
+            if (!string.IsNullOrEmpty(id))
+            {
+                rawHash = GetStableHashCode(id);
+                hasValue = true;
+            }
+            else
+            {
+                rawHash = 0;
+                hasValue = false;
+            }
         }
+
         public RinEventFilter(int id)
         {
             stringIndex = null;
-            intIndex = id;
+            rawHash = id;
+            hasValue = true;
         }
+        private static int GetStableHashCode(string str)
+        {
+            unchecked
+            {
+                //hashing from hell
+                int hash = (int)2166136261;
+                for (int i = 0; i < str.Length; i++)
+                    hash = (hash ^ str[i]) * 16777619;
+                return hash;
+            }
+        }
+        public static implicit operator RinEventFilter(string id) => new(id);
+        public static implicit operator RinEventFilter(int id) => new(id);
+        public static implicit operator int?(RinEventFilter filter) => filter.hash;
     }
+
     public static class EventBusTriggerExtension
     {
         public static void Publish<T>(this T item, RinEventFilter filter)
@@ -143,6 +187,7 @@ namespace rinCore
         {
             RinBus.Publish(item, filter.hash);
         }
+
         public static void Publish<T>(this T item, int? target = null)
             where T : IRinEvent
         {

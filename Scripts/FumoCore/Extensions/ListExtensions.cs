@@ -4,6 +4,55 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#region Populate overloads from hell.
+namespace rinCore
+{
+    #region Single Generic Parameter Populate
+    public static partial class ListExtensions
+    {
+        public static TList Populate<TList, T>(this TList l, params T[] items) where TList : IList<T>
+        {   /*                       _oo0oo_
+            *                      o8888888o
+            *                      88" . "88
+            *                      (| -_- |)
+            *                      0\  =  /0
+            *                    ___/`---'\___
+            *                  .' \\|     |// '.
+            *                 / \\|||  :  |||// \
+            *                / _||||| -:- |||||- \
+            *               |   | \\\  -  /// |   |
+            *               | \_|  ''\---/''  |_/ |
+            *               \  .-\__  '-'  ___/-. /
+            *             ___'. .'  /--.--\  `. .'___
+            *          ."" '<  `.___\_<|>_/___.' >' "".
+            *         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+            *         \  \ `_.   \_ __\ /__ _/   .-` /  /
+            *     =====`-.____`.___ \_____/___.-`___.-'=====
+            *                       `=---='
+            *
+            *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            *               佛祖保佑         永無BUG
+            *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            if (l == null)
+                throw new System.ArgumentNullException(nameof(l),
+                    "Cannot populate a null list due to explicit type requirement. C# Limitation.");
+
+            l.Clear();
+            if (items != null)
+            {
+                if (l is List<T> list)
+                    list.EnsureCapacity(items.Length);
+
+                for (int i = 0; i < items.Length; i++)
+                    l.Add(items[i]);
+            }
+            return l;
+        }
+    }
+    #endregion
+}
+#endregion
+
 namespace rinCore
 {
     public enum ListAddMode
@@ -37,8 +86,19 @@ namespace rinCore
             }
         }
     }
-    public static class ListExtensions
+    public static partial class ListExtensions
     {
+        public static int EnsureCapacity<T>(this List<T> list, int capacity)
+        {
+            if (list == null) return 0;
+
+            if (list.Capacity < capacity)
+            {
+                list.Capacity = capacity;
+            }
+
+            return list.Capacity;
+        }
         public static bool AddIfDoesntExist<T>(this List<T> l, T other)
         {
             if (!l.Contains(other))

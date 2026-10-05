@@ -149,7 +149,12 @@ namespace rinCore.Bullet
     {
         public struct InputSettings
         {
-            public List<IProjectileMod> Mods;
+            private List<IProjectileMod> _mods;
+            public List<IProjectileMod> Mods
+            {
+                get => _mods ??= new List<IProjectileMod>();
+                set => _mods = value;
+            }
             public float BaseDamage;
             public FumoUnit Sender;
             public Vector2 Origin;
@@ -187,7 +192,7 @@ namespace rinCore.Bullet
                 FumoUnit optionalTarget = null,
                 float addedForward = 0f)
             {
-                Mods = null;
+                _mods = null;
                 BaseDamage = baseDamage;
                 Sender = sender;
                 Origin = origin;

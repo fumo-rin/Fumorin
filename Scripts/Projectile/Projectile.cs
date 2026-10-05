@@ -1,12 +1,50 @@
-using Mono.CSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Tilemaps;
-
+/*                                    =-@@@@@@@@@@@@@@@@@@                                          
+                         @@@@@@@@@@@@@@@@@%@@@@@@@@@@@@@@@@@@@@                                
+                         @######%##%%%%%%%%%%%%%@%%#########%@@@@@@                            
+                         @@#%%%%###%########*+=+%@@@@@@@%########%@@@@@                        
+                         @@%%%%%%##*+*+==---:--: .:-==#@@@@%#*%%%%###%@@@                      
+                         @@%%####**+===-===+====++==--.  .+@@@%*#%##*##%@@@                    
+                         @@##%#%%##*++=====++++++========-. .#@@@@@%%%##*@@@                   
+                         @@%%%##*++-.:-:-::.:::::::::-:----=-.:*###%@@%%@@                     
+                         @@###**+-:-----------------:::------::+*@%#@@@%@                      
+ Headless                @@###**=.::-------------=-=---------::..-==#%%%@                      
+Generic ish              @%###+=--::::-----:::::.::------::----::.-+%###@                      
+    Projectile          @@#*#*-::::----:-:::::::::::::::::::::--:.:=%%%%@                      
+         System         @@#+*+.:::::::-:-:-:----:::::::::::::::::.:-#%%#@                      
+                       @@#*-=-:-:--::::::::--------::::::::::----:::*%%%@                      
+  From                 @#*+-==-=-:-::--::-------:--::::-:.::---=-:-=*%%@@@                     
+    Hell               @*++===-=-----==-:::::::::::-------:::---:--+@@@@@                      
+                      @@+*+===-----:::--:..:::::::-:------::::--:-=@@                          
+                      @@+#+-===++=++=-+*+-:::----:::::----------::+@-                          
+    Death             @@#*+==-===:::--=+*+=----=-----:-=-:.:..:-:-#@                           
+       Ahead.           @@%=====-=+*=-...:+*+-:=-:.:=--+=-::...:--=@@                           
+                        *@@===--=#@@@@@@@#*##+*++=+***#@@#+===++=+@=                           
+                          @=::---+**%#%%%#+=---===+#***#%%*+---==+@                            
+                          @@%+=+*#*+*%@@#+---:-:::-*####**+===---@@                            
+                          @+@%%#%@@@*-    ..........-==+*#%##%@@@@                             
+                          @:..:.  .*@@@@@#+::::::====--:.. ..:=+*@                             
+                         @@=.          =%@@@@@@@@@@@@*-..        -@@                           
+                       @@@  .:++#@@@@@@@%%%##%%%%%%%@%####**=.     #@                          
+                         @@@@@@@@@@##%%@@@%%##%%%%%%###%@@@@@@@#@@@@@                          
+                         @@%#%%%##*#*******########*#******+*%@@@                              
+                          @@%%##***###****#####*******#########@                               
+                           @@@@%%##*#######***#***##%@@@@@@@@@#@@=                             
+                            @@%%%%@@@@@%%#######*##%%#++++*+#%%#@@%                            
+                            @@#%%####%%@@@@%##***#%#+-:....      :@@                           
+                             @==-::.     .*%@@#*#**+=-.:...::...-@@@                           
+                             @@-......:..  .=@@@###+--:::::::-=@@@                             
+                              :@@==::::.  ....=@@#+:......::==%@                               
+                               @@====-=*%*         .*@@@+-=-:..@@                              
+                                @%:.::.:+#@@@@@@@@@@@  @@=::...+@                              
+                                 @*. . ..=@%            .@:...:#@                              
+                                 *@@@#:=@@               @@@@@@@@                              
+                                     @@@@                  */
 namespace rinCore.Bullet
 {
     public record RSTG_LootList(List<Vector2> points, Vector2? senderPoint, SweepMode mode = SweepMode.Sweep) : IRinEvent;
@@ -110,6 +148,27 @@ namespace rinCore.Bullet
     }
     public partial class Projectile
     {
+        struct appliedSweep
+        {
+            public HashSet<(float, byte)> sweeps;
+            public float EndTime => sweeps?.DefaultIfEmpty().Max(x => x.Item1) ?? 0f;
+            public byte Loot => sweeps?.DefaultIfEmpty().Max(x => x.Item2) ?? 0;
+            public void ApplySweep(FEB_WhenProjectileSweep s)
+            {
+                sweeps ??= new();
+                sweeps.RemoveWhere(x => Time.time >= x.Item1);
+                sweeps.Add((s.packet.Duration + Time.time, s.packet.Loot));
+            }
+            public bool Sweeping => Time.time < EndTime;
+        }
+        static appliedSweep sweep;
+        static Projectile()
+        {
+            RinBus.Bind<FEB_WhenProjectileSweep>((a) =>
+            {
+                sweep.ApplySweep(a);
+            });
+        }
         public List<IProjectileMod> mods = null;
         public partial struct Mods
         {
@@ -131,41 +190,30 @@ namespace rinCore.Bullet
             public struct DFK_Cancel : IProjectileMod
             {
                 public float Duration;
+                public float Radius;
+                public FumoUnit.UFaction clearForFaction;
                 float IProjectileMod.Duration => Duration;
                 bool IProjectileMod.Sequential => Sequential;
                 public bool Sequential;
-                public float Radius;
                 public bool ClearSenderProjectile;
-                public FumoUnit.UFaction clearForFaction;
                 [ThreadStatic] static List<Vector2> points;
                 public void Run(Projectile p, float deltaTime, ref float elapsed)
                 {
                     if (!p.IsValid) return;
-
-                    FumoUnit.UFaction clearFaction = clearForFaction;
-                    Vector2 point = p.FinalizedPosition;
-                    float radius = Radius;
-                    bool clear = ClearSenderProjectile;
+                    var self = this;
 
                     points ??= new List<Vector2>();
                     points.Clear();
 
                     ProjectileRunner.DestroyProjectiles(
                         cand => cand.IsValid
-                             && cand.Faction.IsFriendlyWith(clearFaction)
-                             && cand.FinalizedPosition.SquareDistanceToLessThan(point, radius),
+                             && cand.Faction.IsFriendlyWith(self.clearForFaction)
+                             && cand.FinalizedPosition.SquareDistanceToLessThan(p.FinalizedPosition, self.Radius),
 
                         destroyedList =>
                         {
-                            for (int i = 0; i < destroyedList.Count; i++)
-                            {
-                                points.Add(destroyedList[i].FinalizedPosition);
-                            }
-
-                            if (clear && destroyedList.Count > 0)
-                            {
-                                p.IsValid = false;
-                            }
+                            points.AddRange(destroyedList.Select(x => x.FinalizedPosition));
+                            if (self.ClearSenderProjectile && destroyedList.Count > 0) p.IsValid = false;
                         });
 
                     if (points.Count > 0)
@@ -250,8 +298,9 @@ namespace rinCore.Bullet
     public enum SweepMode
     {
         Dummy = 0,
-        Sweep = 1,
-        Seal = 100,
+        Sweep = 100,
+        LingeringSweep = 200,
+        Seal = 300,
     }
     public interface IParticleRenderItem
     {
@@ -454,11 +503,15 @@ namespace rinCore.Bullet
             public byte Loot;
             public float Duration;
         }
-        public record FEB_Projectile_Sweep(SweepPacket packet) : IRinEvent;
+        public record FEB_WhenProjectileSweep(SweepPacket packet) : IRinEvent;
         public static void SweepAll(SweepPacket packet, Action<List<Projectile>> sweepAction = null)
         {
-            ProjectileRunner.DestroyProjectiles(null, sweepAction);
-            new FEB_Projectile_Sweep(packet).Publish();
+            ProjectileRunner.DestroyProjectiles(null, sweepAction ?? new Action<List<Projectile>>(p =>
+            {
+                var pts = p?.ConvertAll(x => x.FinalizedPosition);
+                if (pts?.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
+            }));
+            new FEB_WhenProjectileSweep(packet).Publish();
         }
         public struct SealPacket
         {
@@ -482,12 +535,12 @@ namespace rinCore.Bullet
         }
         public struct BulletPacket
         {
+            public List<IProjectileMod> Mods;
             public ProjectileDefine Define;
             public FumoUnit Sender;
             public Vector2 Position;
             public Vector2 VelocityDirection;
             public float Damage;
-            public List<IProjectileMod> Mods;
         }
         public static Projectile BuildProjectile(BulletPacket b)
         {
@@ -499,6 +552,25 @@ namespace rinCore.Bullet
             }
             return null;
         }
+        #region Sweeping Frame Buffer
+        static List<Vector2> frontBuffer = new();
+        static List<Vector2> backBuffer = new();
+        public static bool GetLootFrame(out RSTG_LootList loot)
+        {
+            if (backBuffer.Count == 0)
+            {
+                loot = null;
+                return false;
+            }
+            var temp = backBuffer;
+            backBuffer = frontBuffer;
+            frontBuffer = temp;
+
+            backBuffer.Clear();
+            loot = new RSTG_LootList(frontBuffer, null, SweepMode.LingeringSweep);
+            return true;
+        }
+        #endregion
         static bool CreateProjectile(BulletPacket b, out Projectile p)
         {
             void Cancel(Vector2 position, Vector2 direction)
@@ -510,14 +582,11 @@ namespace rinCore.Bullet
             {
                 return false;
             }
-            bool SweepThisBullet = false;
-            if (SweepThisBullet)
+            if (sweep.Sweeping && b.Sender.AssignedFaction.IsHostileWith(FumoUnit.UFaction.Player))
             {
-                bool RNG = false;
-                //RNG = ProjectileRunner.SweepLootChance > 0 && RNG.Byte255 < ProjectileRunner.SweepLootChance;
-                if (RNG)
+                if (sweep.Loot > 0 && RNG.Byte255 < sweep.Loot)
                 {
-                    //PointItemRunner.SpawnPointItem(position + Random.insideUnitCircle);
+                    backBuffer.Add(b.Position);
                     Cancel(b.Position, b.VelocityDirection);
                 }
                 return false;
@@ -532,7 +601,6 @@ namespace rinCore.Bullet
                 spawnTime = Time.time,
                 animationOffsetSeconds = (1f / b.Define.animationSpeed) * (b.Define.animationSpreadPercent.RandomPositiveNegativeRange().Multiply(0.01f)),
                 mods = b.Mods,
-                //mods = mods?.Select(m => m.Clone()).ToList(),
                 IsValid = true
             };
             ProjectileRunner.InjectProjectile(p);
