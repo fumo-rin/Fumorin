@@ -25,7 +25,7 @@ namespace rinCore
         {
             s.onValueChanged.AddListener(SliderRefresh);
             float currentDeadzone = GenericInput.FetchDeadzone();
-            s.SetValues(currentDeadzone, .8f, .1f);
+            s.SetValues_Nullsafe(currentDeadzone, .8f, .1f);
             SliderRefresh(currentDeadzone);
         }
         private void OnDestroy()

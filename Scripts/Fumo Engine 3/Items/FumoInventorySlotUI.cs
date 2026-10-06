@@ -90,7 +90,7 @@ namespace rinCore
             bool success = false;
             if (success = action.newItem.containedItem is IWeaponSwingLock)
             {
-                chargeSlider.SetValuesInt(0, 30, 0, false);
+                chargeSlider.SetValuesInt_Nullsafe(0, 30, 0, false);
             }
             chargeSlider.gameObject.SetActive(success);
         }

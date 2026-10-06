@@ -85,7 +85,7 @@ namespace rinCore
             {
                 if (healthSlider != null)
                 {
-                    healthSlider.SetValues(0f, 1f, 0f, false);
+                    healthSlider.SetValues_Nullsafe(0f, 1f, 0f, false);
                     healthSlider.value = 0f;
                 }
 
@@ -106,7 +106,7 @@ namespace rinCore
                     ? health.CurrentMaxHealth
                     : 1f;
 
-                healthSlider.SetValues(current, max, 0f, false);
+                healthSlider.SetValues_Nullsafe(current, max, 0f, false);
                 healthSlider.value = current;
             }
         }

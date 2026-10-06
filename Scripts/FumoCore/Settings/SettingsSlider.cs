@@ -28,7 +28,7 @@ namespace rinCore
             if (PersistentJSON.TryLoad(out int found, GeneralManager.FPS_SAVE_KEY))
             {
                 float v = found.MultiplyAndFloorAsFloat(0.1f);
-                slider.SetValues(v, 12f, 6f, true);
+                slider.SetValues_Nullsafe(v, 12f, 6f, true);
             }
         }
         private void OnDestroy()

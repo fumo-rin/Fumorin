@@ -384,6 +384,9 @@ namespace rinCore.Bullet
 
         private void Update()
         {
+            if (GeneralManager.IsPaused)
+                return;
+
             int count = masterProjectileList.Count;
 
             if (count == 0)
@@ -398,16 +401,15 @@ namespace rinCore.Bullet
                 {
                     GlobalClear = currentClear
                 };
+
                 Projectile.ProcessBatch(masterProjectileList, dt, runSettings, (Projectile.IProjectileHit hit) =>
                 {
 
                 });
 
                 masterProjectileList.RemoveAll(x => x == null || !x.IsValid);
-
                 TimeSlowHandler.SetSimulatedSlowdownTarget(GetTargetSlowdown(SlowdownProjectileTargetCount ?? 400));
             }
-            //Post Process Frame
             if (Projectile.GetLootFrame(out RSTG_LootList lingeringSweepLoot))
             {
                 lingeringSweepLoot.Publish();

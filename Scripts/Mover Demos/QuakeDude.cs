@@ -71,11 +71,11 @@ namespace rinCore
             oldSensString = oldText;
             if (PersistentJSON.TryLoad(out float f, "Player Sens"))
             {
-                sensitivtySlider.SetValues(f, 1f, 0.002f, true);
+                sensitivtySlider.SetValues_Nullsafe(f, 1f, 0.002f, true);
             }
             else
             {
-                sensitivtySlider.SetValues(0.1f, 1f, 0.002f, true);
+                sensitivtySlider.SetValues_Nullsafe(0.1f, 1f, 0.002f, true);
             }
         }
         private void OnDestroy()
