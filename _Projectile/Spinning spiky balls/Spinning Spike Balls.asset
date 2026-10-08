@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: rinCore::rinCore.Projectile.ProjectileDefine
   animationSpeed: 2
   animationSpreadPercent: 7
-  spin: 0
+  spin: -270
   SortingLayer: Projectile
   particleTemplate: {fileID: 5905382930097071747, guid: c82d88bdabe9e4848af1d74bc74ba1e3, type: 3}
   Size: 1.05

@@ -352,6 +352,7 @@ namespace rinCore.Bullet
         }
         [HideInInspector] public float Render_Size => 1f;
         [HideInInspector] Vector2 _currentPosition;
+        public float SpeedMod = 1f;
         public bool SkipRender => !IsValid;
         public Vector2 FinalizedPosition
         {
@@ -400,7 +401,7 @@ namespace rinCore.Bullet
             }
         }
         static HashSet<int> grazedProjectiles;
-        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float dt, Settings settings, Action<IProjectileHit> extraHitAction)
+        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
         {
             if (grazedProjectiles == null)
                 grazedProjectiles = new();
@@ -414,8 +415,10 @@ namespace rinCore.Bullet
             batchContactFilter.useTriggers = true;
             batchContactFilter.useLayerMask = true;
 
+            float dt;
             foreach (var proj in projCollection)
             {
+                dt = batchDT * proj.SpeedMod;
                 if (!proj.IsValid)
                     continue;
 
@@ -547,6 +550,7 @@ namespace rinCore.Bullet
             public Vector2 Position;
             public Vector2 VelocityDirection;
             public float Damage;
+            public float? SpeedMod;
         }
         public static Projectile BuildProjectile(BulletPacket b)
         {
@@ -607,6 +611,7 @@ namespace rinCore.Bullet
                 spawnTime = Time.time,
                 animationOffsetSeconds = (1f / b.Define.animationSpeed) * (b.Define.animationSpreadPercent.RandomPositiveNegativeRange().Multiply(0.01f)),
                 mods = b.Mods,
+                SpeedMod = b.SpeedMod ?? 1f,
                 IsValid = true
             };
             ProjectileRunner.InjectProjectile(p);

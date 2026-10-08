@@ -162,6 +162,7 @@ namespace rinCore.Bullet
             public Vector2 Direction;
             public FumoUnit OptionalTarget;
             public float AddedForward;
+            public float SpeedMod;
 
             public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
@@ -199,6 +200,7 @@ namespace rinCore.Bullet
                 Direction = direction;
                 OptionalTarget = optionalTarget;
                 AddedForward = addedForward;
+                SpeedMod = 1f;
             }
 
             public InputSettings Copy()
@@ -353,7 +355,8 @@ namespace rinCore.Bullet
                 Position = input.Origin + offset,
                 VelocityDirection = velocity,
                 Damage = input.BaseDamage,
-                Mods = input.Mods
+                Mods = input.Mods,
+                SpeedMod = input.SpeedMod,
             });
 
             bool spawnedBullet = output != null;
@@ -386,6 +389,7 @@ namespace rinCore.Bullet
 
                 Projectile p = BuildProjectile(new BulletPacket
                 {
+                    SpeedMod = input.SpeedMod,
                     Define = define,
                     Sender = input.Sender,
                     Position = input.Origin + offset,

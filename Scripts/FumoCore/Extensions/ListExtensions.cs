@@ -1,4 +1,5 @@
 using rinCore;
+using rinCore.rinCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace rinCore
     #region Single Generic Parameter Populate
     public static partial class ListExtensions
     {
-        public static TList Populate<TList, T>(this TList l, params T[] items) where TList : List<T>
+        public static TList Populate<TList, T>(this TList l, params T[] items) where TList : IList<T>
         {   /*                       _oo0oo_
             *                      o8888888o
             *                      88" . "88
@@ -40,11 +41,26 @@ namespace rinCore
             l.Clear();
             if (items != null)
             {
-                l.EnsureCapacity(items.Length);
+                if (l is List<T> concreteList)
+                {
+                    concreteList.EnsureCapacity(items.Length);
+                }
 
                 for (int i = 0; i < items.Length; i++)
                     l.Add(items[i]);
             }
+            return l;
+        }
+        public static IList<TItem> PopulateSingle<TItem, TActual>(this IList<TItem> l, TActual item) where TActual : TItem
+        {
+            if (l == null)
+                throw new System.ArgumentNullException(nameof(l));
+
+            l.Clear();
+
+            if (item != null)
+                l.Add(item);
+
             return l;
         }
     }
