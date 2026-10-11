@@ -90,7 +90,6 @@ namespace rinCore
         [SerializeField] InputActionReference moveInput, lookInput;
         static Vector2 cachedMove, cachedLook;
 
-        // This is your pure raw look vector. No processing, no normalization filters.
         public static Vector2 Look => instance != null ? cachedLook : Vector2.zero;
 
         public static Vector2 Move

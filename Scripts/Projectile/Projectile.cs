@@ -469,7 +469,7 @@ namespace rinCore.Bullet
                     {
                         // If it hit terrain/environment wall without IProjectileHit
                         proj.IsValid = false;
-                        ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.25f), hit.normal, new()
+                        ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.05f), hit.normal, new()
                         {
                             colorOverride = null,
                             forceMultiplier = 1f

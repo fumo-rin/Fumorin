@@ -22,7 +22,7 @@ namespace rinCore
     public interface IUnitMover
     {
         public float MaxSpeed { get; set; }
-        public MoveResult Move(FumoUnit unit, Vector2 input, ref float nextMoveTime);
+        public MoveResult Move(FumoUnit unit, Vector2 input, ref float nextMoveTime, float? maxSpeedOverride = null);
     }
     public class FumoUnitMovers
     {
@@ -45,7 +45,7 @@ namespace rinCore
                 this.MaxSpeed = maxSpeed;
                 settings = s;
             }
-            public MoveResult Move(FumoUnit unit, Vector2 input, ref float nextMoveTime)
+            public MoveResult Move(FumoUnit unit, Vector2 input, ref float nextMoveTime, float? maxSpeedOverride = null)
             {
                 MoveResult result = MoveResult.Failed;
                 if (input == Vector2.zero)
@@ -149,7 +149,7 @@ namespace rinCore
     #region Mover
     public partial class FumoUnit
     {
-        float nextMoveTime;
+        protected float nextMoveTime;
         [SerializeField] protected Animator moveAnimator;
         [SerializeField] protected string moveAnimatorStringKey = "MOVE";
         [SerializeField] protected Transform moveFlipAnchor;
@@ -648,7 +648,7 @@ namespace rinCore
         public float UnitRadius => 0.5f;
         [SerializeField] Rigidbody2D rb;
         public Rigidbody2D RB => rb;
-        Pather pather;
+        [field: SerializeField] public Pather pather { get; internal set; }
         private void Awake()
         {
             pather = Pather.Create(this, UnitRadius);

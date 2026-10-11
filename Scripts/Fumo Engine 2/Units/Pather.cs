@@ -4,6 +4,7 @@ using Pathfinding;
 using Pathfinding.RVO;
 using System;
 using System.Collections;
+using NUnit.Framework.Api;
 
 namespace rinCore
 {
@@ -86,10 +87,15 @@ namespace rinCore
         }
         public static Pather Create(FumoUnit unit, float patherRadius)
         {
-            Pather p = new();
+            Pather p = unit.pather;
+            if (p == null)
+            {
+                p = new();
+            }
             p.owner = unit;
             p.ValidatePather(p.owner);
             p.AssignStuff(patherRadius);
+            unit.pather = p;
             return p;
         }
         public Pather AssignStuff(float radius)
@@ -189,7 +195,7 @@ namespace rinCore
                 return Vector2.zero;
             if (p != null && p.vectorPath.Count == 1)
             {
-                return (Vector2)p.vectorPath[0] - position.normalized;
+                return (Vector2)p.vectorPath[0] - position;
             }
             return ((Vector2)p.vectorPath[currentWaypoint.Clamp(0, p.vectorPath.Count - 1)] - position).normalized;
         }
