@@ -13,6 +13,40 @@ namespace rinCore
             public static Color32 VersionText => ColorHelper.Gray7.Opacity(50);
             public static Color32 UINest => new Color32(210, 130, 190, 50);
         }
+        public struct Rainbow
+        {
+            private float frequency;
+            private float offset;
+            private float speedMod;
+
+            public Rainbow(float frequency, float offset, float speedMod = 1f)
+            {
+                this.frequency = frequency;
+                this.offset = offset;
+                this.speedMod = speedMod;
+            }
+
+            public static implicit operator Color32(Rainbow r)
+            {
+                float t = ((Time.time * r.speedMod) + r.offset) / r.frequency;
+                float hue = t - Mathf.Floor(t);
+                return Color.HSVToRGB(hue, 1f, 1f);
+            }
+
+            public static Rainbow operator *(Rainbow r, float speedMultiplier)
+            {
+                return new Rainbow(r.frequency, r.offset, r.speedMod * speedMultiplier);
+            }
+
+            public static Rainbow Rainbow_1sec => new Rainbow(1f, 0f);
+            public static Rainbow Rainbow_2sec => new Rainbow(2f, 0.5f);
+            public static Rainbow Rainbow_3sec => new Rainbow(3f, 1.2f);
+            public static Rainbow Rainbow_3sec_2 => new Rainbow(3f, 2.4f);
+            public static Rainbow Rainbow_5sec => new Rainbow(5f, 1.8f);
+            public static Rainbow Rainbow_5sec_2 => new Rainbow(5f, 3.5f);
+            public static Rainbow Rainbow_10sec => new Rainbow(10f, 4.0f);
+            public static Rainbow Rainbow_10sec_2 => new Rainbow(10f, 7.2f);
+        }
         public static Color32 Peach => new Color32(235, 160, 90, 255);
         public static Color32 FullBlue => new Color32(0, 0, 255, 255);
         public static Color32 FullGreen => new Color32(0, 255, 0, 255);
@@ -53,6 +87,20 @@ namespace rinCore
         {
             Color32 color = c;
             return new(color.r, color.g, color.b, alpha);
+        }
+        public static Color32 LerpUnclamped(this Color32 a, Color32 b, float t)
+        {
+            return new Color32(
+                (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.r, b.r, t)), 0, 255),
+                (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.g, b.g, t)), 0, 255),
+                (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.b, b.b, t)), 0, 255),
+                (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.a, b.a, t)), 0, 255)
+            );
+        }
+        public static Color32 SineAB(this Color32 a, Color32 b, float sineT)
+        {
+            float t = 0.5f + sineT.SineWave(Time.time, 0.5f);
+            return a.LerpUnclamped(b, t);
         }
     }
 }

@@ -15,13 +15,19 @@ namespace rinCore
         public Vector3 LastGroundNormal { get; private set; } = Vector3.up;
         public float ForcedGroundedEndTime;
         public bool IsGrounded => Time.time < ForcedGroundedEndTime || (box != null && groundedFrame(box));
+
         bool groundedFrame(BoxCollider box)
         {
             isOnIce = false;
             bool grounded = false;
             Bounds b = box.bounds;
 
-            if (Physics.BoxCast(b.center + Vector3.up * 0.02f, new Vector3(b.extents.x * 0.95f, b.extents.y * 0.95f, b.extents.z * 0.95f), Vector3.down, out RaycastHit hit, box.transform.rotation, 0.1f, groundMask, QueryTriggerInteraction.Ignore))
+            Vector3 center = b.center;
+            Vector3 halfExtents = new Vector3(b.extents.x * 0.95f, 0.01f, b.extents.z * 0.95f);
+
+            float castDistance = b.extents.y + 0.05f;
+
+            if (Physics.BoxCast(center + Vector3.up * 0.02f, halfExtents, Vector3.down, out RaycastHit hit, box.transform.rotation, castDistance, groundMask, QueryTriggerInteraction.Ignore))
             {
                 if (hit.transform.CompareTag(string.Intern(iceTag)))
                 {

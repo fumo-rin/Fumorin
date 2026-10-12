@@ -7,64 +7,85 @@ namespace rinCore
 {
     public static class IntExtensions
     {
-        #region Primes Gen
-        public static IEnumerable<int> Primes(this int count, int start = 2)
-        {
-            static bool IsPrime(int value, List<int> primes)
-            {
-                if (value < 2)
-                    return false;
-                if (value == 2)
-                    return true;
-                if ((value & 1) == 0)
-                    return false;
-                int limit = (int)Math.Sqrt(value);
-                foreach (int prime in primes)
-                {
-                    if (prime > limit)
-                        break;
+        #region Primes Gen & Rolling Cache
+        private const int MaxRollingCacheSize = 2000;
+        private static readonly HashSet<int> basePrimes = new() { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 };
+        private static readonly LinkedList<int> rollingPrimes = new(new int[] { 37, 41, 43, 47 });
+        private static int highestCachedPrime = 47;
 
-                    if (value % prime == 0)
-                        return false;
-                }
-                return true;
-            }
-            if (count <= 0)
-                yield break;
-            start = start == int.MinValue ? int.MaxValue : Math.Abs(start);
-            if (start < 2) start = 2;
-            int candidate = start;
-            if (candidate == 2)
+        private static void AddToRollingCache(int prime)
+        {
+            if (basePrimes.Contains(prime) || rollingPrimes.Contains(prime)) return;
+
+            rollingPrimes.AddLast(prime);
+            highestCachedPrime = prime;
+
+            if (rollingPrimes.Count > MaxRollingCacheSize)
             {
-                yield return 2;
-                if (--count == 0)
-                    yield break;
-                candidate = 3;
-            }
-            else if ((candidate & 1) == 0)
-            {
-                candidate++;
-            }
-            List<int> knownPrimes = new() { 2 };
-            for (int i = 3; i <= Math.Sqrt(candidate); i += 2)
-            {
-                if (IsPrime(i, knownPrimes))
-                    knownPrimes.Add(i);
-            }
-            while (count > 0 && candidate > 0)
-            {
-                if (IsPrime(candidate, knownPrimes))
-                {
-                    knownPrimes.Add(candidate);
-                    yield return candidate;
-                    count--;
-                }
-                if (candidate >= int.MaxValue - 2)
-                    yield break;
-                candidate += 2;
+                rollingPrimes.RemoveFirst();
             }
         }
 
+        private static bool IsPrimeCached(int n)
+        {
+            if (n <= 1) return false;
+            if (basePrimes.Contains(n) || rollingPrimes.Contains(n)) return true;
+
+            int limit = (int)Math.Sqrt(n);
+
+            foreach (int p in basePrimes)
+            {
+                if (p > limit) break;
+                if (n % p == 0) return false;
+            }
+
+            foreach (int p in rollingPrimes)
+            {
+                if (p > limit) break;
+                if (n % p == 0) return false;
+            }
+            for (int i = 37; i <= limit; i += 2)
+            {
+                if (n % i == 0) return false;
+            }
+
+            return true;
+        }
+
+        public static IEnumerable<int> Primes(this int count, int start = 2)
+        {
+            if (count <= 0) yield break;
+            start = start == int.MinValue ? int.MaxValue : Math.Abs(start);
+            if (start < 2) start = 2;
+
+            int found = 0;
+            int current = start;
+
+            while (found < count)
+            {
+                int next = current.NextPrime(0);
+                yield return next;
+                current = next + 1;
+                found++;
+            }
+        }
+
+        public static int NextPrime(this int current, int skip = 0)
+        {
+            int candidate = current + 1;
+            int skipped = 0;
+
+            while (true)
+            {
+                if (IsPrimeCached(candidate))
+                {
+                    AddToRollingCache(candidate);
+                    if (skipped == skip) return candidate;
+                    skipped++;
+                }
+                candidate++;
+            }
+        }
         #endregion
         public static int Clamp(this int i, int min, int max)
         {

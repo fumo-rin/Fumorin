@@ -84,25 +84,23 @@ namespace rinCore
             Cursor.visible = true;
             sensitivtySlider.onValueChanged.RemoveAllListeners();
         }
-
         #region Recoil
         float currentRecoil;
-        Quaternion currentRecoilTarget;
+        float recoilYaw;
+        float recoilPitch;
+
         public void AddRecoil(float r, float max)
         {
-            currentRecoil += r;
-            currentRecoil = currentRecoil.Clamp(0f, max);
+            currentRecoil = (currentRecoil + r).Clamp(0f, max);
 
             float recoilPhase = RNG.FloatRange(0.4f, 1.2f);
-            float yaw = Mathf.Sin(recoilPhase) * 12f;
-            float pitch = -40f + Mathf.Sin(recoilPhase * 1.7f) * 12f;
-
-            currentRecoilTarget = Quaternion.Euler(pitch, yaw, 0f);
+            recoilYaw = Mathf.Sin(recoilPhase) * 12f;
+            recoilPitch = -40f + Mathf.Sin(recoilPhase * 1.7f) * 12f;
         }
-        void RecoilFrame(out Quaternion recoilOffset)
+
+        void RecoilFrame()
         {
-            currentRecoil = currentRecoil.LerpTowards(0f, 2.8f * Time.deltaTime);
-            recoilOffset = Quaternion.Slerp(Quaternion.Euler(0f, 0f, 0f), currentRecoilTarget, currentRecoil.MapTo01(0f, 90f));
+            currentRecoil = currentRecoil.LerpTowards(0f, 2.4f * Time.deltaTime);
         }
         #endregion
         public void MatchLook(Transform t)
@@ -137,7 +135,7 @@ namespace rinCore
                     rb.linearVelocity = new Vector3(rb.linearVelocity.x, y, rb.linearVelocity.z);
                 }
             }
-            RecoilFrame(out Quaternion recoil);
+            RecoilFrame();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             if (GeneralManager.IsPaused)
@@ -154,9 +152,12 @@ namespace rinCore
 
             pitch = Mathf.Clamp(pitch, -89f, 89f);
 
-            float finalPitch = Mathf.Clamp((recoil.x * 360f) + pitch, -89.9f, 89.9f);
+            float recoilAmount = currentRecoil.MapTo01(0f, 55f);
 
-            cameraPivot.localRotation = Quaternion.Euler(finalPitch, (-180f + recoil.y * 360f) + yaw, (recoil.z * 360f) + 0f);
+            float finalPitch = Mathf.Clamp(pitch + recoilPitch * recoilAmount, -89.9f, 89.9f);
+            float finalYaw = yaw + recoilYaw * recoilAmount;
+
+            cameraPivot.localRotation = Quaternion.Euler(finalPitch, finalYaw - 180f, 0f);
 
             Vector2 input = GenericInput.Move;
 

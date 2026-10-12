@@ -281,7 +281,7 @@ namespace rinCore
         }
         public static float LerpTowards(this float f, float other, float speed)
         {
-            return f.LerpUnclamped(other, speed).Clamp(0f, 1f);
+            return f.LerpUnclamped(other, speed).Clamp(Mathf.Min(f, other), Mathf.Max(f, other));
         }
         public static string ToThousandsString(this float value, int decimals = 0, string thousandsSeparator = ",", CultureInfo culture = null)
         {
