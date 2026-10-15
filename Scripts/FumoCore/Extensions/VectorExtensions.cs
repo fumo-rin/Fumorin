@@ -146,6 +146,7 @@ namespace rinCore
             return new Vector2Int(v.x.ToInt(), v.y.ToInt());
         }
         #endregion
+        public static Vector2 Vec2(this Vector3 v) => new(v.x, v.y);
         public static Vector3 ToXZ(this Vector3 v)
         {
             return new()

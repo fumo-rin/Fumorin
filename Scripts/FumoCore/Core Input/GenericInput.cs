@@ -31,33 +31,13 @@ namespace rinCore
     [DefaultExecutionOrder(-123)]
     public static class InputActionRawExtensions
     {
-        /// <summary>
-        /// Reads direct hardware values for physical movement states. 
-        /// </summary>
         public static Vector2 ReadRawVector2(this InputActionReference reference, bool clamp)
         {
-            if (reference == null || reference.action == null) return Vector2.zero;
+            if (reference == null || reference.action == null)
+                return Vector2.zero;
 
-            Vector2 combined = Vector2.zero;
-            var controls = reference.action.controls;
-
-            for (int i = 0; i < controls.Count; i++)
-            {
-                if (controls[i] is InputControl<Vector2> v2Control)
-                {
-                    combined += v2Control.ReadValue();
-                }
-                else if (controls[i] is InputControl<float> fControl)
-                {
-                    combined = reference.action.ReadValue<Vector2>();
-                }
-            }
-
-            if (clamp)
-            {
-                return Vector2.ClampMagnitude(combined, 1f);
-            }
-            return combined;
+            Vector2 value = reference.action.ReadValue<Vector2>();
+            return clamp ? Vector2.ClampMagnitude(value, 1f) : value;
         }
 
         public static bool IsPressedRaw(this InputActionReference reference, float threshold = 0.5f)
@@ -138,7 +118,7 @@ namespace rinCore
     }
     #endregion
 
-    [DefaultExecutionOrder(-100)]
+    [DefaultExecutionOrder(100)]
     public partial class GenericInput : MonoBehaviour
     {
         private static GenericInput instance;
@@ -188,19 +168,15 @@ namespace rinCore
         {
             UpdateDeadzone(FetchDeadzone());
         }
-
         private void Update()
         {
-            cachedMove = moveInput != null ? moveInput.ReadRawVector2(true) : Vector2.zero;
+            cachedMove = moveInput != null
+                ? moveInput.ReadRawVector2(true)
+                : Vector2.zero;
 
-            if (lookInput != null && lookInput.action != null)
-            {
-                cachedLook = lookInput.ReadRawVector2(false);
-            }
-            else
-            {
-                cachedLook = Vector2.zero;
-            }
+            cachedLook = lookInput != null
+                ? lookInput.ReadRawVector2(false)
+                : Vector2.zero;
 
             foreach (var kvp in trackers)
             {
