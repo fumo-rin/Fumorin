@@ -149,6 +149,8 @@ namespace rinCore.Bullet
     {
         public struct InputSettings
         {
+            public ACWrapper soundOverride;
+            public bool PreventSound;
             private List<IProjectileMod> _mods;
             public List<IProjectileMod> Mods
             {
@@ -193,6 +195,8 @@ namespace rinCore.Bullet
                 FumoUnit optionalTarget = null,
                 float addedForward = 0f)
             {
+                PreventSound = false;
+                soundOverride = null;
                 _mods = null;
                 BaseDamage = baseDamage;
                 Sender = sender;
@@ -370,6 +374,14 @@ namespace rinCore.Bullet
                     define.FlareSizeMod);
             }
 
+            if (spawnedBullet && !input.PreventSound)
+            {
+                ACWrapper sound = (input.soundOverride != null ? input.soundOverride :
+                   define.soundOverride != null ? define.soundOverride :
+                   null);
+                sound.Play(input.Origin);
+            }
+
             return spawnedBullet;
         }
 
@@ -414,7 +426,13 @@ namespace rinCore.Bullet
 
                 output.Add(p);
             }
-
+            if (output.Count > 0 && !input.PreventSound)
+            {
+                ACWrapper sound = (input.soundOverride != null ? input.soundOverride :
+                   define.soundOverride != null ? define.soundOverride :
+                   null);
+                sound.Play(input.Origin);
+            }
             return output.Count > 0;
         }
 

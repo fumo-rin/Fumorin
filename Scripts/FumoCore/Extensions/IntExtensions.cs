@@ -5,6 +5,51 @@ using UnityEngine;
 
 namespace rinCore
 {
+    #region Int Sequencer
+    public struct IntSequencer
+    {
+        public enum SequenceMode
+        {
+            Loop,
+            Clamp,
+            PingPong
+        }
+        public int[] Targets { get; set; }
+        public SequenceMode Mode { get; set; }
+
+        public IntSequencer(params int[] targets) : this(SequenceMode.Loop, targets) { }
+
+        public IntSequencer(SequenceMode mode, params int[] targets)
+        {
+            Targets = targets ?? Array.Empty<int>();
+            Mode = mode;
+        }
+        public int Evaluate(int index)
+        {
+            if (Targets.Length == 0) return 0;
+            if (index < 0) index = 0;
+
+            int count = Targets.Length;
+            int mappedIndex = Mode switch
+            {
+                SequenceMode.Clamp => Math.Min(index, count - 1),
+                SequenceMode.PingPong => PingPongIndex(index, count),
+                SequenceMode.Loop or _ => index % count
+            };
+
+            return Targets[mappedIndex];
+        }
+        public int this[int index] => Evaluate(index);
+
+        private static int PingPongIndex(int index, int count)
+        {
+            if (count <= 1) return 0;
+            int cycle = (count - 1) * 2;
+            int pingPong = index % cycle;
+            return pingPong >= count ? cycle - pingPong : pingPong;
+        }
+    }
+    #endregion
     public static class IntExtensions
     {
         #region Primes Gen & Rolling Cache

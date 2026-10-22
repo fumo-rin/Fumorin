@@ -23,6 +23,7 @@ namespace rinCore.Bullet
         [field: SerializeField] public float CollisionRadius { get; private set; } = 0.05f;
         [field: SerializeField] public bool Flare { get; private set; } = true;
         [field: SerializeField] public Color32 FlareColor { get; private set; } = ColorHelper.PastelPurple.Opacity(255);
+        public ACWrapper soundOverride;
 
         public bool StartPS(out ParticleSystem ps)
         {
