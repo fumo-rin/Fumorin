@@ -20,7 +20,7 @@ namespace rinCore
         {
             get
             {
-                double processedVisibleScore = ((float)RawScore).ReverseQuantize((float)ScoreDivisor);
+                double processedVisibleScore = RawScore.ReverseQuantize(ScoreDivisor);
                 double processedFinal = processedVisibleScore + RawExtrasScore;
                 if (processedFinal > HighScore)
                 {
@@ -30,8 +30,12 @@ namespace rinCore
             }
         }
 
-        public void Reset()
+        public void Reset(bool submitCurrent)
         {
+            if (submitCurrent)
+            {
+                StoreAndUploadScore();
+            }
             RawScore = 0d;
             RawExtrasScore = 0d;
         }
@@ -52,13 +56,14 @@ namespace rinCore
 
         public void StoreAndUploadScore(LeaderboardMetadata meta = null)
         {
+            double snapshot = ProcessedFinalScore;
             PersistentJSON.LoadScore(FileFriendlyKey, out double storedScore);
-            if (ProcessedFinalScore > storedScore)
+            if (snapshot > storedScore)
             {
-                PersistentJSON.SaveScore(ProcessedFinalScore, FileFriendlyKey);
+                PersistentJSON.SaveScore(snapshot, FileFriendlyKey);
             }
 
-            long submitableScore = ProcessedFinalScore.ToLong();
+            long submitableScore = snapshot.ToLong();
             FumoLeaderboard.CurrentLeaderboardKey = ScoreStorageKey;
             _ = FumoLeaderboard.SubmitScoreAsync(submitableScore, meta);
         }

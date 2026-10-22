@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using rinCore.UGS;
+using Codice.CM.Common;
 
 namespace rinCore
 {
@@ -136,8 +137,13 @@ namespace rinCore
             public struct AddScore : IRinEvent
             {
                 public double score;
-                public bool quantized;
+                public bool AsExtra;
                 public bool contributePopup;
+            }
+            public struct ResetScore : IRinEvent
+            {
+                public bool clearScore;
+                public bool submitCurrent;
             }
             public enum progressMode
             {
@@ -177,13 +183,13 @@ namespace rinCore
 
         protected virtual void OnAddScore(Events.AddScore a)
         {
-            if (a.quantized)
+            if (a.AsExtra)
             {
-                Scoring.RawScore += a.score;
+                Scoring.RawExtrasScore += a.score;
             }
             else
             {
-                Scoring.RawExtrasScore += a.score;
+                Scoring.RawScore += a.score;
             }
         }
 
@@ -192,15 +198,22 @@ namespace rinCore
             RinBus.Release<Events.ProgressScene>(SessionScenes.MissingSessionProgressEvent);
             RinBus.Bind<Events.ProgressScene>(scenes.PerformNextSceneEvent);
             RinBus.Bind<Events.AddScore>(OnAddScore);
+            RinBus.Bind<Events.ResetScore>(WhenContinue);
         }
 
         protected virtual void WhenUnbind()
         {
             RinBus.Release<Events.ProgressScene>(scenes.PerformNextSceneEvent);
             RinBus.Release<Events.AddScore>(OnAddScore);
+            RinBus.Bind<Events.ResetScore>(WhenContinue);
         }
 
         protected virtual void WhenEnd() { }
+        protected virtual void WhenContinue(Events.ResetScore r)
+        {
+            if (r.clearScore)
+                scoringData.Reset(r.submitCurrent);
+        }
     }
     #endregion
     [System.Serializable]

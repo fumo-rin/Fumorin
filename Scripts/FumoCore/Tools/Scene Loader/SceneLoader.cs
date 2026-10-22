@@ -154,6 +154,7 @@ namespace rinCore
         {
             if (pair == null || IsLoading) yield break;
             IsLoading = true;
+            TimeSlowHandler.RemoveDurationlessTimescale("Continue Stall");
 
             Application.backgroundLoadingPriority = ThreadPriority.High;
             loadingScreenText.color = loadingScreenText.color.Opacity(0);

@@ -7,6 +7,21 @@ using UnityEngine;
 
 namespace rinCore
 {
+    public struct RandomFloatWrapper
+    {
+        public float MaxValue;
+        public bool Negative;
+        public RandomFloatWrapper(float maxValue, bool negative)
+        {
+            MaxValue = maxValue;
+            Negative = negative;
+        }
+        public float Generate()
+        {
+            return RNG.FloatRange(Negative ? -MaxValue : 0f, MaxValue);
+        }
+        public static implicit operator float(RandomFloatWrapper wrapper) => wrapper.Generate();
+    }
     public readonly struct ArcRotationalOffset
     {
         public float TargetSpeed { get; }
@@ -124,6 +139,14 @@ namespace rinCore
         {
             return Mathf.Abs(f);
         }
+        public static double Absolute(this double f)
+        {
+            return Math.Abs(f);
+        }
+        public static int SignInt(this double f)
+        {
+            return Math.Sign((float)f);
+        }
         public static float AbsoluteNegative(this float f)
         {
             return 0f - f.Absolute();
@@ -231,6 +254,17 @@ namespace rinCore
             }
             stepSize = stepSize.Max(0.1f);
             float value = Mathf.Floor(f.Absolute() / stepSize.Absolute()) * stepSize.Absolute();
+            return value * f.SignInt();
+        }
+
+        public static double ReverseQuantize(this double f, double stepSize)
+        {
+            if (f == 0d)
+            {
+                return 0d;
+            }
+            stepSize = stepSize.Max(0.1);
+            double value = Math.Floor(f.Absolute() / stepSize.Absolute()) * stepSize.Absolute();
             return value * f.SignInt();
         }
         public static float Squared(this float f) => f * f;
