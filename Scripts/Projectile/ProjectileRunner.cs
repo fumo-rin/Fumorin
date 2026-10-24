@@ -55,7 +55,7 @@ namespace rinCore.Bullet
         {
             if (instance == null || instance.bulletCancelParticlePrefab == null)
                 return;
-            instance.bulletCancelParticlePrefab.FC_EmitSingleParticleCached(position, velocity * velocityMultiplier, 50f);
+            instance.bulletCancelParticlePrefab.FC_EmitSingleParticleCached(position, velocity * velocityMultiplier, 0f);
         }
     }
     #endregion
