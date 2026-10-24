@@ -295,6 +295,169 @@ namespace rinCore.Bullet
         }
     }
     #endregion
+    #region Run Batch
+    public partial class Projectile
+    {
+        [HideInInspector] public int? UnitHitCount;
+        HashSet<Transform> multiHitUnitTracker = null;
+
+        static RaycastHit2D[] hits = new RaycastHit2D[15];
+        static ContactFilter2D batchContactFilter = new ContactFilter2D()
+        {
+            useLayerMask = true,
+            useTriggers = true
+        };
+        public struct Settings
+        {
+            public LayerMask hitLayers;
+            public RProj_Global_Clear GlobalClear;
+            public Settings(LayerMask mask)
+            {
+                hitLayers = mask;
+                GlobalClear = null;
+            }
+        }
+        static HashSet<int> grazedProjectiles;
+        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
+        {
+            if (grazedProjectiles == null)
+                grazedProjectiles = new();
+
+            int grazeCount = 0;
+            Vector2? firstGraze = null;
+            bool graze = FumoUnit.PlayerAs(out FumoUnit player) && player.IsAlive;
+            Vector2 fallbackGraze = player == null ? Vector2.zero : player.CenterOrCurrentPosition;
+
+            batchContactFilter.useTriggers = true;
+            batchContactFilter.useLayerMask = true;
+
+            float dt;
+            foreach (var proj in projCollection)
+            {
+                dt = batchDT * proj.SpeedMod;
+                if (!proj.IsValid)
+                    continue;
+
+                if (settings.GlobalClear != null && settings.GlobalClear.clear.HasValue)
+                {
+                    if (!settings.GlobalClear.clear.Value.Contains(proj.FinalizedPosition))
+                    {
+                        proj.IsValid = false;
+                        continue;
+                    }
+                }
+
+                if (graze && !grazedProjectiles.Contains(proj.SpawnIndex) &&
+                    proj.Faction.IsHostileWith(player.AssignedFaction) &&
+                    proj.FinalizedPosition.SquareDistanceToLessThan(player.CenterOrCurrentPosition, 1.15f))
+                {
+                    firstGraze ??= proj.FinalizedPosition;
+                    grazedProjectiles.Add(proj.SpawnIndex);
+                    grazeCount++;
+                }
+
+                RunMods(proj, dt);
+
+                Vector2 startPos = proj.FinalizedPosition;
+                proj.PreviousPosition = startPos;
+                Vector2 moveDelta = dt * proj.FinalizedVelocity;
+                Vector2 endPos = startPos + moveDelta;
+                proj._currentPosition = endPos;
+
+                float travelDistance = moveDelta.magnitude;
+                Vector2 castDirection = travelDistance > 0.0001f ? moveDelta / travelDistance : Vector2.zero;
+
+                batchContactFilter.SetLayerMask(settings.hitLayers);
+
+                int hitsCount = Physics2D.CircleCast(startPos, proj.data.CollisionRadius, castDirection, batchContactFilter, hits, travelDistance);
+
+                for (int i = 0; i < hitsCount; i++)
+                {
+                    RaycastHit2D hit = hits[i];
+                    Transform hitTrans = hit.transform;
+                    if (hitTrans == null) continue;
+
+                    if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
+                    {
+                        proj.IsValid = false;
+                        ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.05f), hit.normal, new()
+                        {
+                            colorOverride = null,
+                            forceMultiplier = 1f
+                        });
+                        break;
+                    }
+
+                    if (ihit.PHitFaction.IsFriendlyWith(proj.Faction) || proj.Sender == (object)ihit)
+                        continue;
+
+                    if (proj.UnitHitCount?.CompareTo(0) > 0)
+                    {
+                        var tracker = proj.multiHitUnitTracker ??= new HashSet<Transform>();
+                        Transform rootEnemy = hitTrans.root;
+                        if (tracker.Contains(rootEnemy))
+                        {
+                            continue;
+                        }
+                        tracker.Add(rootEnemy);
+
+                        ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                        {
+                            colorOverride = null,
+                            forceMultiplier = 1f
+                        });
+
+                        bool multiHit = ihit.TryProjectileHit(new()
+                        {
+                            Damage = proj.FinalDamage,
+                            Sender = proj.Sender,
+                            Normal = hit.normal,
+                            Point = hit.point
+                        }, out _);
+
+                        if (multiHit)
+                        {
+                            extraHitAction?.Invoke(ihit);
+                            proj.UnitHitCount--;
+                            if (proj.UnitHitCount <= 0)
+                            {
+                                proj.IsValid = false;
+                                break;
+                            }
+                            continue;
+                        }
+                    }
+
+                    ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                    {
+                        colorOverride = null,
+                        forceMultiplier = 1f
+                    });
+
+                    bool unitHit = ihit.TryProjectileHit(new()
+                    {
+                        Damage = proj.FinalDamage,
+                        Sender = proj.Sender,
+                        Normal = hit.normal,
+                        Point = hit.point
+                    }, out _);
+
+                    if (unitHit)
+                    {
+                        proj.IsValid = false;
+                        extraHitAction?.Invoke(ihit);
+                        break;
+                    }
+                }
+            }
+
+            if (grazeCount > 0)
+            {
+                new RSTG_Graze_Frame(grazeCount, firstGraze ?? fallbackGraze).Publish();
+            }
+        }
+    }
+    #endregion
 
     public static class FactionExtension
     {
@@ -340,6 +503,7 @@ namespace rinCore.Bullet
         public FumoUnit.UFaction Faction => Sender.AssignedFaction;
         [HideInInspector] public float spawnTime;
         [HideInInspector] public float animationOffsetSeconds;
+
         [HideInInspector] public bool IsValid { get; set; }
         [HideInInspector] public Vector2 Render_Position => FinalizedPosition;
         [HideInInspector] public float Render_Angle => FastAtan2Deg(_regularVelocity.x, _regularVelocity.y);
@@ -382,130 +546,6 @@ namespace rinCore.Bullet
             public Transform HitTransform => (this is Component comp) ? comp.transform : null;
 
             public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
-        }
-        static RaycastHit2D[] hits = new RaycastHit2D[4];
-        static HashSet<IProjectileHit> hitList = new();
-        static ContactFilter2D batchContactFilter = new ContactFilter2D()
-        {
-            useLayerMask = true,
-            useTriggers = true
-        };
-        public struct Settings
-        {
-            public LayerMask hitLayers;
-            public RProj_Global_Clear GlobalClear;
-            public Settings(LayerMask mask)
-            {
-                hitLayers = mask;
-                GlobalClear = null;
-            }
-        }
-        static HashSet<int> grazedProjectiles;
-        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
-        {
-            if (grazedProjectiles == null)
-                grazedProjectiles = new();
-
-            int grazeCount = 0;
-            Vector2? firstGraze = null;
-            bool graze = FumoUnit.PlayerAs(out FumoUnit player) && player.IsAlive;
-            Vector2 fallbackGraze = player == null ? Vector2.zero : player.CenterOrCurrentPosition;
-
-            // Make sure contact filter retains triggers!
-            batchContactFilter.useTriggers = true;
-            batchContactFilter.useLayerMask = true;
-
-            float dt;
-            foreach (var proj in projCollection)
-            {
-                dt = batchDT * proj.SpeedMod;
-                if (!proj.IsValid)
-                    continue;
-
-                // Global Clear
-                if (settings.GlobalClear != null && settings.GlobalClear.clear.HasValue)
-                {
-                    if (!settings.GlobalClear.clear.Value.Contains(proj.FinalizedPosition))
-                    {
-                        proj.IsValid = false;
-                        continue;
-                    }
-                }
-
-                // Graze check
-                if (graze && !grazedProjectiles.Contains(proj.SpawnIndex) &&
-                    proj.Faction.IsHostileWith(player.AssignedFaction) &&
-                    proj.FinalizedPosition.SquareDistanceToLessThan(player.CenterOrCurrentPosition, 1.15f))
-                {
-                    firstGraze ??= proj.FinalizedPosition;
-                    grazedProjectiles.Add(proj.SpawnIndex);
-                    grazeCount++;
-                }
-
-                RunMods(proj, dt);
-
-                Vector2 startPos = proj.FinalizedPosition;
-                proj.PreviousPosition = startPos;
-                Vector2 moveDelta = dt * proj.FinalizedVelocity;
-                Vector2 endPos = startPos + moveDelta;
-                proj._currentPosition = endPos;
-
-                float travelDistance = moveDelta.magnitude;
-                Vector2 castDirection = travelDistance > 0.0001f ? moveDelta / travelDistance : Vector2.zero;
-
-                // Pass the settings.hitLayers directly so we don't accidentally ignore hurtbox layers!
-                batchContactFilter.SetLayerMask(settings.hitLayers);
-
-                int hitsCount = Physics2D.CircleCast(startPos, proj.data.CollisionRadius, castDirection, batchContactFilter, hits, travelDistance);
-
-                for (int i = 0; i < hitsCount; i++)
-                {
-                    RaycastHit2D hit = hits[i];
-                    Transform hitTrans = hit.transform;
-                    if (hitTrans == null) continue;
-
-                    // Check for target component
-                    if (!hitTrans.TryGetComponent(out IProjectileHit ihit))
-                    {
-                        // If it hit terrain/environment wall without IProjectileHit
-                        proj.IsValid = false;
-                        ProjectileRenderer.HitParticle(hit.point - hit.normal.ScaleToMagnitude(.05f), hit.normal, new()
-                        {
-                            colorOverride = null,
-                            forceMultiplier = 1f
-                        });
-                        break; // Stop checking hit array for this bullet
-                    }
-
-                    // Ignore friendly units
-                    if (ihit.PHitFaction.IsFriendlyWith(proj.Faction) || proj.Sender == (object)ihit)
-                        continue;
-
-                    // Valid hostile hit!
-                    ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
-                    {
-                        colorOverride = null,
-                        forceMultiplier = 1f
-                    });
-
-                    ihit.TryProjectileHit(new()
-                    {
-                        Damage = proj.FinalDamage,
-                        Sender = proj.Sender,
-                        Normal = hit.normal,
-                        Point = hit.point
-                    }, out _);
-
-                    proj.IsValid = false;
-                    extraHitAction?.Invoke(ihit);
-                    break; // Bullet consumed!
-                }
-            }
-
-            if (grazeCount > 0)
-            {
-                new RSTG_Graze_Frame(grazeCount, firstGraze ?? fallbackGraze).Publish();
-            }
         }
         public struct SweepPacket
         {

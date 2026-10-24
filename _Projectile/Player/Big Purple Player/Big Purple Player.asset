@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 070f83cb5bb53f04e95be8ee8baa3455, type: 3}
+  m_Name: Big Purple Player
+  m_EditorClassIdentifier: rinCore::rinCore.Projectile.ProjectileDefine
+  animationSpeed: 3
+  animationSpreadPercent: 0
+  spin: 0
+  SortingLayer: Ysort
+  particleTemplate: {fileID: 5905382930097071747, guid: 9b449ac4879e93a47b924b433cdf3e38, type: 3}
+  Size: 1.25
+  FlareSizeMod: 0.95
+  <ProjectileTint>k__BackingField:
+    serializedVersion: 2
+    rgba: 2952790015
+  <LockRotation>k__BackingField: 0
+  AddedSortingLayer: -2000
+  <CollisionRadius>k__BackingField: 0.05
+  <Flare>k__BackingField: 0
+  <FlareColor>k__BackingField:
+    serializedVersion: 2
+    rgba: 4284419427
+  soundOverride: {fileID: 11400000, guid: f51fea6d6e9424944b4db30f2475365c, type: 2}

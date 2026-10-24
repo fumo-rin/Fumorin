@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace rinCore.Bullet
@@ -172,7 +173,8 @@ namespace rinCore.Bullet
 
                 if (FumoUnit.Player == sender)
                 {
-                    FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, out autoAim);
+                    IEnumerable<FumoUnit> onScreenEnemies = FumoUnit.AliveEnemies.Where(x => x is ISTGUnit_OnScreen scr && scr.IsOnScreen);
+                    FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, onScreenEnemies, out autoAim);
                 }
                 else if (sender.AssignedFaction.Match(FumoUnit.UFaction.Enemy))
                 {

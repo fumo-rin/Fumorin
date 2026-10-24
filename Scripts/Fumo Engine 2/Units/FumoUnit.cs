@@ -328,16 +328,15 @@ namespace rinCore
             public Vector2 relativeAim;
             public float maxDot;
         }
-        public static bool AutoAim(Vector2 point, AutoAimSettings settings, out FumoUnit result)
+        public static bool AutoAim(Vector2 point, AutoAimSettings settings, IEnumerable<FumoUnit> enemies, out FumoUnit result)
         {
             result = null;
-            if (settings.relativeAim == Vector2.zero)
-            {
-                return false;
-            }
-            float bestDot = settings.maxDot;
 
-            foreach (var unit in AliveEnemies)
+            Vector2 aimDir = settings.relativeAim == Vector2.zero ? Vector2.up : settings.relativeAim.normalized;
+
+            float bestScore = -float.MaxValue;
+
+            foreach (var unit in enemies)
             {
                 Vector2 position = unit.CurrentPosition;
                 Vector2 diff = position - point;
@@ -347,11 +346,20 @@ namespace rinCore
                     continue;
                 }
 
-                float dot = Vector2.Dot(settings.relativeAim.normalized, diff.normalized);
+                float distance = diff.magnitude;
+                Vector2 dirToTarget = diff / distance;
+                float dot = Vector2.Dot(aimDir, dirToTarget);
 
-                if (dot > bestDot)
+                if (dot < settings.maxDot)
                 {
-                    bestDot = dot;
+                    continue;
+                }
+
+                float score = dot - (distance * 0.0001f);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
                     result = unit;
                 }
             }
@@ -535,6 +543,10 @@ namespace rinCore
         }
     }
     #endregion
+    public interface ISTGUnit_OnScreen
+    {
+        public bool IsOnScreen { get; }
+    }
     public interface IDamageMod
     {
         public float DamageMod { get; }
