@@ -11,17 +11,17 @@ namespace rinCore
         {
             materialQueue.RunMaterialQueue(duration);
         }
-        private void WhenIframes(IUnitIframes.PlayerIframes frames)
+        private void WhenIframes(IPlayerIFrames.PlayerIframes frames)
         {
             TriggerFlashMaterial(frames.duration);
         }
         private void OnEnable()
         {
-            RinBus.Bind<IUnitIframes.PlayerIframes>(WhenIframes);
+            RinBus.Bind<IPlayerIFrames.PlayerIframes>(WhenIframes);
         }
         private void OnDisable()
         {
-            RinBus.Release<IUnitIframes.PlayerIframes>(WhenIframes);
+            RinBus.Release<IPlayerIFrames.PlayerIframes>(WhenIframes);
         }
     }
 }

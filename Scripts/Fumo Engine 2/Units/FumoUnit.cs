@@ -388,6 +388,11 @@ namespace rinCore
     {
         public bool TryProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage)
         {
+            if (this is IPlayerIFrames frames && frames.IFramesRemaining > 0f)
+            {
+                processedDealtDamage = 0f;
+                return false;
+            }
             bool hit = WhenProjectileHit(packet, out processedDealtDamage);
             if (processedDealtDamage > 0f)
             {
@@ -535,8 +540,9 @@ namespace rinCore
         public float DamageMod { get; }
     }
     #region IFrames
-    public interface IUnitIframes
+    public interface IPlayerIFrames
     {
+        public void SetCurrentIFrames(float duration);
         public record PlayerIframes(float duration, float endTime) : IRinEvent;
         public float IFramesRemaining { get; }
     }
@@ -547,7 +553,7 @@ namespace rinCore
             if (!FumoUnit.PlayerAs<FumoUnit>(out FumoUnit f))
                 return false;
 
-            return f.IsAlive && (!(f is IUnitIframes frames) || frames.IFramesRemaining <= maxFrames);
+            return f.IsAlive && (!(f is IPlayerIFrames frames) || frames.IFramesRemaining <= maxFrames);
         }
         public static WaitUntil WaitForPlayerAliveWithIframes0_8 => new WaitUntil(() => IsPlayerIframesLessOrEqualTo(0.8f));
     }
