@@ -166,6 +166,7 @@ namespace rinCore.Bullet
             public FumoUnit OptionalTarget;
             public float AddedForward;
             public float SpeedMod;
+            public bool Sealable;
 
             public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
@@ -187,6 +188,7 @@ namespace rinCore.Bullet
                     settings.relativeAim,
                     1f,
                     autoAim);
+                input.Sealable = true;
             }
 
             public InputSettings(
@@ -207,6 +209,7 @@ namespace rinCore.Bullet
                 OptionalTarget = optionalTarget;
                 AddedForward = addedForward;
                 SpeedMod = 1f;
+                Sealable = true;
             }
 
             public InputSettings Copy()
@@ -356,6 +359,7 @@ namespace rinCore.Bullet
 
             output = BuildProjectile(new BulletPacket
             {
+                Sealable = input.Sealable,
                 Define = define,
                 Sender = input.Sender,
                 Position = input.Origin + offset,
@@ -403,6 +407,7 @@ namespace rinCore.Bullet
 
                 Projectile p = BuildProjectile(new BulletPacket
                 {
+                    Sealable = input.Sealable,
                     SpeedMod = input.SpeedMod,
                     Define = define,
                     Sender = input.Sender,

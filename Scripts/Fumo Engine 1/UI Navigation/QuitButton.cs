@@ -16,6 +16,7 @@ namespace rinCore
         {
             b.AddClickAction(() => Application.Quit());
             b.interactable = !GeneralManager.IsWebGL && !GeneralManager.IsEditor;
+            b.GetComponent<Image>().raycastTarget = b.interactable;
         }
         private void OnDestroy()
         {

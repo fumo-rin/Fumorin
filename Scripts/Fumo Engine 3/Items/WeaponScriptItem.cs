@@ -34,6 +34,7 @@ namespace rinCore
                     Vector2 dir = packet.RawTarget - a;
                     Projectile.BuildProjectile(new()
                     {
+                        Sealable = true,
                         Define = projectile,
                         Position = packet.Sender.CurrentPosition,
                         Sender = packet.Sender,
@@ -58,6 +59,7 @@ namespace rinCore
                                 Vector2 dir = RNG.SeededRandomVector2 * RNG.FloatRange(6f, 12f);
                                 Projectile.BuildProjectile(new()
                                 {
+                                    Sealable = true,
                                     Define = projectile,
                                     Position = packet.Sender.CurrentPosition,
                                     Sender = packet.Sender,
@@ -89,6 +91,7 @@ namespace rinCore
                             a = packet.Sender.CurrentPosition;
                             Projectile p = Projectile.BuildProjectile(new()
                             {
+                                Sealable = true,
                                 Define = projectile,
                                 Position = packet.Sender.CurrentPosition,
                                 Sender = packet.Sender,
@@ -126,6 +129,7 @@ namespace rinCore
                                 Vector2 dir = Vector2.down.Rotate2D(-20f + angle + i.AsFloat(45f));
                                 Projectile.BuildProjectile(new()
                                 {
+                                    Sealable = true,
                                     Define = projectile,
                                     Position = packet.Sender.CurrentPosition,
                                     Sender = packet.Sender,

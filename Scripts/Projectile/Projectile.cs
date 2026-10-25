@@ -1,3 +1,4 @@
+using Pathfinding.Graphs.Grid.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -498,15 +499,16 @@ namespace rinCore.Bullet
         }
         public float FinalDamage => BaseDamage * (Sender is not null and IDamageMod mod ? mod.DamageMod : 1f);
         public float BaseDamage = 1f;
-        [NonSerialized] public FumoUnit Sender;
-        [NonSerialized] public ProjectileDefine data;
+        public FumoUnit Sender;
+        public ProjectileDefine data;
         public FumoUnit.UFaction Faction => Sender.AssignedFaction;
-        [HideInInspector] public float spawnTime;
-        [HideInInspector] public float animationOffsetSeconds;
+        public float spawnTime;
+        public float animationOffsetSeconds;
 
-        [HideInInspector] public bool IsValid { get; set; }
-        [HideInInspector] public Vector2 Render_Position => FinalizedPosition;
-        [HideInInspector] public float Render_Angle => FastAtan2Deg(_regularVelocity.x, _regularVelocity.y);
+        public bool IsValid { get; set; }
+        public bool Sealable;
+        public Vector2 Render_Position => FinalizedPosition;
+        public float Render_Angle => FastAtan2Deg(_regularVelocity.x, _regularVelocity.y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float FastAtan2Deg(float y, float x)
@@ -514,8 +516,8 @@ namespace rinCore.Bullet
             float angle = math.atan2(y, x) * Mathf.Rad2Deg;
             return angle < 0f ? angle + 360f : angle;
         }
-        [HideInInspector] public float Render_Size => 1f;
-        [HideInInspector] Vector2 _currentPosition;
+        public float Render_Size => 1f;
+        Vector2 _currentPosition;
         public float SpeedMod = 1f;
         public bool SkipRender => !IsValid;
         public Vector2 FinalizedPosition
@@ -553,12 +555,22 @@ namespace rinCore.Bullet
             public float Duration;
         }
         public record FEB_WhenProjectileSweep(SweepPacket packet) : IRinEvent;
-        public static void SweepAll(SweepPacket packet, Action<List<Projectile>> sweepAction = null)
+        public static void SweepAll(SweepPacket packet)
         {
-            ProjectileRunner.DestroyProjectiles(null, sweepAction ?? new Action<List<Projectile>>(p =>
+            ProjectileRunner.DestroyProjectiles(null, new Action<List<Projectile>>(p =>
             {
-                var pts = p?.ConvertAll(x => x.FinalizedPosition);
-                if (pts?.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
+                if (p == null || p.Count == 0) return;
+
+                var pts = new List<Vector2>(p.Count);
+                for (int i = 0; i < p.Count; i++)
+                {
+                    if (RNG.Byte255 < packet.Loot)
+                    {
+                        pts.Add(p[i].FinalizedPosition);
+                    }
+                }
+
+                if (pts.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
             }));
             new FEB_WhenProjectileSweep(packet).Publish();
         }
@@ -574,13 +586,29 @@ namespace rinCore.Bullet
             public float Distance;
             public byte Loot;
         }
-        public static void SealWith(SealPacket sweep, Action<List<Projectile>> sweepAction)
+        public static void SealWith(SealPacket sweep)
         {
             ProjectileRunner.DestroyProjectiles(x =>
-            x.IsValid &&
-            x.Sender == sweep.Owner &&
-            sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance)
-            , sweepAction);
+                x.IsValid &&
+                x.Sealable &&
+                x.Sender == sweep.Owner &&
+                sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance),
+                p =>
+                {
+                    if (p == null || p.Count == 0) return;
+
+                    var pts = new List<Vector2>(p.Count);
+                    for (int i = 0; i < p.Count; i++)
+                    {
+                        if (RNG.Byte255 < sweep.Loot)
+                        {
+                            pts.Add(p[i].FinalizedPosition);
+                        }
+                    }
+
+                    if (pts.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
+                }
+            );
         }
         public struct BulletPacket
         {
@@ -591,6 +619,7 @@ namespace rinCore.Bullet
             public Vector2 VelocityDirection;
             public float Damage;
             public float? SpeedMod;
+            public bool Sealable;
         }
         public static Projectile BuildProjectile(BulletPacket b)
         {
@@ -643,6 +672,7 @@ namespace rinCore.Bullet
             }
             p = new Projectile
             {
+                Sealable = b.Sealable,
                 Sender = b.Sender,
                 data = b.Define,
                 _currentPosition = b.Position,
