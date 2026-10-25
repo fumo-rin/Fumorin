@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Unity.Services.Matchmaker.Models;
-
-
 #region Jank
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using WebSocketSharp;
 #endif
-
 namespace System.Runtime.CompilerServices
 {
     public static class IsExternalInit { }
@@ -19,6 +16,11 @@ namespace System.Runtime.CompilerServices
 namespace rinCore
 {
     public interface IRinEvent { }
+
+    public interface IRinEvent_Consumeable : IRinEvent
+    {
+        public bool IsConsumed { get; set; }
+    }
 
     #region Editor Only Reset logic
 #if UNITY_EDITOR
@@ -59,65 +61,77 @@ namespace rinCore
 #endif
             #endregion
 
-            public static Action<T> untargettedEvent;
-            private static readonly Dictionary<int, Action<T>> targetedEvents = new();
+            private static readonly List<Action<T>> untargettedListeners = new();
+            private static readonly Dictionary<int, List<Action<T>>> targetedListeners = new();
 
             #region Strapping
             public static void Bind(Action<T> listener, int? target = null)
             {
                 if (!target.HasValue)
                 {
-                    untargettedEvent += listener;
+                    if (!untargettedListeners.Contains(listener))
+                        untargettedListeners.Add(listener);
                     return;
                 }
 
                 int key = target.Value;
-                if (targetedEvents.TryGetValue(key, out var existing))
+                if (!targetedListeners.TryGetValue(key, out var list))
                 {
-                    targetedEvents[key] = existing + listener;
+                    list = new List<Action<T>>();
+                    targetedListeners[key] = list;
                 }
-                else
-                {
-                    targetedEvents[key] = listener;
-                }
+                if (!list.Contains(listener))
+                    list.Add(listener);
             }
 
             public static void Release(Action<T> listener, int? target = null)
             {
                 if (!target.HasValue)
                 {
-                    untargettedEvent -= listener;
+                    untargettedListeners.Remove(listener);
                     return;
                 }
 
                 int key = target.Value;
-                if (!targetedEvents.TryGetValue(key, out var action))
-                    return;
-
-                action -= listener;
-
-                if (action == null)
-                    targetedEvents.Remove(key);
-                else
-                    targetedEvents[key] = action;
+                if (targetedListeners.TryGetValue(key, out var list))
+                {
+                    list.Remove(listener);
+                    if (list.Count == 0)
+                        targetedListeners.Remove(key);
+                }
             }
 
             public static void Publish(T eventData, int? target = null)
             {
+                bool isConsumable = eventData is IRinEvent_Consumeable;
+                IRinEvent_Consumeable consumable = isConsumable ? (IRinEvent_Consumeable)eventData : null;
+
                 if (!target.HasValue)
                 {
-                    untargettedEvent?.Invoke(eventData);
+                    for (int i = 0; i < untargettedListeners.Count; i++)
+                    {
+                        if (isConsumable && consumable.IsConsumed)
+                            break;
+                        untargettedListeners[i]?.Invoke(eventData);
+                    }
                     return;
                 }
 
-                if (targetedEvents.TryGetValue(target.Value, out var action))
-                    action?.Invoke(eventData);
+                if (targetedListeners.TryGetValue(target.Value, out var list))
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (isConsumable && consumable.IsConsumed)
+                            break;
+                        list[i]?.Invoke(eventData);
+                    }
+                }
             }
 
             public static void Clear()
             {
-                untargettedEvent = null;
-                targetedEvents.Clear();
+                untargettedListeners.Clear();
+                targetedListeners.Clear();
             }
             #endregion
         }
@@ -164,17 +178,18 @@ namespace rinCore
             rawHash = id;
             hasValue = true;
         }
+
         private static int GetStableHashCode(string str)
         {
             unchecked
             {
-                //hashing from hell
                 int hash = (int)2166136261;
                 for (int i = 0; i < str.Length; i++)
                     hash = (hash ^ str[i]) * 16777619;
                 return hash;
             }
         }
+
         public static implicit operator RinEventFilter(string id) => new(id);
         public static implicit operator RinEventFilter(int id) => new(id);
         public static implicit operator int?(RinEventFilter filter) => filter.hash;

@@ -21,7 +21,7 @@ namespace rinCore
     #region Prop Drawer
 #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ManagedReferencePickerAttribute), true)]
-    public class BaseGunDrawer : PropertyDrawer
+    public class ManagedReferencePickerDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -212,7 +212,7 @@ namespace rinCore
             Rect addBtnRect = new Rect(position.x + 15, y, position.width - 15, lineHeight);
             if (GUI.Button(addBtnRect, "+ Add New Element"))
             {
-                Type baseType = BaseGunDrawer.GetElementType(fieldInfo.FieldType);
+                Type baseType = ManagedReferencePickerDrawer.GetElementType(fieldInfo.FieldType);
 
                 GenericMenu menu = new();
                 var derivedTypes = TypeCache.GetTypesDerivedFrom(baseType)
@@ -220,7 +220,7 @@ namespace rinCore
 
                 foreach (var type in derivedTypes)
                 {
-                    string path = BaseGunDrawer.GetNestedMenuPath(type);
+                    string path = ManagedReferencePickerDrawer.GetNestedMenuPath(type);
                     menu.AddItem(new GUIContent(path), false, () =>
                     {
                         property.serializedObject.Update();
@@ -278,7 +278,7 @@ namespace rinCore
 
             string current = property.managedReferenceValue == null
                 ? "None"
-                : BaseGunDrawer.GetNestedMenuPath(property.managedReferenceValue.GetType());
+                : ManagedReferencePickerDrawer.GetNestedMenuPath(property.managedReferenceValue.GetType());
 
             if (EditorGUI.DropdownButton(dropdown, new GUIContent(current), FocusType.Passive))
             {
@@ -291,13 +291,13 @@ namespace rinCore
                     property.serializedObject.ApplyModifiedProperties();
                 });
 
-                Type baseType = BaseGunDrawer.GetElementType(fieldInfo.FieldType);
+                Type baseType = ManagedReferencePickerDrawer.GetElementType(fieldInfo.FieldType);
                 var derivedTypes = TypeCache.GetTypesDerivedFrom(baseType)
                     .Where(t => !t.IsAbstract && !t.IsInterface && t.GetConstructor(Type.EmptyTypes) != null);
 
                 foreach (var type in derivedTypes)
                 {
-                    string path = BaseGunDrawer.GetNestedMenuPath(type);
+                    string path = ManagedReferencePickerDrawer.GetNestedMenuPath(type);
                     menu.AddItem(new GUIContent(path), false, () =>
                     {
                         property.serializedObject.Update();

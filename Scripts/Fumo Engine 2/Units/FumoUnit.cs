@@ -408,7 +408,7 @@ namespace rinCore
             }
             return hit;
         }
-        public abstract bool WhenProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
+        protected abstract bool WhenProjectileHit(Projectile.HitPacket packet, out float processedDealtDamage);
     }
     #endregion
     #region MoveLerp
