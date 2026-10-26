@@ -79,6 +79,18 @@ namespace rinCore
     }
     public static class FloatExtensions
     {
+        public static byte MapToByte(this float value, float inMin, float inMax)
+        {
+            if (Mathf.Approximately(inMin, inMax))
+            {
+                return value >= inMax ? (byte)255 : (byte)0;
+            }
+
+            float t = (value - inMin) / (inMax - inMin);
+            float clampedT = Mathf.Clamp01(t);
+
+            return (byte)(clampedT * 255f + 0.5f);
+        }
         public static readonly float Percent = 0.01f;
         public static float LerpTime(this float f, float target, float delta)
         {

@@ -410,7 +410,7 @@ namespace rinCore.Bullet
                 masterProjectileList.RemoveAll(x => x == null || !x.IsValid);
                 TimeSlowHandler.SetSimulatedSlowdownTarget(GetTargetSlowdown(SlowdownProjectileTargetCount ?? 400));
             }
-            if (Projectile.GetLootFrame(out RSTG_LootList lingeringSweepLoot))
+            if (Projectile.GetLootFrame(out RSTG_SweepLoot lingeringSweepLoot))
             {
                 lingeringSweepLoot.Publish();
             }

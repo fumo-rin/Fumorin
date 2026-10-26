@@ -44,7 +44,7 @@ MonoBehaviour:
     m_Value: 1
   scatter:
     m_OverrideState: 1
-    m_Value: 0.497
+    m_Value: 0.344
   clamp:
     m_OverrideState: 1
     m_Value: 100

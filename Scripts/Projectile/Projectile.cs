@@ -48,7 +48,7 @@ Generic ish              @%###+=--::::-----:::::.::------::----::.-+%###@
                                      @@@@                  */
 namespace rinCore.Bullet
 {
-    public record RSTG_LootList(List<Vector2> points, Vector2? senderPoint, SweepMode mode = SweepMode.Sweep) : IRinEvent;
+    public record RSTG_SweepLoot(List<Vector2> points, Vector2? senderPoint, SweepMode mode = SweepMode.SweepNoFlash) : IRinEvent;
     public record RProj_Global_Clear(Rect? clear) : IRinEvent;
     #region Events
     public record RSTG_Graze_Frame(int count, Vector2 firstPosition) : IRinEvent;
@@ -225,7 +225,7 @@ namespace rinCore.Bullet
 
                     if (points.Count > 0)
                     {
-                        new RSTG_LootList(points, null, SweepMode.Seal).Publish();
+                        new RSTG_SweepLoot(points, null, SweepMode.Seal).Publish();
                     }
                 }
             }
@@ -469,6 +469,7 @@ namespace rinCore.Bullet
     {
         Dummy = 0,
         Sweep = 100,
+        SweepNoFlash = 130,
         LingeringSweep = 200,
         Seal = 300,
     }
@@ -551,6 +552,7 @@ namespace rinCore.Bullet
         }
         public struct SweepPacket
         {
+            public bool WithEffect;
             public byte Loot;
             public float Duration;
         }
@@ -570,7 +572,7 @@ namespace rinCore.Bullet
                     }
                 }
 
-                if (pts.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
+                if (pts.Count > 0) new RSTG_SweepLoot(pts, null, packet.WithEffect ? SweepMode.Sweep : SweepMode.SweepNoFlash).Publish();
             }));
             new FEB_WhenProjectileSweep(packet).Publish();
         }
@@ -606,7 +608,7 @@ namespace rinCore.Bullet
                         }
                     }
 
-                    if (pts.Count > 0) new RSTG_LootList(pts, null, SweepMode.Sweep).Publish();
+                    if (pts.Count > 0) new RSTG_SweepLoot(pts, null, SweepMode.Sweep).Publish();
                 }
             );
         }
@@ -634,7 +636,7 @@ namespace rinCore.Bullet
         #region Sweeping Frame Buffer
         static List<Vector2> frontBuffer = new();
         static List<Vector2> backBuffer = new();
-        public static bool GetLootFrame(out RSTG_LootList loot)
+        public static bool GetLootFrame(out RSTG_SweepLoot loot)
         {
             if (backBuffer.Count == 0)
             {
@@ -646,7 +648,7 @@ namespace rinCore.Bullet
             frontBuffer = temp;
 
             backBuffer.Clear();
-            loot = new RSTG_LootList(frontBuffer, null, SweepMode.LingeringSweep);
+            loot = new RSTG_SweepLoot(frontBuffer, null, SweepMode.LingeringSweep);
             return true;
         }
         #endregion
