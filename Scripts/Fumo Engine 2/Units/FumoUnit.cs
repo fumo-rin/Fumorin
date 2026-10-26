@@ -495,6 +495,7 @@ namespace rinCore
         public float CurrentHealth { get; }
         public float CurrentMaxHealth { get; }
         public float currentHealthPercent01 => CurrentMaxHealth <= 0 ? 0f : CurrentHealth / CurrentMaxHealth;
+        public float AssignHealth { set; }
     }
     #endregion
     #region Action Frame & STG
