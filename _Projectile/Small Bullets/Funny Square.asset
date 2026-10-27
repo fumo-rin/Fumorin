@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 070f83cb5bb53f04e95be8ee8baa3455, type: 3}
+  m_Name: Funny Square
+  m_EditorClassIdentifier: rinCore::rinCore.Projectile.ProjectileDefine
+  animationSpeed: 5.5
+  animationSpreadPercent: 0
+  spin: -270
+  SortingLayer: Projectile
+  particleTemplate: {fileID: 5905382930097071747, guid: 21afd614fde39eb43acd71ac10cebc9c, type: 3}
+  Size: 0.6
+  FlareSizeMod: 1.35
+  <ProjectileTint>k__BackingField:
+    serializedVersion: 2
+    rgba: 4294967295
+  <LockRotation>k__BackingField: 0
+  AddedSortingLayer: 100
+  <CollisionRadius>k__BackingField: 0.05
+  <Flare>k__BackingField: 1
+  <FlareColor>k__BackingField:
+    serializedVersion: 2
+    rgba: 4285031679
+  soundOverride: {fileID: 11400000, guid: cf89707f38592624c88b93277a939ba9, type: 2}

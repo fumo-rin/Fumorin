@@ -12,7 +12,7 @@ namespace rinCore
         private void Awake()
         {
             b = GetComponent<Button>();
-            if (GeneralManager.IsWebGL)
+            if (GeneralManager.IsWebGL || GeneralManager.IsEditor)
             {
                 b.interactable = false;
             }

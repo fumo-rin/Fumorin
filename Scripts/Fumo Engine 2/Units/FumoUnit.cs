@@ -399,7 +399,7 @@ namespace rinCore
             if (this is IPlayerIFrames frames && frames.IFramesRemaining > 0f)
             {
                 processedDealtDamage = 0f;
-                return false;
+                return true;
             }
             bool hit = WhenProjectileHit(packet, out processedDealtDamage);
             if (processedDealtDamage > 0f)
