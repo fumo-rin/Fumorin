@@ -630,10 +630,6 @@ namespace rinCore.Bullet
             {
                 newP.BaseDamage = b.Damage;
                 newP.SpawnIndex = CurrentIndex++;
-                if (b.FlareColor == null)
-                {
-                    Debug.Log("Weee");
-                }
                 return newP;
             }
             return null;

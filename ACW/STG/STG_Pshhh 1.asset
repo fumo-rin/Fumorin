@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
+  m_Name: STG_Pshhh 1
+  m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
+  SoundName: STG Pshhh 1
+  soundVolume: 0.87
+  <soundClips>k__BackingField:
+  - clip: {fileID: 8300000, guid: f599011b85d475e498aed696ea1738d5, type: 3}
+    PitchVariancePercent: 3
+    PitchOrigin: 3.11
+    Volume: 0.457
+    Muted: 0
+  - clip: {fileID: 8300000, guid: bf3e14ed47ecc7547b4a024ea2d943dc, type: 3}
+    PitchVariancePercent: 6.8
+    PitchOrigin: 1.49
+    Volume: 0.396
+    Muted: 0
+  - clip: {fileID: 8300000, guid: ac7da9b8c00609a42947e0fa39cb41a2, type: 3}
+    PitchVariancePercent: 12
+    PitchOrigin: 1.84
+    Volume: 0.782
+    Muted: 0
+  - clip: {fileID: 8300000, guid: ac7da9b8c00609a42947e0fa39cb41a2, type: 3}
+    PitchVariancePercent: 12
+    PitchOrigin: 1.02
+    Volume: 0.329
+    Muted: 0
+  <soundMode>k__BackingField: 20
+  <singleRepeatLockoutTime>k__BackingField: 0.016666668
+  <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0

@@ -11,6 +11,7 @@ namespace rinCore
     public record FEB_Unit_Death(FumoUnit unit, Vector2 position, bool forceKill = false) : IRinEvent;
     public record FEB_Unit_PlayerDeath(FumoUnit unit, Vector2 position) : IRinEvent;
     public record FEB_Unit_Damaged(bool player, FumoUnit unit, float damage) : IRinEvent;
+    public record FEB_BossBarPhaseKill(FumoUnit unit, Vector2 position, bool forceKill = false) : IRinEvent;
     #region Unit Movers
     public enum MoveResult
     {

@@ -162,7 +162,13 @@ namespace rinCore
             if (activeBoss == action.unit)
                 activeBoss = null;
         }
+        private void UnitPhased(FEB_BossBarPhaseKill action)
+        {
+            UnitDeath(new FEB_Unit_Death(action.unit, action.position, action.forceKill)
+            {
 
+            });
+        }
         private void UnitDamaged(FEB_Unit_Damaged action)
         {
             if (action.unit == null || !bossNameLookup.ContainsKey(action.unit))
@@ -212,6 +218,7 @@ namespace rinCore
             RinBus.Bind<FEB_Unit_Damaged>(UnitDamaged);
             RinBus.Bind<FEB_Unit_Death>(UnitDeath);
             RinBus.Bind<FEB_Unit_AssignBossBar>(RegisterBoss);
+            RinBus.Bind<FEB_BossBarPhaseKill>(UnitPhased);
         }
 
         private void OnDisable()
@@ -219,6 +226,7 @@ namespace rinCore
             RinBus.Release<FEB_Unit_Damaged>(UnitDamaged);
             RinBus.Release<FEB_Unit_Death>(UnitDeath);
             RinBus.Release<FEB_Unit_AssignBossBar>(RegisterBoss);
+            RinBus.Release<FEB_BossBarPhaseKill>(UnitPhased);
         }
 
         private void Update()

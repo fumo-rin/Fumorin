@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 070f83cb5bb53f04e95be8ee8baa3455, type: 3}
-  m_Name: Helly
+  m_Name: Spinny Jaggy L
   m_EditorClassIdentifier: rinCore::rinCore.Projectile.ProjectileDefine
-  animationSpeed: 2.5
+  animationSpeed: 5.5
   animationSpreadPercent: 0
-  spin: 0
+  spin: -540
   SortingLayer: Projectile
-  particleTemplate: {fileID: 5905382930097071747, guid: a7e6d3c12f632ca469941169733ec305, type: 3}
-  Size: 0.7
+  particleTemplate: {fileID: 5905382930097071747, guid: 5f281cadaabb0b640a016b68979af161, type: 3}
+  Size: 1.65
   FlareSizeMod: 1.35
   <ProjectileTint>k__BackingField:
     serializedVersion: 2
     rgba: 4294967295
   <LockRotation>k__BackingField: 0
-  AddedSortingLayer: -200
-  <CollisionRadius>k__BackingField: 0.05
+  AddedSortingLayer: 100
+  <CollisionRadius>k__BackingField: 0.125
   <Flare>k__BackingField: 1
   <FlareColor>k__BackingField:
     serializedVersion: 2
-    rgba: 4294915732
+    rgba: 4285577215
   soundOverride: {fileID: 0}

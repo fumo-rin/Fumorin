@@ -190,6 +190,7 @@ namespace rinCore.Bullet
                 list.Add(p);
             }
 
+            flareParticle.Clear();
             float flareDuration = growTime + shrinkTime + 0.15f;
             for (int i = 0; i < activeDefinesList.Count; i++)
             {
@@ -205,7 +206,6 @@ namespace rinCore.Bullet
                 if (!systemDictByID.TryGetValue(key, out var ps)) continue;
 
                 ps.Clear();
-                flareParticle.Clear();
 
                 var renderer = ps.GetComponent<ParticleSystemRenderer>();
                 if (renderer != null)
@@ -265,7 +265,7 @@ namespace rinCore.Bullet
                         rotation = angle
                     };
 
-                    if (p.FlareColor != null && unmodifiedElapsed <= flareDuration)
+                    if (p.IsValid && p.FlareColor != null && unmodifiedElapsed <= flareDuration)
                     {
                         float flareProgress = Mathf.Clamp01(unmodifiedElapsed / flareDuration);
                         float flareScaleFactor = Mathf.Lerp(1.5f, 0.0f, flareProgress);
@@ -287,8 +287,6 @@ namespace rinCore.Bullet
 
                 ps.SetParticles(managedCacheArray, count);
                 flareParticle.SetParticles(flareCacheArray, flareCount);
-
-                Debug.Log($"Par:{count} Fla:{flareCount}");
             }
         }
     }

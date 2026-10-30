@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5905382930097071747}
   - component: {fileID: 7349522124422518044}
   m_Layer: 0
-  m_Name: Helly
+  m_Name: Helly Purple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
