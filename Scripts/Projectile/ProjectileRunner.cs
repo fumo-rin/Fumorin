@@ -6,6 +6,7 @@ using UnityEngine;
 using rinCore;
 using System.Linq;
 using Pathfinding.RVO;
+using UnityEngine.Rendering;
 
 namespace rinCore.Bullet
 {
@@ -63,14 +64,14 @@ namespace rinCore.Bullet
     #region Bullet Flare
     public partial class ProjectileRenderer
     {
-        [SerializeField] private ParticleSystem bulletFlareParticlePrefab;
+        [SerializeField] private ParticleSystem flareParticle;
 
         public static void BulletFlareParticle(Vector3 position, Color32 color, Vector3? velocity = null, float sizeMultiplier = 1f)
         {
-            if (instance == null || instance.bulletFlareParticlePrefab == null)
+            if (instance == null || instance.flareParticle == null)
                 return;
 
-            instance.bulletFlareParticlePrefab.FC_EmitSingleParticleCached(
+            instance.flareParticle.FC_EmitSingleParticleCached(
                 position + new Vector3(0, 0, -1),
                 velocity ?? Vector3.zero,
                 0f,
@@ -90,6 +91,7 @@ namespace rinCore.Bullet
 
         private NativeList<ParticleSystem.Particle> particleBuffer;
         private ParticleSystem.Particle[] managedCacheArray;
+        private ParticleSystem.Particle[] flareCacheArray;
         private Dictionary<int, ParticleSystem> systemDictByID;
         private Dictionary<int, List<Projectile>> fastDefineLookup;
         private List<ProjectileDefine> activeDefinesList;
@@ -106,6 +108,7 @@ namespace rinCore.Bullet
             activeDefinesList = new List<ProjectileDefine>(32);
             particleBuffer = new NativeList<ParticleSystem.Particle>(100000, Allocator.Persistent);
             managedCacheArray = new ParticleSystem.Particle[100000];
+            flareCacheArray = new ParticleSystem.Particle[32000];
         }
 
         public void Release()
@@ -187,6 +190,7 @@ namespace rinCore.Bullet
                 list.Add(p);
             }
 
+            float flareDuration = growTime + shrinkTime + 0.15f;
             for (int i = 0; i < activeDefinesList.Count; i++)
             {
                 var define = activeDefinesList[i];
@@ -199,6 +203,9 @@ namespace rinCore.Bullet
                 }
 
                 if (!systemDictByID.TryGetValue(key, out var ps)) continue;
+
+                ps.Clear();
+                flareParticle.Clear();
 
                 var renderer = ps.GetComponent<ParticleSystemRenderer>();
                 if (renderer != null)
@@ -213,6 +220,10 @@ namespace rinCore.Bullet
                 {
                     managedCacheArray = new ParticleSystem.Particle[Mathf.NextPowerOfTwo(count)];
                 }
+                if (flareCacheArray.Length < count)
+                {
+                    flareCacheArray = new ParticleSystem.Particle[Mathf.NextPowerOfTwo(count)];
+                }
 
                 var textureSheetAnimation = ps.textureSheetAnimation;
                 int totalFrames = textureSheetAnimation.numTilesX * textureSheetAnimation.numTilesY;
@@ -220,6 +231,7 @@ namespace rinCore.Bullet
 
                 Color32 particleColor = define.ProjectileTint;
 
+                int flareCount = 0;
                 for (int j = 0; j < count; j++)
                 {
                     var p = batch[j];
@@ -252,9 +264,31 @@ namespace rinCore.Bullet
                         startColor = particleColor,
                         rotation = angle
                     };
+
+                    if (p.FlareColor != null && unmodifiedElapsed <= flareDuration)
+                    {
+                        float flareProgress = Mathf.Clamp01(unmodifiedElapsed / flareDuration);
+                        float flareScaleFactor = Mathf.Lerp(1.5f, 0.0f, flareProgress);
+
+                        if (flareScaleFactor > 0.001f)
+                        {
+                            flareCacheArray[flareCount++] = new ParticleSystem.Particle
+                            {
+                                position = new Vector3(p.FinalizedPosition.x, p.FinalizedPosition.y, -1f),
+                                startSize = define.FlareSizeMod * flareScaleFactor,
+                                startLifetime = 0.1f,
+                                remainingLifetime = 0.05f,
+                                startColor = p.FlareColor.Value,
+                                rotation = p.Render_Angle,
+                            };
+                        }
+                    }
                 }
 
                 ps.SetParticles(managedCacheArray, count);
+                flareParticle.SetParticles(flareCacheArray, flareCount);
+
+                Debug.Log($"Par:{count} Fla:{flareCount}");
             }
         }
     }
@@ -315,10 +349,6 @@ namespace rinCore.Bullet
             if (current == null || p == null || p.data == null) return;
             ProjectileRenderer.AddDefine(p.data);
             current.masterProjectileList.Add(p);
-            if (p.data.Flare)
-            {
-                ProjectileRenderer.BulletFlareParticle(p.FinalizedPosition, p.data.FlareColor, p.FinalizedVelocity, p.data.FlareSizeMod);
-            }
         }
         public static Action<List<Projectile>> StandardProjectileClear = (list) =>
         {

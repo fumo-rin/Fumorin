@@ -1,4 +1,3 @@
-using Pathfinding.Graphs.Grid.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -501,6 +500,7 @@ namespace rinCore.Bullet
         public float FinalDamage => BaseDamage * (Sender is not null and IDamageMod mod ? mod.DamageMod : 1f);
         public float BaseDamage = 1f;
         public FumoUnit Sender;
+        public Color32? FlareColor;
         public ProjectileDefine data;
         public FumoUnit.UFaction Faction => Sender.AssignedFaction;
         public float spawnTime;
@@ -619,6 +619,7 @@ namespace rinCore.Bullet
             public FumoUnit Sender;
             public Vector2 Position;
             public Vector2 VelocityDirection;
+            public Color32? FlareColor;
             public float Damage;
             public float? SpeedMod;
             public bool Sealable;
@@ -629,6 +630,10 @@ namespace rinCore.Bullet
             {
                 newP.BaseDamage = b.Damage;
                 newP.SpawnIndex = CurrentIndex++;
+                if (b.FlareColor == null)
+                {
+                    Debug.Log("Weee");
+                }
                 return newP;
             }
             return null;
@@ -684,7 +689,8 @@ namespace rinCore.Bullet
                 animationOffsetSeconds = (1f / b.Define.animationSpeed) * (b.Define.animationSpreadPercent.RandomPositiveNegativeRange().Multiply(0.01f)),
                 mods = b.Mods,
                 SpeedMod = b.SpeedMod ?? 1f,
-                IsValid = true
+                IsValid = true,
+                FlareColor = b.FlareColor,
             };
             ProjectileRunner.InjectProjectile(p);
             return true;

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
+  m_Name: STG_Activation
+  m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
+  SoundName: STG Hit 1
+  soundVolume: 0.421
+  <soundClips>k__BackingField:
+  - clip: {fileID: 8300000, guid: d210a6d32fdfe1446817ac9b42b23cc8, type: 3}
+    PitchVariancePercent: 3.8
+    PitchOrigin: 1.6
+    Volume: 0.222
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 08a09199963007445b75b1d1e9740df5, type: 3}
+    PitchVariancePercent: 6
+    PitchOrigin: 0.53
+    Volume: 0.095
+    Muted: 0
+  - clip: {fileID: 8300000, guid: f6187f2451bdbd14d96c1010389cf261, type: 3}
+    PitchVariancePercent: 6
+    PitchOrigin: 1
+    Volume: 0.75
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 5cf5f566a425543458b198c78a3e8702, type: 3}
+    PitchVariancePercent: 6
+    PitchOrigin: 1.13
+    Volume: 0.75
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 5cf5f566a425543458b198c78a3e8702, type: 3}
+    PitchVariancePercent: 6
+    PitchOrigin: 0.75
+    Volume: 0.75
+    Muted: 0
+  <soundMode>k__BackingField: 20
+  <singleRepeatLockoutTime>k__BackingField: 0.05
+  <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0

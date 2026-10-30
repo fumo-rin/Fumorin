@@ -29,4 +29,4 @@ MonoBehaviour:
   <FlareColor>k__BackingField:
     serializedVersion: 2
     rgba: 4285031679
-  soundOverride: {fileID: 11400000, guid: cf89707f38592624c88b93277a939ba9, type: 2}
+  soundOverride: {fileID: 0}

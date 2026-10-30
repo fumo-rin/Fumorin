@@ -167,6 +167,7 @@ namespace rinCore.Bullet
             public float AddedForward;
             public float SpeedMod;
             public bool Sealable;
+            public bool Flare;
 
             public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
@@ -210,6 +211,7 @@ namespace rinCore.Bullet
                 AddedForward = addedForward;
                 SpeedMod = 1f;
                 Sealable = true;
+                Flare = true;
             }
 
             public InputSettings Copy()
@@ -367,18 +369,10 @@ namespace rinCore.Bullet
                 Damage = input.BaseDamage,
                 Mods = input.Mods,
                 SpeedMod = input.SpeedMod,
+                FlareColor = (define.Flare && input.Flare) ? define.FlareColor : null,
             });
 
             bool spawnedBullet = output != null;
-
-            if (spawnedBullet && define.Flare)
-            {
-                ProjectileRenderer.BulletFlareParticle(
-                    output.FinalizedPosition,
-                    define.FlareColor,
-                    output.FinalizedVelocity,
-                    define.FlareSizeMod);
-            }
 
             if (spawnedBullet && !input.PreventSound)
             {
@@ -399,36 +393,31 @@ namespace rinCore.Bullet
             Vector2 rotatedDirection;
             float angle;
 
+            BulletPacket pack = new BulletPacket
+            {
+                Sealable = input.Sealable,
+                SpeedMod = input.SpeedMod,
+                Define = define,
+                Sender = input.Sender,
+                Damage = input.BaseDamage,
+                Mods = input.Mods,
+                FlareColor = (define.Flare && input.Flare) ? define.FlareColor : null,
+            };
+
             foreach (float item in settings.ArcInterval.StepFromTo(settings.StartingAngle, settings.EndingAngle))
             {
                 angle = item * (settings.IsReverse ? -1f : 1f);
                 rotatedDirection = input.Direction.Rotate2D(angle);
                 offset = rotatedDirection.ScaleToMagnitude(input.AddedForward);
 
-                Projectile p = BuildProjectile(new BulletPacket
-                {
-                    Sealable = input.Sealable,
-                    SpeedMod = input.SpeedMod,
-                    Define = define,
-                    Sender = input.Sender,
-                    Position = input.Origin + offset,
-                    VelocityDirection = rotatedDirection.normalized * settings.ProjectileSpeed,
-                    Damage = input.BaseDamage,
-                    Mods = input.Mods
-                });
+                pack.Position = input.Origin + offset;
+                pack.VelocityDirection = rotatedDirection.normalized * settings.ProjectileSpeed;
+
+                Projectile p = BuildProjectile(pack);
 
                 if (p == null)
                 {
                     continue;
-                }
-
-                if (define.Flare)
-                {
-                    ProjectileRenderer.BulletFlareParticle(
-                        p.FinalizedPosition,
-                        define.FlareColor,
-                        p.FinalizedVelocity,
-                        define.FlareSizeMod);
                 }
 
                 output.Add(p);

@@ -18,7 +18,7 @@ MonoBehaviour:
   SortingLayer: Projectile
   particleTemplate: {fileID: 5905382930097071747, guid: 1d93f7823548bbd4cb16647a62d36561, type: 3}
   Size: 0.75
-  FlareSizeMod: 1.65
+  FlareSizeMod: 1.35
   <ProjectileTint>k__BackingField:
     serializedVersion: 2
     rgba: 4294967295
@@ -29,4 +29,4 @@ MonoBehaviour:
   <FlareColor>k__BackingField:
     serializedVersion: 2
     rgba: 4294928865
-  soundOverride: {fileID: 11400000, guid: cf89707f38592624c88b93277a939ba9, type: 2}
+  soundOverride: {fileID: 0}
