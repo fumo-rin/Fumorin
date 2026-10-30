@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace rinCore
 {
-    public class CountStepper : IEnumerable<int>
+    public record CountStepper : IEnumerable<int>
     {
         public int Pool;
-        public int LoopCount;
-        public int Step;
-        public bool IsDepleted => Step >= Pool;
-        public CountStepper(int pool, int loopCount)
+        public int CycleCount;
+        public int CurrentStep;
+        public bool IsDepleted => CurrentStep >= Pool;
+        public CountStepper(int pool, float loopCount)
         {
-            this.Step = 0;
+            this.CurrentStep = 0;
             this.Pool = pool;
-            this.LoopCount = loopCount;
+            this.CycleCount = loopCount.Floor().ToInt().Clamp(1, int.MaxValue);
         }
         #region Enumerator
         public IEnumerator<int> GetEnumerator()
@@ -32,20 +32,20 @@ namespace rinCore
         #endregion
         public CountStepper Restart()
         {
-            Step = 0;
+            CurrentStep = 0;
             return this;
         }
         public IEnumerable<int> ForeachOnce
         {
             get
             {
-                int steps = LoopCount;
+                int steps = CycleCount;
                 while (steps > 0 && !IsDepleted)
                 {
-                    Step++;
-                    steps--;
+                    yield return CurrentStep;
 
-                    yield return Step;
+                    CurrentStep++;
+                    steps--;
                 }
             }
         }
@@ -56,10 +56,10 @@ namespace rinCore
                 int steps = Pool;
                 while (steps > 0 && !IsDepleted)
                 {
-                    Step++;
-                    steps--;
+                    yield return CurrentStep;
 
-                    yield return Step;
+                    CurrentStep++;
+                    steps--;
                 }
             }
         }
