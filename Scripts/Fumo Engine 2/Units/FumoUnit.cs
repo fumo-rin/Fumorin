@@ -577,8 +577,10 @@ namespace rinCore
         public FumoUnit CenterOwner { get; }
         public Vector2 Center { get; }
     }
-    public abstract partial class FumoUnit : MonoBehaviour
+    public abstract partial class FumoUnit : MonoBehaviour, FastUpdate.IFastRunable
     {
+        int _fastIndex;
+        int FastUpdate.IFastRunable.FastIndex { get => _fastIndex; set => _fastIndex = value; }
         protected void TriggerDeath()
         {
             if (this == Player)
@@ -669,6 +671,7 @@ namespace rinCore
         [SerializeField] Rigidbody2D rb;
         public Rigidbody2D RB => rb;
         [field: SerializeField] public Pather pather { get; internal set; }
+
         private void Awake()
         {
             pather = Pather.Create(this, UnitRadius);
@@ -683,7 +686,7 @@ namespace rinCore
             ClearAllActions();
             WhenDestroy();
         }
-        private void Update()
+        public void RunFastFrame(float dt)
         {
             if (this == null || !this.IsAlive)
             {
@@ -716,6 +719,7 @@ namespace rinCore
         }
         private void OnDisable()
         {
+            FastUpdate.UnregisterItem(this);
             cemData = new()
             {
                 startTime = -1f,
@@ -727,6 +731,7 @@ namespace rinCore
         }
         private void OnEnable()
         {
+            FastUpdate.RegisterItem(this);
             SwingLockEnd = Time.time + 0.75f;
             SwapLockEnd = Time.time + 0.75f;
             WhenEnable();

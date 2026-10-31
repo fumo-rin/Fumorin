@@ -17,7 +17,7 @@ namespace rinCore
             {
                 a01 = new(0.2f, 0.3f),
                 b01 = new(0.8f, 0.5f),
-                color = ColorHelper.White,
+                color = ColorHelper.Raw.White,
                 duration = 3.25f,
                 fadeIn = 0.5f,
                 fadeOut = 0.5f,
@@ -65,7 +65,7 @@ namespace rinCore
                     if (item.cutsceneImage != null)
                     {
                         cutsceneViewer.sprite = item.cutsceneImage;
-                        cutsceneViewer.color = ColorHelper.White.Opacity(255);
+                        cutsceneViewer.color = ColorHelper.Raw.White.Opacity(255);
                     }
                     else
                     {
@@ -88,7 +88,7 @@ namespace rinCore
         private void SetBlackScreen()
         {
             cutsceneViewer.sprite = null;
-            cutsceneViewer.color = ColorHelper.White.Opacity(0);
+            cutsceneViewer.color = ColorHelper.Raw.White.Opacity(0);
         }
     }
 }

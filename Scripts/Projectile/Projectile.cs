@@ -501,6 +501,7 @@ namespace rinCore.Bullet
         public float BaseDamage = 1f;
         public FumoUnit Sender;
         public Color32? FlareColor;
+        public Color32? FixedColorMod;
         public ProjectileDefine data;
         public FumoUnit.UFaction Faction => Sender.AssignedFaction;
         public float spawnTime;

@@ -16,7 +16,7 @@ namespace rinCore
                 return;
 
             bossNameLookup[assignment.unit] = assignment.bossName;
-            damageTable[assignment.unit] = new RollingFloatTracker(windowSeconds: 3f, intervalSeconds: 0.1f, emaSmoothing: 25f);
+            damageTable[assignment.unit] = new RollingFloatTracker(windowSeconds: 0.8f, intervalSeconds: 0.04f, emaSmoothing: 25f);
         }
         private void CleanupDeadUnits()
         {

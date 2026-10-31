@@ -101,7 +101,7 @@ namespace rinCore
 
             if (selection.slot == slotIndex)
             {
-                selectionImage.color = ColorHelper.PastelYellow.Opacity(startingColor.a);
+                selectionImage.color = ColorHelper.Raw.PastelYellow.Opacity(startingColor.a);
             }
             else
             {

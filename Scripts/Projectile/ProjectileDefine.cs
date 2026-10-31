@@ -11,7 +11,7 @@ namespace rinCore.Bullet
         [SortingLayer] public string SortingLayer = "Default";
         [SerializeField] private ParticleSystem particleTemplate;
         [SerializeField] public float Size = 0.75f, FlareSizeMod = 1.65f;
-        [field: SerializeField] public Color32 ProjectileTint { get; private set; } = ColorHelper.White.Opacity(255);
+        [field: SerializeField] public Color32 ProjectileTint { get; private set; } = ColorHelper.Raw.White.Opacity(255);
         [field: SerializeField] public bool LockRotation { get; private set; }
 
         #region Sorting Layer
@@ -22,7 +22,7 @@ namespace rinCore.Bullet
         #endregion
         [field: SerializeField] public float CollisionRadius { get; private set; } = 0.05f;
         [field: SerializeField] public bool Flare { get; private set; } = true;
-        [field: SerializeField] public Color32 FlareColor { get; private set; } = ColorHelper.PastelPurple.Opacity(255);
+        [field: SerializeField] public Color32 FlareColor { get; private set; } = ColorHelper.Raw.PastelPurple.Opacity(255);
         public ACWrapper soundOverride;
 
         public bool StartPS(out ParticleSystem ps)

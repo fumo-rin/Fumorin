@@ -9,7 +9,7 @@ namespace rinCore
         [SerializeField] Image OptionalImage;
         [SerializeField] TMP_Text ItemNameText, AmountText;
 
-        public Color LabelColor => ColorHelper.PastelBlue.Opacity(50);
+        public Color LabelColor => ColorHelper.Raw.PastelBlue.Opacity(50);
 
         private void Awake()
         {
@@ -27,7 +27,7 @@ namespace rinCore
                 if (OptionalImage != null)
                 {
                     OptionalImage = null;
-                    OptionalImage.color = ColorHelper.White.Opacity(0);
+                    OptionalImage.color = ColorHelper.Raw.White.Opacity(0);
                 }
                 if (ItemNameText != null)
                     ItemNameText.text = "";
@@ -38,7 +38,7 @@ namespace rinCore
             var item = action.handItem.containedItem;
             if (OptionalImage != null)
             {
-                OptionalImage.color = ColorHelper.White.Opacity(255);
+                OptionalImage.color = ColorHelper.Raw.White.Opacity(255);
                 OptionalImage.sprite = item.inventoryIcon;
             }
             if (ItemNameText != null)

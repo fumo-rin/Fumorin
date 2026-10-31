@@ -8,7 +8,7 @@ namespace rinCore
 {
     public class RunescapeDockSelector : MonoBehaviour, IPointerDownHandler, IHierarchyComponentColor
     {
-        public Color LabelColor => ColorHelper.PastelBlue.Opacity(25);
+        public Color LabelColor => ColorHelper.Raw.PastelBlue.Opacity(25);
         [SerializeField] Image selectionLabel;
         [SerializeField] TMP_Text labelText;
         RunescapeDock.DockItem _tabBackingField;

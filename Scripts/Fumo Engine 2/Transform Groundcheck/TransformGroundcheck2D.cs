@@ -36,7 +36,7 @@ namespace rinCore
             if (groundCheckAnchor == null)
                 return;
             bool grounded = IsGrounded;
-            Gizmos.color = grounded ? ColorHelper.PastelGreen : ColorHelper.PastelYellow;
+            Gizmos.color = grounded ? ColorHelper.Raw.PastelGreen : ColorHelper.Raw.PastelYellow;
             Gizmos.DrawWireSphere(groundCheckPosition, radius);
         }
         public bool HasCoyoteTime => CoyoteTimeLength + LastGroundedTime >= Time.time;

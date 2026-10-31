@@ -17,5 +17,18 @@ namespace rinCore
 
             onComplete?.Invoke();
         }
+        public static IEnumerator Wrap(this IEnumerator routine, IEnumerator b)
+        {
+            if (routine != null)
+            {
+                while (routine.MoveNext())
+                    yield return routine.Current;
+            }
+            if (b != null)
+            {
+                while (b.MoveNext())
+                    yield return b.Current;
+            }
+        }
     }
 }

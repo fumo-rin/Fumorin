@@ -16,7 +16,7 @@ namespace rinCore
             public float fadeOut = 0.5f;
             public float duration = 2f;
             public float DurationWithFade => duration + fadeIn + fadeOut;
-            public Color32 color = ColorHelper.White;
+            public Color32 color = ColorHelper.Raw.White;
 
             public Vector2 a01 = new(0.3f, 0.5f);
             public Vector2 b01 = new(0.7f, 0.7f);
@@ -30,7 +30,7 @@ namespace rinCore
                 this.fadeIn = 0.5f;
                 this.fadeOut = 0.5f;
                 this.duration = 2f;
-                this.color = ColorHelper.White;
+                this.color = ColorHelper.Raw.White;
                 this.a01 = new(0.3f, 0.5f);
                 this.b01 = new(0.7f, 0.7f);
                 this.fontSize = 20f;

@@ -46,7 +46,7 @@ namespace rinCore
         }
 #endif
         #endregion
-        public Color LabelColor => ColorHelper.PastelBlue.Opacity(50);
+        public Color LabelColor => ColorHelper.Raw.PastelBlue.Opacity(50);
         #region Dock Item & Selector Fill
         public enum DockItem
         {

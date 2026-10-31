@@ -7,7 +7,7 @@ namespace rinCore
     [RequireComponent(typeof(Slider))]
     public class SettingsSlider : MonoBehaviour, IHierarchyComponentColor
     {
-        public Color LabelColor => ColorHelper.PastelGreen.Opacity(50);
+        public Color LabelColor => ColorHelper.Raw.PastelGreen.Opacity(50);
         [SerializeField] TMP_Text sliderText;
         string storedSliderText;
         Slider slider;

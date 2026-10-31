@@ -261,7 +261,7 @@ namespace rinCore.Bullet
                         startSize = define.Size * scaleFactor,
                         startLifetime = animSpeed,
                         remainingLifetime = currentRemaining,
-                        startColor = particleColor,
+                        startColor = p?.FixedColorMod ?? particleColor,
                         rotation = angle
                     };
 
@@ -278,7 +278,7 @@ namespace rinCore.Bullet
                                 startSize = define.FlareSizeMod * flareScaleFactor,
                                 startLifetime = 0.1f,
                                 remainingLifetime = 0.05f,
-                                startColor = p.FlareColor.Value,
+                                startColor = p.FixedColorMod ?? p.FlareColor.Value,
                                 rotation = p.Render_Angle,
                             };
                         }
