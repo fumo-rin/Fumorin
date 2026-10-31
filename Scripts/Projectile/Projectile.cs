@@ -532,6 +532,7 @@ namespace rinCore.Bullet
         Vector2 _regularVelocity;
         public Vector2 ExtraVelocity;
         Vector2? PreviousPosition = null;
+        Vector2? PreviousFinalizedVelocity;
         public bool HasPreviousPosition(out Vector2 pos)
         {
             pos = PreviousPosition ?? default;
@@ -541,7 +542,13 @@ namespace rinCore.Bullet
         {
             get
             {
-                return _regularVelocity + ExtraVelocity;
+                Vector2 vec = _regularVelocity + ExtraVelocity;
+                if (vec == Vector2.zero)
+                {
+                    vec = PreviousFinalizedVelocity ?? Vector2.down;
+                }
+                PreviousFinalizedVelocity = vec;
+                return vec;
             }
         }
         public interface IProjectileHit

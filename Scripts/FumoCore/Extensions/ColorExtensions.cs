@@ -135,6 +135,32 @@ namespace rinCore
                 (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.a, b.a, t)), 0, 255)
             );
         }
+        public static Color32 Lighten(this Color32 color, float amount)
+        {
+            int r = color.r + Mathf.RoundToInt(amount * 255f);
+            int g = color.g + Mathf.RoundToInt(amount * 255f);
+            int b = color.b + Mathf.RoundToInt(amount * 255f);
+
+            return new Color32(
+                (byte)Mathf.Clamp(r, 0, 255),
+                (byte)Mathf.Clamp(g, 0, 255),
+                (byte)Mathf.Clamp(b, 0, 255),
+                color.a
+            );
+        }
+        public static Color32 Darken(this Color32 color, float amount)
+        {
+            int r = color.r - Mathf.RoundToInt(amount * 255f);
+            int g = color.g - Mathf.RoundToInt(amount * 255f);
+            int b = color.b - Mathf.RoundToInt(amount * 255f);
+
+            return new Color32(
+                (byte)Mathf.Clamp(r, 0, 255),
+                (byte)Mathf.Clamp(g, 0, 255),
+                (byte)Mathf.Clamp(b, 0, 255),
+                color.a
+            );
+        }
         public static Color32 SineAB(this Color32 a, Color32 b, float sineT)
         {
             float t = 0.5f + sineT.SineWave(Time.time, 0.5f);
