@@ -147,6 +147,7 @@ namespace rinCore
         }
         #endregion
         public static Vector2 Vec2(this Vector3 v) => new(v.x, v.y);
+        public static Vector3 Vec3(this Vector2 v) => new(v.x, v.y);
         public static Vector3 ToXZ(this Vector3 v)
         {
             return new()

@@ -319,7 +319,7 @@ namespace rinCore
                 }
                 foreach (var item in aliveEnemies)
                 {
-                    if (item != null && item.gameObject != null && item.IsAlive && !item.exiting)
+                    if (item != null && item.gameObject != null && item.IsAlive)
                         yield return item;
                 }
             }
@@ -422,7 +422,6 @@ namespace rinCore
             endTime = null,
             startTime = -1f
         };
-        bool exiting = false;
         public void Action_CEM_Stop()
         {
             if (currentExternalMovement != null)
@@ -434,7 +433,6 @@ namespace rinCore
         {
             IEnumerator Move_Out(Vector2 direction)
             {
-                exiting = true;
                 Vector2 v = Vector2.zero;
                 while (this != null && this.IsAlive)
                 {
