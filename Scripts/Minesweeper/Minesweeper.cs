@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 
+
 #if UNITY_EDITOR
 using UnityEditor;
 namespace Rensenware
@@ -589,7 +590,7 @@ namespace Rensenware
         #endregion
 
         #region Window Open
-        [MenuItem("Rensenware/Minesweeper")]
+        [MenuItem("Fumorin/Minesweeper")]
         public static void OpenWindow()
         {
             Minesweeper window = GetWindow<Minesweeper>();
