@@ -318,6 +318,16 @@ namespace rinCore.Bullet
             }
         }
         static HashSet<int> grazedProjectiles;
+        public static void ShiftAllProjectiles(IEnumerable<Projectile> projCollection, Vector2 shift)
+        {
+            foreach (var proj in projCollection)
+            {
+                if (!proj.IsValid)
+                    continue;
+
+                proj._currentPosition += shift;
+            }
+        }
         public static void ProcessBatch(IEnumerable<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
         {
             if (grazedProjectiles == null)

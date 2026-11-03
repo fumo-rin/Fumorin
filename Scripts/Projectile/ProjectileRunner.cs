@@ -333,6 +333,26 @@ namespace rinCore.Bullet
         }
     }
     #endregion
+    #region Shift
+    public partial class ProjectileRunner : MonoBehaviour
+    {
+        private struct InternalShift : IRinEvent
+        {
+            public Vector2 delta;
+        }
+        public static void External_Shift_Frame(Vector2 delta)
+        {
+            new InternalShift()
+            {
+                delta = delta
+            }.Publish();
+        }
+        private void ShiftCollection(InternalShift s)
+        {
+            Projectile.ShiftAllProjectiles(masterProjectileList, s.delta);
+        }
+    }
+    #endregion
 
     #region Main Runner Implementation
     public partial class ProjectileRunner : MonoBehaviour
@@ -396,6 +416,7 @@ namespace rinCore.Bullet
             _renderer.Bind();
             RinBus.Bind<RProj_Global_Clear>(ApplyGlobalClear);
             RinBus.Bind<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
+            RinBus.Bind<InternalShift>(ShiftCollection);
             SlowdownPickupsCount = null;
         }
         private void OnDisable()
@@ -403,6 +424,7 @@ namespace rinCore.Bullet
             _renderer.Release();
             RinBus.Release<RProj_Global_Clear>(ApplyGlobalClear);
             RinBus.Release<RProj_Slowdown_PickupsCount>(ApplyPickupsCount);
+            RinBus.Release<InternalShift>(ShiftCollection);
         }
         private void ApplyGlobalClear(RProj_Global_Clear clear)
         {

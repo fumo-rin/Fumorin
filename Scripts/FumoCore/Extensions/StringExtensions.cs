@@ -72,6 +72,33 @@ namespace rinCore
     }
     public static class StringExtensions
     {
+        public static string AbbreviatedReadable(this string fullName)
+        {
+            var words = Regex.Split(fullName, @"(?<!^)(?=[A-Z])");
+            string result = "";
+            bool isFirstWord = true;
+
+            foreach (var w in words)
+            {
+                if (string.IsNullOrEmpty(w)) continue;
+                string cleanWord = w.Trim();
+                if (cleanWord.Length == 0) continue;
+
+                int takeCount = isFirstWord ? Mathf.Min(3, cleanWord.Length) : 1;
+                string processed = cleanWord.Substring(0, takeCount);
+
+                if (isFirstWord)
+                {
+                    result += processed.Capitalized();
+                }
+                else
+                {
+                    result += processed.ToUpper();
+                }
+                isFirstWord = false;
+            }
+            return result;
+        }
         public static string Capitalized(this string s)
         {
             if (string.IsNullOrEmpty(s))

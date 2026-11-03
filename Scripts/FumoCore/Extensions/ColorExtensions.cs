@@ -6,6 +6,7 @@ namespace rinCore
 {
     public struct ColorHelper
     {
+        public static Color32 White => new Color32(255, 255, 255, 255);
         #region Hierarchy Components
         public struct HierarchyTypes
         {
@@ -20,6 +21,7 @@ namespace rinCore
         public struct Rainbow
         {
             [SerializeField] private float frequency, offset, speedMod;
+            [SerializeField, HideInInspector] private byte opacity;
             [SerializeField] private bool isTrans;
             public Rainbow(float frequency, float offset, float speedMod = 1f)
             {
@@ -27,10 +29,19 @@ namespace rinCore
                 this.offset = offset;
                 this.speedMod = speedMod;
                 this.isTrans = false;
+                this.opacity = 255;
+            }
+            public Rainbow Opacity(byte op)
+            {
+                Rainbow copy = this;
+                copy.opacity = op;
+                return copy;
             }
             public static implicit operator Color32(Rainbow r)
             {
-                return (Color)r;
+                Color c = (Color)r;
+                Color32 baseColor = c;
+                return new Color32(baseColor.r, baseColor.g, baseColor.b, r.opacity);
             }
             public static implicit operator Color(Rainbow r)
             {
@@ -116,6 +127,20 @@ namespace rinCore
     }
     public static class ColorExtensions
     {
+        public static Color32 Techno(this Color32 c, float bpm, byte? offOpacity = null, float? startTime = null)
+        {
+            return Techno(c, bpm, c.Opacity(offOpacity ?? 0), startTime);
+        }
+        public static Color32 Techno(this Color32 c, float bpm, Color32 offColor, float? startTime = null)
+        {
+            float start = startTime ?? 0f;
+            float beatDuration = 60f / bpm.Max(1f);
+            float t = (Time.time - start) % beatDuration / beatDuration;
+
+            t = LerpCurves.EaseOutQuad(t);
+
+            return c.LerpUnclamped(offColor, t.Clamp(0f, 1f));
+        }
         public static Color32 Opacity(this Color c, byte alpha)
         {
             Color32 color = c;
@@ -133,6 +158,15 @@ namespace rinCore
                 (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.g, b.g, t)), 0, 255),
                 (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.b, b.b, t)), 0, 255),
                 (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.LerpUnclamped(a.a, b.a, t)), 0, 255)
+            );
+        }
+        public static Color LerpUnclamped(this Color a, Color b, float t)
+        {
+            return new Color(
+                Mathf.LerpUnclamped(a.r, b.r, t),
+                Mathf.LerpUnclamped(a.g, b.g, t),
+                Mathf.LerpUnclamped(a.b, b.b, t),
+                Mathf.LerpUnclamped(a.a, b.a, t)
             );
         }
         public static Color32 Lighten(this Color32 color, float amount)

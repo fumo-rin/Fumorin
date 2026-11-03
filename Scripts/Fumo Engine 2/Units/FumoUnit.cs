@@ -429,7 +429,37 @@ namespace rinCore
                 StopCoroutine(currentExternalMovement);
             }
         }
-        public void Action_CEM_Exit(Vector2 direction, Rect? space, float delay, Action whenFinish)
+        public struct ExitPacket
+        {
+            public float delay, acceleration;
+        }
+        public void Action_CEM_ExitEndless(Vector2 direction, ExitPacket exit)
+        {
+            IEnumerator Move_Out(Vector2 direction)
+            {
+                Vector2 v = Vector2.zero;
+                while (this != null && this.IsAlive)
+                {
+                    float acceleration = (exit.acceleration > 0.5f ? exit.acceleration : 12f);
+                    v = v.MoveTowards(direction, acceleration);
+                    transform.position += (Vector3)v * Time.deltaTime;
+                    yield return null;
+                }
+            }
+            IEnumerator CO_WaitAndRun()
+            {
+                yield return exit.delay.WaitForSeconds();
+                Action_CEM_Stop();
+                cemData = new()
+                {
+                    startTime = Time.time,
+                    endTime = -1f
+                };
+                currentExternalMovement = StartCoroutine(Move_Out(direction));
+            }
+            StartCoroutine(CO_WaitAndRun());
+        }
+        public void Action_CEM_Exit(Vector2 direction, Rect? space, ExitPacket exit, Action whenFinish)
         {
             IEnumerator Move_Out(Vector2 direction)
             {
@@ -440,14 +470,15 @@ namespace rinCore
                     {
                         yield break;
                     }
-                    v = v.MoveTowards(direction, 12f);
+                    float acceleration = (exit.acceleration > 0.5f ? exit.acceleration : 12f);
+                    v = v.MoveTowards(direction, acceleration);
                     transform.position += (Vector3)v * Time.deltaTime;
                     yield return null;
                 }
             }
             IEnumerator CO_WaitAndRun()
             {
-                yield return delay.WaitForSeconds();
+                yield return exit.delay.WaitForSeconds();
                 Action_CEM_Stop();
                 cemData = new()
                 {

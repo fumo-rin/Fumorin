@@ -590,7 +590,7 @@ namespace Rensenware
         #endregion
 
         #region Window Open
-        [MenuItem("Fumorin/Minesweeper")]
+        [MenuItem("Rensenware/Minesweeper")]
         public static void OpenWindow()
         {
             Minesweeper window = GetWindow<Minesweeper>();

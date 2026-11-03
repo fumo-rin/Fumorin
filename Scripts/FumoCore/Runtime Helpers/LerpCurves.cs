@@ -87,7 +87,6 @@ public static class LerpCurves
         t = Clamp01(t);
         return (float)Math.Sin(t * Math.PI / 2f);
     }
-
     public static float EaseInOutSine(float t)
     {
         t = Clamp01(t);
