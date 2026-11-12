@@ -411,12 +411,6 @@ namespace rinCore.Bullet
                         }
                         tracker.Add(rootEnemy);
 
-                        ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
-                        {
-                            colorOverride = null,
-                            forceMultiplier = 1f
-                        });
-
                         bool multiHit = ihit.TryProjectileHit(new()
                         {
                             Damage = proj.FinalDamage,
@@ -427,6 +421,13 @@ namespace rinCore.Bullet
 
                         if (multiHit)
                         {
+
+                            ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                            {
+                                colorOverride = null,
+                                forceMultiplier = 1f
+                            });
+
                             extraHitAction?.Invoke(ihit);
                             proj.UnitHitCount--;
                             if (proj.UnitHitCount <= 0)
@@ -438,12 +439,6 @@ namespace rinCore.Bullet
                         }
                     }
 
-                    ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
-                    {
-                        colorOverride = null,
-                        forceMultiplier = 1f
-                    });
-
                     bool unitHit = ihit.TryProjectileHit(new()
                     {
                         Damage = proj.FinalDamage,
@@ -451,9 +446,14 @@ namespace rinCore.Bullet
                         Normal = hit.normal,
                         Point = hit.point
                     }, out _);
-
                     if (unitHit)
                     {
+                        ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
+                        {
+                            colorOverride = null,
+                            forceMultiplier = 1f
+                        });
+
                         proj.IsValid = false;
                         extraHitAction?.Invoke(ihit);
                         break;
