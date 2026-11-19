@@ -428,7 +428,8 @@ namespace rinCore.Bullet
         }
         private void ApplyGlobalClear(RProj_Global_Clear clear)
         {
-            currentClear = clear;
+            RProj_Global_Clear c = new(clear.clear?.Shrink(-0.1f, -0.1f));
+            currentClear = c;
         }
         static RProj_Global_Clear currentClear;
 
