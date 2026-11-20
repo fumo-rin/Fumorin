@@ -157,6 +157,13 @@ namespace rinCore
         private IUnitMover baseUnitMover;
         public IUnitMover GetMover() => baseUnitMover;
         public IUnitMover SetMover(IUnitMover mover) => this.baseUnitMover = mover;
+        public void AnimateMovement(Vector2 v)
+        {
+            if (moveAnimator != null)
+            {
+                moveAnimator.SetBool(moveAnimatorStringKey, v.sqrMagnitude > 0.1f);
+            }
+        }
         public MoveResult PathMoveUnit(Vector2 input)
         {
             if (moveAnimator != null)

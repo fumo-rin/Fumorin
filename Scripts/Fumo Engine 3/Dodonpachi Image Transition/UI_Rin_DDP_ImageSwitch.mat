@@ -35,7 +35,7 @@ Material:
     - _GravityScale: 0.35
     - _RotationScale: 1.5
     - _SpreadScale: 0.35
-    - _State: 1
+    - _State: 0
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0
