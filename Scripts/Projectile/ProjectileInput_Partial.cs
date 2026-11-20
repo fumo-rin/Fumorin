@@ -172,9 +172,11 @@ namespace rinCore.Bullet
             public static void Auto(FumoUnit sender, FumoUnit.AutoAimSettings settings, out InputSettings input)
             {
                 FumoUnit autoAim = null;
+                float defaultDamage = 5f;
 
                 if (FumoUnit.Player == sender)
                 {
+                    defaultDamage = 1f;
                     IEnumerable<FumoUnit> onScreenEnemies = FumoUnit.AliveEnemies.Where(x => x is ISTGUnit_OnScreen scr && scr.IsOnScreen);
                     FumoUnit.AutoAim(sender.CenterOrCurrentPosition, settings, onScreenEnemies, out autoAim);
                 }
@@ -187,7 +189,7 @@ namespace rinCore.Bullet
                     sender.CurrentPosition,
                     sender,
                     settings.relativeAim,
-                    1f,
+                    defaultDamage,
                     autoAim);
                 input.Sealable = true;
             }

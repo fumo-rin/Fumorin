@@ -41,7 +41,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha_Clipping: 0.5
+    - _Alpha_Clipping: 0.078
     - _FlashDuration: 0.08
     - _FlashTime: 0
     m_Colors:

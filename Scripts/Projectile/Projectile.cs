@@ -1,3 +1,4 @@
+using Codice.Client.Common.Locks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -320,16 +321,20 @@ namespace rinCore.Bullet
         static HashSet<int> grazedProjectiles;
         public static void ShiftAllProjectiles(IEnumerable<Projectile> projCollection, Vector2 shift)
         {
+            if (projCollection == null) return;
             foreach (var proj in projCollection)
             {
-                if (!proj.IsValid)
+                if (proj == null || !proj.IsValid)
                     continue;
 
                 proj._currentPosition += shift;
             }
         }
-        public static void ProcessBatch(IEnumerable<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
+        public static void ProcessBatch(List<Projectile> projCollection, float batchDT, Settings settings, Action<IProjectileHit> extraHitAction)
         {
+            if (projCollection == null || projCollection.Count == 0)
+                return;
+
             if (grazedProjectiles == null)
                 grazedProjectiles = new();
 
@@ -341,12 +346,14 @@ namespace rinCore.Bullet
             batchContactFilter.useTriggers = true;
             batchContactFilter.useLayerMask = true;
 
-            float dt;
-            foreach (var proj in projCollection)
+            int count = projCollection.Count;
+            for (int pIdx = 0; pIdx < count; pIdx++)
             {
-                dt = batchDT * proj.SpeedMod;
-                if (!proj.IsValid)
+                Projectile proj = projCollection[pIdx];
+                if (proj == null || !proj.IsValid)
                     continue;
+
+                float dt = batchDT * proj.SpeedMod;
 
                 if (settings.GlobalClear != null && settings.GlobalClear.clear.HasValue)
                 {
@@ -421,7 +428,6 @@ namespace rinCore.Bullet
 
                         if (multiHit)
                         {
-
                             ProjectileRenderer.HitParticle(hit.point, hit.normal, new()
                             {
                                 colorOverride = null,
@@ -513,7 +519,7 @@ namespace rinCore.Bullet
         public Color32? FlareColor;
         public Color32? FixedColorMod;
         public ProjectileDefine data;
-        public FumoUnit.UFaction Faction => Sender.AssignedFaction;
+        public FumoUnit.UFaction Faction => Sender == null ? FumoUnit.UFaction.Default : Sender.AssignedFaction;
         public float spawnTime;
         public float animationOffsetSeconds;
 
@@ -601,18 +607,39 @@ namespace rinCore.Bullet
                 this.Owner = Owner;
                 this.Distance = -1f;
                 this.Loot = 255;
+                this.Origin = Owner.CenterOrCurrentPosition;
             }
+            public SealPacket(Vector2 origin)
+            {
+                this.Owner = null;
+                this.Distance = -1f;
+                this.Loot = 255;
+                this.Origin = origin;
+            }
+            [HideInInspector]
+            public Vector2 Origin;
             public FumoUnit Owner;
             public float Distance;
             public byte Loot;
         }
         public static void SealWith(SealPacket sweep)
         {
-            ProjectileRunner.DestroyProjectiles(x =>
+            Predicate<Projectile> nullSweeper = (x) =>
+
+                sweep.Owner == null &&
+                x.IsValid &&
+                x.Sealable &&
+                sweep.Distance >= 0.05f && sweep.Origin.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance);
+
+            Predicate<Projectile> validItem = (x) =>
+
+                sweep.Owner != null &&
                 x.IsValid &&
                 x.Sealable &&
                 x.Sender == sweep.Owner &&
-                sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance),
+                sweep.Distance >= 0.05f && x.Sender.CurrentPosition.SquareDistanceToLessThan(x.FinalizedPosition, sweep.Distance);
+
+            ProjectileRunner.DestroyProjectiles(x => nullSweeper(x) || validItem(x),
                 p =>
                 {
                     if (p == null || p.Count == 0) return;
@@ -682,7 +709,8 @@ namespace rinCore.Bullet
             {
                 return false;
             }
-            if (sweep.Sweeping && b.Sender.AssignedFaction.IsHostileWith(FumoUnit.UFaction.Player))
+            FumoUnit.UFaction senderFaction = b.Sender == null ? FumoUnit.UFaction.Default : b.Sender.AssignedFaction;
+            if (sweep.Sweeping && senderFaction.IsHostileWith(FumoUnit.UFaction.Player))
             {
                 if (sweep.Loot > 0 && RNG.Byte255 < sweep.Loot)
                 {
