@@ -37,6 +37,24 @@ namespace rinCore
                 this.horizontalAlignment = HorizontalAlignmentOptions.Center;
                 this.verticalAlignment = VerticalAlignmentOptions.Bottom;
             }
+            public static textPacket DefaultValues
+            {
+                get
+                {
+                    return new()
+                    {
+                        fadeIn = 0.5f,
+                        fadeOut = 0.5f,
+                        duration = 2f,
+                        color = ColorHelper.Raw.White,
+                        a01 = new(0.3f, 0.5f),
+                        b01 = new(0.7f, 0.7f),
+                        fontSize = 20f,
+                        horizontalAlignment = HorizontalAlignmentOptions.Center,
+                        verticalAlignment = VerticalAlignmentOptions.Bottom,
+                    };
+                }
+            }
         }
         #endregion
 

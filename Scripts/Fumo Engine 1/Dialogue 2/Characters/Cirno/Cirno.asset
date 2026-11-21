@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Cirno
   m_EditorClassIdentifier: rinCore::RinCore.DialogueCharacterSO
   characterName: Cirno
-  sprite: {fileID: 21300000, guid: 41fabdc78580c044ebcbd6f180da8919, type: 3}
-  talkSprite: {fileID: 21300000, guid: 3ee4a28314ab82b44b17863ef2d5565f, type: 3}
+  sprite: {fileID: 21300000, guid: 6562a13e6e266684fa2c042ac71cbd5e, type: 3}
+  talkSprite: {fileID: 21300000, guid: 75d5015df7eb3d647b1ed75c487cd9da, type: 3}
   words:
     volume: 1
     speechClips:

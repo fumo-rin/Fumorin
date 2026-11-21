@@ -1163,6 +1163,17 @@
                 },
                 {
                     "name": "",
+                    "id": "ade06360-00f9-4c76-880b-ba9e7445be29",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select UI",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "abdd3e4f-ce83-4903-8fe8-2d0b72c59820",
                     "path": "<Keyboard>/z",
                     "interactions": "",

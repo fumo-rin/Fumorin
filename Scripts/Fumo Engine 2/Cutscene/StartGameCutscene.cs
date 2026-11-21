@@ -29,7 +29,19 @@ namespace rinCore
 
         [SerializeField] MusicWrapper cutsceneMusic;
         [SerializeField] Image cutsceneViewer;
-        [SerializeField] List<CutsceneItem> items = new();
+        [SerializeField]
+        List<CutsceneItem> items = new(9)
+        {
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+            new(){ textPacket = GameXYTextDisplay.textPacket.DefaultValues,},
+        };
         [SerializeField] ScenePairSO nextScene;
         [SerializeField] Button skipButton;
         bool skipped;
@@ -52,10 +64,17 @@ namespace rinCore
         {
             IEnumerator CO_Run()
             {
+                cutsceneViewer.sprite = items[0].cutsceneImage;
+                cutsceneViewer.color = ColorHelper.Raw.White.Opacity(255);
                 bool first = true;
                 yield return new WaitForSeconds(initialDelay);
+                if (cutsceneMusic != null)
+                {
+                    yield return MusicPlayer.FadeOutAndWait();
+                }
                 cutsceneMusic.Play();
 
+                if (skipButton != null) new FEB_EventSystem_SelectBuffered(skipButton.gameObject).Publish();
                 foreach (var item in items)
                 {
                     skipped = false;
