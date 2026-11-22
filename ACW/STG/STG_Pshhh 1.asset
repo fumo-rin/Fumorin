@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: STG_Pshhh 1
   m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
   SoundName: STG Pshhh 1
-  soundVolume: 0.87
+  soundVolume: 0.604
   <soundClips>k__BackingField:
   - clip: {fileID: 8300000, guid: f599011b85d475e498aed696ea1738d5, type: 3}
     PitchVariancePercent: 3

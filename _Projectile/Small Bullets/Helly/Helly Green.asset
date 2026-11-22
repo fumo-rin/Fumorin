@@ -23,7 +23,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   <LockRotation>k__BackingField: 0
-  AddedSortingLayer: -200
+  AddedSortingLayer: 400
   <CollisionRadius>k__BackingField: 0.05
   <Flare>k__BackingField: 1
   <FlareColor>k__BackingField:

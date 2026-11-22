@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a2e8f152cdd254ea1b3f5896d1546e, type: 3}
+  m_Name: STG_Sweep 1
+  m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
+  SoundName: STG Sweep 1
+  soundVolume: 1
+  <soundClips>k__BackingField:
+  - clip: {fileID: 8300000, guid: cb445ba3847158c46bb904194911e93d, type: 3}
+    PitchVariancePercent: 4.5
+    PitchOrigin: 5.03
+    Volume: 0.852
+    Muted: 0
+  - clip: {fileID: 8300000, guid: e777f11669564d748afec8130a516656, type: 3}
+    PitchVariancePercent: 4.5
+    PitchOrigin: 0.81
+    Volume: 1
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 2790318f3fcf86b40adadb459f6f7af2, type: 3}
+    PitchVariancePercent: 4.5
+    PitchOrigin: 0.2
+    Volume: 0.25
+    Muted: 0
+  - clip: {fileID: 8300000, guid: 2790318f3fcf86b40adadb459f6f7af2, type: 3}
+    PitchVariancePercent: 4.5
+    PitchOrigin: 1.5
+    Volume: 0.941
+    Muted: 0
+  <soundMode>k__BackingField: 20
+  <singleRepeatLockoutTime>k__BackingField: 0.016666668
+  <Is3D>k__BackingField: 1
+  IsNetworked: 0
+  <NetworkID>k__BackingField: 0

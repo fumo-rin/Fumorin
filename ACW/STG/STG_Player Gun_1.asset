@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: STG_Player Gun_1
   m_EditorClassIdentifier: rinCore::rinCore.ACWrapper
   SoundName: STG_Player Gun_1
-  soundVolume: 1
+  soundVolume: 0.632
   <soundClips>k__BackingField:
   - clip: {fileID: 8300000, guid: 06ba8215836d91940aa036364ccb87ab, type: 3}
     PitchVariancePercent: 11.9
