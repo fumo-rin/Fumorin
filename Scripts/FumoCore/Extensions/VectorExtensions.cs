@@ -286,6 +286,14 @@ namespace rinCore
         {
             return new(v.x, v.y, z);
         }
+        public static Vector2 X(this Vector2 v, float x)
+        {
+            return new(x, v.y);
+        }
+        public static Vector2 Y(this Vector2 v, float y)
+        {
+            return new(v.x, y);
+        }
         public static float CalculateTravelTime(this Vector2 v, float speed)
         {
             return v.magnitude / speed.Max(0.01f);

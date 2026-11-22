@@ -147,6 +147,26 @@ namespace rinCore
         }
     }
     #endregion
+    #region Managed Coroutines
+    public partial class FumoUnit
+    {
+        private Dictionary<string, Coroutine> managedRoutines;
+        public void StartTrackedRoutine(IEnumerator co, string key)
+        {
+            EndTrackedRoutine(key);
+            managedRoutines[key] = StartCoroutine(co.Wrap(() => EndTrackedRoutine(key)));
+        }
+        public void EndTrackedRoutine(string key)
+        {
+            managedRoutines ??= new();
+            if (managedRoutines.TryGetValue(key, out Coroutine c))
+            {
+                StopCoroutine(c);
+                managedRoutines.Remove(key);
+            }
+        }
+    }
+    #endregion
     #region Mover
     public partial class FumoUnit
     {
