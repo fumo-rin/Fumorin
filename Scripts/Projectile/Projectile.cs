@@ -1,4 +1,3 @@
-using Codice.Client.Common.Locks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
