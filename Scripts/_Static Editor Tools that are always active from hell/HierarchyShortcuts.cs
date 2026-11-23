@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine.SceneManagement;
 namespace rinCore
 {
+#if UNITY_EDITOR
 
     [InitializeOnLoad]
     public static class HierarchyShortcuts
@@ -184,4 +185,5 @@ namespace rinCore
             }
         }
     }
+#endif
 }

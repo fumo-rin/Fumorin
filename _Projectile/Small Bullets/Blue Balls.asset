@@ -18,7 +18,7 @@ MonoBehaviour:
   SortingLayer: Projectile
   particleTemplate: {fileID: 5905382930097071747, guid: 1515408bb2eac3a44a98151e2909e2f7, type: 3}
   Size: 0.75
-  FlareSizeMod: 1.65
+  FlareSizeMod: 1.35
   <ProjectileTint>k__BackingField:
     serializedVersion: 2
     rgba: 4294967295
