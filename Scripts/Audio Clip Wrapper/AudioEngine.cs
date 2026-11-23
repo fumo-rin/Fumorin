@@ -169,14 +169,14 @@ namespace rinCore
         private const string EffectsKey = "EffectsSFX";
         private const string MusicKey = "MusicSFX";
         private const string DialogueKey = "DialogueSFX";
-        public static float EffectsVolume { get; private set; } = 0.3f;
+        public static float EffectsVolume { get; private set; } = 0.4f;
         public static float MusicVolume { get; private set; } = 0.5f;
         public static float DialogueVolume { get; private set; } = 0.5f;
         private void LoadVolumeSettings()
         {
             Debug.Log("Loading Volume");
             if (!PersistentJSON.TryLoad(out float sfx, EffectsKey))
-                sfx = 0.3f;
+                sfx = 0.4f;
             EffectsVolume = sfx;
 
 
